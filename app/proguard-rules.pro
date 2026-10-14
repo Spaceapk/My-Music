@@ -71,3 +71,7 @@
 -keep class com.music.bitchord.playback.PlayerConnectionKt {
     public static androidx.media3.common.MediaItem toMediaItem(com.music.bitchord.data.model.Song);
 }
+
+# AndroidJUnitRunner calls Trace from its separate APK. Gradle excludes the
+# shared dependency from the runner, so it must survive shrinking in the app.
+-keep class androidx.tracing.** { *; }

@@ -3,7 +3,7 @@ set -euo pipefail
 trap 'timeout 10s adb logcat -d -b crash > device-crash-log.txt 2>&1 || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
 apk=${TEST_APP_APK:-$(find built -name '*prod*x86_64*debug.apk' -o -name '*prod*universal*debug.apk' | head -1)}
 if [ -z "$apk" ]; then apk=$(find built -path '*/prod/debug/*' -name '*universal*.apk' | head -1); fi
-test_apk=${TEST_INSTRUMENTATION_APK:-$(find built -name '*androidTest.apk' | head -1)}
+test_apk=${TEST_INSTRUMENTATION_APK:-$(find built -path '*/androidTest/prod/debug/*' -name '*.apk' | head -1)}
 test -n "$apk"
 test -n "$test_apk"
 timeout 180s adb install --no-incremental "$apk"

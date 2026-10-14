@@ -104,12 +104,12 @@ jobs:
           emulator-boot-timeout: 300
           emulator-options: -no-window -gpu swiftshader -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
           disable-animations: true
-          script: TEST_APP_APK=dist/test-release.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
+          script: TEST_APP_APK=dist/Star-Music-1.0.0-beta.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
       - name: Retain signed APK and verification evidence
         if: always() && steps.release.outputs.exists == 'false'
         uses: actions/upload-artifact@v4
         with:
-          name: star-signed-release-verified
+          name: star-signed-release-evidence
           path: |
             dist/Star-Music-1.0.0-beta.apk
             dist/signature-verification.txt
