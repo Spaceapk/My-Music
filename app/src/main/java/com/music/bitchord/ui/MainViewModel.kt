@@ -1386,6 +1386,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         if (_library.value is UiState.Success) refresh(Feed.LIBRARY)
     }
 
+    private var deviceLibraryJob: kotlinx.coroutines.Job? = null
+    private var deviceLibraryReloadPending = false
+
     init {
         startSearchPipeline()
         startSuggestPipeline()
@@ -1959,7 +1962,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      * are in the next answer; the last list stays up meanwhile.
      */
     fun loadLibrarySongs() {
-        viewModelScope.launch {
+        if (deviceLibraryJob?.isActive == true) {
+            deviceLibraryReloadPending = true
+            return
+        }
+        deviceLibraryJob = viewModelScope.launch {
+            do {
+                deviceLibraryReloadPending = false
             val context = getApplication<Application>()
             _librarySongs.value = if (!LocalMediaRepository.hasStoragePermission(context)) {
                 UiState.Error(text(R.string.storage_required_read))
@@ -1972,6 +1981,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     onFailure = { UiState.Error(text(R.string.no_local_audio_found)) },
                 )
             }
+            } while (deviceLibraryReloadPending)
         }
     }
 

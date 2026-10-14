@@ -10,7 +10,7 @@ timeout 180s adb install --no-incremental "$apk"
 timeout 180s adb install --no-incremental "$test_apk"
 adb shell svc wifi disable
 adb shell svc data disable
-timeout 120s adb shell am instrument -w -r -e class com.music.bitchord.DevicePlaylistStoreTest,com.music.bitchord.OfflinePlaylistPlaybackTest,com.music.bitchord.ExampleInstrumentedTest org.nexlibre.spacemusic.test/androidx.test.runner.AndroidJUnitRunner | tee device-tests.txt
+timeout 120s adb shell am instrument -w -r -e class com.music.bitchord.DevicePlaylistStoreTest,com.music.bitchord.OfflinePlaylistPlaybackTest,com.music.bitchord.ExampleInstrumentedTest,com.music.bitchord.LocalPlaybackServiceTest org.nexlibre.spacemusic.test/androidx.test.runner.AndroidJUnitRunner | tee device-tests.txt
 grep -q 'OK (' device-tests.txt
 ! grep -q 'FAILURES\|INSTRUMENTATION_FAILED\|shortMsg=' device-tests.txt
 timeout 15s adb shell svc wifi enable

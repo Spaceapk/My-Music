@@ -7376,7 +7376,7 @@ class PlaybackService : MediaLibraryService() {
         override fun onPlaybackResumption(
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
-        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> = scope.future(Dispatchers.IO) {
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> = scope.future(Dispatchers.Main.immediate) {
             // 1. If player currently holds items in its queue, resume from it
             val activePlayer = player
             if (activePlayer != null && activePlayer.mediaItemCount > 0) {
