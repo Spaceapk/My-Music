@@ -1942,7 +1942,7 @@ fun NowPlayingScreen(
                             lyricsLoadingText
                         },
                         status = lyricsTranslation.status,
-                        onStatusClick = { showLyricsProviders = true },
+                        onStatusClick = {},
                         picking = lyricPicker.picking,
                         pickBar = {
                             LyricsPickBar(
@@ -1953,20 +1953,10 @@ fun NowPlayingScreen(
                             )
                         },
                         romanizationToggle = {
-                            RomanizationToggleButton(
-                                state = lyricsTranslation.romanizationState,
-                                showingRomanization = lyricsTranslation.showingRomanization,
-                                enabled = !lyrics.isNullOrEmpty(),
-                                onClick = lyricsTranslation.toggleRomanization,
-                            )
+                            
                         },
                         translationToggle = {
-                            TranslationToggleButton(
-                                state = lyricsTranslation.translationState,
-                                showingTranslation = lyricsTranslation.showingTranslation,
-                                enabled = !lyrics.isNullOrEmpty(),
-                                onClick = lyricsTranslation.toggleTranslation,
-                            )
+                            
                         },
                     ) { panelModifier ->
                         LyricsTranslationMotion(
@@ -3339,26 +3329,14 @@ fun NowPlayingScreen(
                                 .align(Alignment.BottomStart)
                                 .graphicsLayer { alpha = translateFade },
                         ) {
-                            RomanizationToggleButton(
-                                state = lyricsTranslation.romanizationState,
-                                showingRomanization = lyricsTranslation.showingRomanization,
-                                enabled = translateShown && !lyrics.isNullOrEmpty(),
-                                onClick = lyricsTranslation.toggleRomanization,
-                            )
+                            
                         }
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
                                 .graphicsLayer { alpha = translateFade },
                         ) {
-                            TranslationToggleButton(
-                                state = lyricsTranslation.translationState,
-                                showingTranslation = lyricsTranslation.showingTranslation,
-                                // Not tappable on the way out: a disc at 20%
-                                // opacity is on its way to gone, not a target.
-                                enabled = translateShown && !lyrics.isNullOrEmpty(),
-                                onClick = lyricsTranslation.toggleTranslation,
-                            )
+                            
                         }
                     }
                     // The bar arrives and leaves without a transition of its own:
@@ -3514,7 +3492,7 @@ fun NowPlayingScreen(
             if (lyricsOpen) {
                 LyricsStatusWithChange(
                     status = lyricsTranslation.status,
-                    onStatusClick = { showLyricsProviders = true },
+                    onStatusClick = {},
                     modifier = Modifier
                         .fillMaxWidth()
                         .offset(y = 6.dp)
