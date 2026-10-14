@@ -477,6 +477,7 @@ private fun BitChordApp(
     // and the page is a sibling of the bar rather than a child.
     val navBarScroll = rememberFloatingTabBarScrollConnection()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    var spaceQuery by rememberSaveable { mutableStateOf("") }
     /**
      * Whether the player's sheet is up. The player is always a full-screen
      * take-over raised over the page, on every window size — the library
@@ -2306,16 +2307,7 @@ private fun BitChordApp(
                 songMenuOrigin = null
                 songActions = song
             },
-            onOpenAlbum = { id ->
-                dismissPlayer()
-                viewModel.openDetail(
-                    id,
-                    song.albumName ?: song.title,
-                    song.artist,
-                    song.thumbnailUrl,
-                    BrowseType.ALBUM,
-                )
-            },
+            onOpenAlbum = { _ -> dismissPlayer(); viewModel.clearDetail(); selectedTab = TAB_HOME; spaceQuery = song.albumName.orEmpty() },
             // A credit with a channel id opens that channel straight away.
             // YouTube does not give one to every credited artist - on a two-artist
             // track it linked only the first, and neither the byline nor the
@@ -2325,37 +2317,7 @@ private fun BitChordApp(
             //
             // No artwork: this track's cover isn't the artist's
             // picture, and the page fills its own in once loaded.
-            onOpenArtist = { id, name ->
-                dismissPlayer()
-                if (id != null) {
-                    viewModel.openDetail(
-                        id,
-                        name,
-                        context.getString(R.string.artist),
-                        null,
-                        BrowseType.ARTIST,
-                    )
-                } else {
-                    scope.launch {
-                        val found = YtMusicRepository.findArtistPageId(name).getOrNull()
-                        if (found != null) {
-                            viewModel.openDetail(
-                                found,
-                                name,
-                                context.getString(R.string.artist),
-                                null,
-                                BrowseType.ARTIST,
-                            )
-                        } else {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.couldnt_find, name),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        }
-                    }
-                }
-            },
+            onOpenArtist = { _, name -> dismissPlayer(); viewModel.clearDetail(); selectedTab = TAB_HOME; spaceQuery = name },
             onOpenPlaybackSource = openSource@{
                 val sourceType = displayedSong.playbackSourceType ?: PlaybackSourceType.QUEUE
                 val sourceTitle = displayedSong.playbackSource
@@ -2992,20 +2954,20 @@ private fun BitChordApp(
                     } else when (key.removePrefix(TAB_KEY).toIntOrNull() ?: selectedTab) {
                         TAB_HOME -> {
                             val deviceState by viewModel.deviceSongs.collectAsStateWithLifecycle()
-                            var localQuery by rememberSaveable { mutableStateOf("") }
+
                             val deviceSongs = (deviceState as? UiState.Success)?.data.orEmpty()
                             Column {
                                 if (!LocalMediaRepository.hasStoragePermission(context)) {
                                     androidx.compose.material3.Button(onClick = { mediaPermissionLauncher.launch(mediaPermission) }) { Text(stringResource(R.string.library)) }
                                 }
                                 androidx.compose.material3.OutlinedTextField(
-                                    value = localQuery, onValueChange = { localQuery = it },
+                                    value = spaceQuery, onValueChange = { spaceQuery = it },
                                     placeholder = { Text(stringResource(R.string.search)) },
                                     modifier = Modifier.fillMaxWidth().padding(top = listPadding.calculateTopPadding()).padding(horizontal = 16.dp),
                                     singleLine = true,
                                 )
                                 LocalMusicScreen(
-                                    songs = deviceSongs.filter { localQuery.isBlank() || it.title.contains(localQuery, true) || it.artist.contains(localQuery, true) },
+                                    songs = deviceSongs.filter { spaceQuery.isBlank() || it.title.contains(spaceQuery, true) || it.artist.contains(spaceQuery, true) || it.albumName.orEmpty().contains(spaceQuery, true) },
                                     currentSong = player.song, isPlaying = player.isPlaying,
                                     onSongClick = { songs, index -> playFrom(songs, index, QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) },
                                     onSongLongPress = openSongMenu,
