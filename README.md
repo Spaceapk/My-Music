@@ -8,7 +8,11 @@ Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a
 
 ## Estado
 
-Implementación inicial pendiente de verificación Android. No hay todavía un APK publicado y verificado de Space Music. GitHub Actions compila y prueba la aplicación; no se reutilizan las claves ni secretos de Star Music.
+**[Compilación verificada y APK de prueba](https://github.com/nexlibre/Space-Music/actions/runs/38640621164)**
+
+Pasaron las pruebas de regresión, lint, compilación, instalación y arranque en Android 13 (API 33), persistencia de listas y decodificación de audio local sin conexión. En los artefactos de la ejecución, `space-android-build` contiene los APK.
+
+El APK debug es una compilación de prueba con firma de desarrollo. La publicación definitiva con una clave estable y las pruebas manuales en teléfonos físicos siguen pendientes. No se reutilizan las claves ni secretos de Star Music.
 
 ## Licencia y créditos
 
