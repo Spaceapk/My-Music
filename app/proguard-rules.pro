@@ -61,3 +61,13 @@
 -dontwarn javax.script.**
 -dontwarn jdk.dynalink.**
 -dontwarn org.ietf.jgss.**
+
+# Star Music's signed-release instrumentation checks exercise the same persisted
+# models and local MediaItem conversion as the UI. Keep their public contract
+# available in the optimized APK so the independent test APK can call it.
+-keep class com.music.bitchord.data.DevicePlaylistStore { *; }
+-keep class com.music.bitchord.data.DevicePlaylist { *; }
+-keep class com.music.bitchord.data.model.Song { *; }
+-keep class com.music.bitchord.playback.PlayerConnectionKt {
+    public static androidx.media3.common.MediaItem toMediaItem(com.music.bitchord.data.model.Song);
+}

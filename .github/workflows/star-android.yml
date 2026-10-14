@@ -2,14 +2,14 @@ name: Star Music Android verification
 on:
   push:
     branches: [main]
-    paths-ignore: ['README.md', 'CHANGELOG.md', 'docs/**']
+    paths-ignore: ['README.md', 'CHANGELOG.md', 'docs/**', '.signing/**']
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
   group: star-android-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest

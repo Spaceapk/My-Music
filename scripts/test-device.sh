@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-apk=$(find built -name '*prod*x86_64*debug.apk' -o -name '*prod*universal*debug.apk' | head -1)
+apk=${TEST_APP_APK:-$(find built -name '*prod*x86_64*debug.apk' -o -name '*prod*universal*debug.apk' | head -1)}
 if [ -z "$apk" ]; then apk=$(find built -path '*/prod/debug/*' -name '*universal*.apk' | head -1); fi
-test_apk=$(find built -name '*androidTest.apk' | head -1)
+test_apk=${TEST_INSTRUMENTATION_APK:-$(find built -name '*androidTest.apk' | head -1)}
 test -n "$apk"
 test -n "$test_apk"
 adb install "$apk"
@@ -16,3 +16,4 @@ adb logcat -c
 adb shell am start -W -n org.nexlibre.starmusic/com.music.bitchord.MainActivity
 sleep 8
 ! adb logcat -d -b crash | grep -q 'FATAL EXCEPTION'
+adb shell pidof org.nexlibre.starmusic
