@@ -112,6 +112,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
             CoroutineScope(Dispatchers.IO).launch { Innertube.ensureSessionScope() }
         }
         AppSettings.init(this, authStore)
+        AppSettings.setAutoplay(false)
         AppSettings.setAnimatedCanvas(false)
         AppSettings.setLyricsSources(emptySet())
         // Before anything resolves a track: an addon with `checkValidLossless`

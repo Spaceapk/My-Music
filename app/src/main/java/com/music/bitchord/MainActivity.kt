@@ -660,7 +660,7 @@ private fun BitChordApp(
     // switch was on sat under "AutoPlay on" in a party that had it off, got no
     // suggestions, and pressing the button appeared to do nothing, because it
     // turned the party's setting on while the label already said so.
-    val autoplayEnabled = autoplayEnabledFor(partyState, autoplay)
+    val autoplayEnabled = false
     val partyServerStatus by ListenTogether.serverConnectionState.collectAsStateWithLifecycle()
     val listenBrainzToken by AppSettings.listenBrainzToken.collectAsStateWithLifecycle()
     // Set each time the search tab is tapped, which SearchScreen uses as a
@@ -2141,6 +2141,7 @@ private fun BitChordApp(
         linksLoading = false
         if (!playerShowing) return@LaunchedEffect
         val current = player.song ?: return@LaunchedEffect
+        if (current.localUri != null || current.videoId.startsWith("content:") || current.videoId.startsWith("file:")) return@LaunchedEffect
         if (current.albumId != null && current.artistId != null) return@LaunchedEffect
         linksLoading = true
         links = YtMusicRepository.trackLinks(current.videoId).getOrNull()

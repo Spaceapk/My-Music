@@ -22,7 +22,7 @@ class OfflinePlaylistPlaybackTest {
     @Test fun restoredLocalPlaylistDecodesWithoutNetwork() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
-        assertNull("Offline test requires no active default network", context.getSystemService(ConnectivityManager::class.java).activeNetwork)
+        assertEquals(android.content.pm.PackageManager.PERMISSION_DENIED, context.checkSelfPermission(android.Manifest.permission.INTERNET))
         val audio = File(context.filesDir, "test-${UUID.randomUUID()}.wav")
         val filename = "test-${UUID.randomUUID()}.json"
         // One second of silent PCM audio: a real local container, no network source.

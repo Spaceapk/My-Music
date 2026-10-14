@@ -1402,6 +1402,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
         viewModelScope.launch {
             AppSettings.filterNonMusicAudio.drop(1).collect {
+                loadLibrarySongs()
                 if (_detailStack.value.any { page -> page.browseId == "local:all" }) {
                     reloadLocalDetail("local:all")
                 }
