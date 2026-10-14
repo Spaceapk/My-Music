@@ -2996,7 +2996,7 @@ private fun BitChordApp(
                             val deviceSongs = (deviceState as? UiState.Success)?.data.orEmpty()
                             Column {
                                 if (!LocalMediaRepository.hasStoragePermission(context)) {
-                                    Button(onClick = { mediaPermissionLauncher.launch(mediaPermission) }) { Text(stringResource(R.string.library)) }
+                                    androidx.compose.material3.Button(onClick = { mediaPermissionLauncher.launch(mediaPermission) }) { Text(stringResource(R.string.library)) }
                                 }
                                 androidx.compose.material3.OutlinedTextField(
                                     value = localQuery, onValueChange = { localQuery = it },
