@@ -1,0 +1,36 @@
+name: Import authorized Space Music source
+on:
+  push:
+    paths: ['.github/workflows/space-import.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Import pinned Star Music and preserve both histories
+        run: |
+          set -euo pipefail
+          bootstrap_sha=$(git rev-parse HEAD)
+          cp bootstrap/space-local.patch /tmp/space-local.patch
+          cp .github/workflows/space-import.yml /tmp/space-import.yml
+          git config user.name nexlibre
+          git config user.email 134002775+nexlibre@users.noreply.github.com
+          git remote add star https://github.com/nexlibre/Star-Music.git
+          git fetch star main
+          git checkout --detach d9872774a835c919bfc487058358f490950d9483
+          git apply --check /tmp/space-local.patch
+          git apply /tmp/space-local.patch
+          git add -A
+          git commit -m 'Create independent local-only Space Music'
+          git merge -s ours --no-commit --allow-unrelated-histories "$bootstrap_sha"
+          rm -rf .github/workflows .signing bootstrap
+          mkdir -p .github/workflows
+          cp /tmp/space-import.yml .github/workflows/space-import.yml
+          git add -A
+          git commit -m 'Import authorized Space Music while retaining source history'
+          git push origin HEAD:main
