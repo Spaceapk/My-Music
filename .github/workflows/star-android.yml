@@ -28,10 +28,14 @@ jobs:
         run: |
           sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'cmake;3.22.1'
           if [ ! -d "$ANDROID_HOME/platforms/android-37" ]; then ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"; fi
-      - name: Build and run regression tests
+      - name: Regression tests
         run: |
           chmod +x gradlew
-          ./gradlew :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdRelease :app:assembleProdDebug :app:assembleProdDebugAndroidTest --stacktrace
+          ./gradlew :shared:jvmTest :app:testProdDebugUnitTest --stacktrace
+      - name: Android lint verification
+        run: ./gradlew :app:lintProdDebug :app:lintVitalProdRelease --stacktrace
+      - name: Build release and test APKs
+        run: ./gradlew :app:assembleProdRelease :app:assembleProdDebug :app:assembleProdDebugAndroidTest --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:

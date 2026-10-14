@@ -1,6 +1,7 @@
 package com.music.bitchord
 
 import android.net.Uri
+import android.net.ConnectivityManager
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.common.Player
 import androidx.test.platform.app.InstrumentationRegistry
@@ -21,6 +22,7 @@ class OfflinePlaylistPlaybackTest {
     @Test fun restoredLocalPlaylistDecodesWithoutNetwork() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
+        assertNull("Offline test requires no active default network", context.getSystemService(ConnectivityManager::class.java).activeNetwork)
         val audio = File(context.filesDir, "test-${UUID.randomUUID()}.wav")
         val filename = "test-${UUID.randomUUID()}.json"
         // One second of silent PCM audio: a real local container, no network source.
