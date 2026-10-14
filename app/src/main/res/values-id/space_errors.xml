@@ -1,0 +1,3 @@
+<resources>
+    <string name="space_local_playback_error">File audio ini tidak dapat diputar. Periksa akses ke file atau pilih lagu lain.</string>
+</resources>

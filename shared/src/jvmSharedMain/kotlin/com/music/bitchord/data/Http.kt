@@ -37,6 +37,26 @@ import java.util.concurrent.atomic.AtomicLong
  * request was slow.
  */
 object Http {
+    @Volatile
+    var networkRequestsEnabled: Boolean = true
+        private set
+
+    /** Installed by Space Music before any application feature starts. */
+    fun disableNetworkRequests() {
+        networkRequestsEnabled = false
+        client.dispatcher.cancelAll()
+    }
+
+    private val networkPolicyInterceptor = okhttp3.Interceptor { chain ->
+        if (!networkRequestsEnabled) {
+            // OkHttp delivers IOExceptions to onFailure. A missing Android
+            // INTERNET permission instead throws SecurityException on its
+            // worker thread and can terminate the whole application.
+            throw java.io.IOException("Network requests are disabled in Space Music")
+        }
+        chain.proceed(chain.request())
+    }
+
 
     // ---- Temporary data-usage instrumentation --------------------------
     //
@@ -136,6 +156,7 @@ object Http {
         .retryOnConnectionFailure(true)
         .dispatcher(Dispatcher().apply { maxRequestsPerHost = 16 })
         .connectionPool(ConnectionPool(16, 5, TimeUnit.MINUTES))
+        .addInterceptor(networkPolicyInterceptor)
         .addInterceptor(webDavInterceptor)
         .apply { if (USAGE_LOGGING_ENABLED) addNetworkInterceptor(usageInterceptor) }
         .build()

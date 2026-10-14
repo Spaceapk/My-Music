@@ -26,6 +26,27 @@ class ExampleInstrumentedTest {
     }
 
     @Test
+    fun strayAsyncNetworkRequestFailsWithoutCrashing() {
+        assertFalse(com.music.bitchord.data.Http.networkRequestsEnabled)
+        val completed = java.util.concurrent.CountDownLatch(1)
+        val failure = java.util.concurrent.atomic.AtomicReference<java.io.IOException?>()
+        val request = okhttp3.Request.Builder().url("https://example.invalid/").build()
+        com.music.bitchord.data.Http.client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                failure.set(e)
+                completed.countDown()
+            }
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                response.close()
+                completed.countDown()
+            }
+        })
+        assertTrue(completed.await(5, java.util.concurrent.TimeUnit.SECONDS))
+        assertNotNull(failure.get())
+        assertTrue(failure.get()!!.message.orEmpty().contains("disabled"))
+    }
+
+    @Test
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext

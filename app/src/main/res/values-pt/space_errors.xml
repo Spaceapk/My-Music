@@ -1,0 +1,3 @@
+<resources>
+    <string name="space_local_playback_error">Não foi possível reproduzir este arquivo de áudio. Verifique o acesso ao arquivo ou selecione outra música.</string>
+</resources>

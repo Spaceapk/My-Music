@@ -3,6 +3,8 @@ package com.music.bitchord
 import android.app.Application
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import com.music.bitchord.data.Http
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -44,6 +46,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
     @OptIn(UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
+        Http.disableNetworkRequests()
         // The player is drawn by the shared UI module; this is what it reads
         // underneath — settings, the Canvas decoder, outputs, the party.
         // Disabled for the local-only Space Music application: AndroidStreamHooks.installEarly()
@@ -182,6 +185,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
             // Coil's own transport never sees Http.client's interceptor, so
             // the header is attached per request instead. See WebDavCoilAuth.
             .components {
+                add(OkHttpNetworkFetcherFactory(callFactory = Http.client))
                 add(WebDavCoilAuth())
                 // Covers filed on the SMB share; anything else falls
                 // through to Coil's own fetchers. See SmbCoverFetcher.

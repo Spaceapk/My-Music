@@ -1969,18 +1969,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         deviceLibraryJob = viewModelScope.launch {
             do {
                 deviceLibraryReloadPending = false
-            val context = getApplication<Application>()
-            _librarySongs.value = if (!LocalMediaRepository.hasStoragePermission(context)) {
-                UiState.Error(text(R.string.storage_required_read))
-            } else {
-                runCatching { LocalMediaRepository.getLocalMusic(context) }.fold(
-                    onSuccess = { songs ->
-                        if (songs.isEmpty()) UiState.Error(text(R.string.no_local_audio_found))
-                        else UiState.Success(songs)
-                    },
-                    onFailure = { UiState.Error(text(R.string.no_local_audio_found)) },
-                )
-            }
+                val context = getApplication<Application>()
+                _librarySongs.value = if (!LocalMediaRepository.hasStoragePermission(context)) {
+                    UiState.Error(text(R.string.storage_required_read))
+                } else {
+                    runCatching { LocalMediaRepository.getLocalMusic(context) }.fold(
+                        onSuccess = { songs ->
+                            if (songs.isEmpty()) UiState.Error(text(R.string.no_local_audio_found))
+                            else UiState.Success(songs)
+                        },
+                        onFailure = { UiState.Error(text(R.string.no_local_audio_found)) },
+                    )
+                }
             } while (deviceLibraryReloadPending)
         }
     }

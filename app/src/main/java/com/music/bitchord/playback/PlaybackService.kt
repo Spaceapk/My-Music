@@ -3173,6 +3173,14 @@ class PlaybackService : MediaLibraryService() {
         val mediaId = item.mediaId
         val uri = item.localConfiguration?.uri
         val position = player.currentPosition.coerceAtLeast(0L)
+        // Local files cannot be repaired by resolving an online replacement.
+        // Leave the error visible and let the listener choose another file.
+        if (isLocalPlayback(mediaId, item)) {
+            TrackLog.w("BitChord", "local playback failed for $mediaId (${error.errorCodeName})", error, about = mediaId)
+            player.pause()
+            Toast.makeText(this, R.string.space_local_playback_error, Toast.LENGTH_LONG).show()
+            return
+        }
         val attempts = recoveries.getOrDefault(mediaId, 0) + 1
         recoveries[mediaId] = attempts
         TrackLog.w(
@@ -5294,61 +5302,9 @@ class PlaybackService : MediaLibraryService() {
      * tracks is more than it does anything with, but it decides that, not this.
      */
     private fun prefetchAround(player: ExoPlayer) {
-        val nextIndex = player.nextMediaItemIndex
-        val upcomingSongs = if (nextIndex != C.INDEX_UNSET) {
-            val end = (nextIndex + AudioCache.QUEUE_DEPTH - 1).coerceAtMost(player.mediaItemCount - 1)
-            (nextIndex..end).map { index -> player.getMediaItemAt(index).toSong() }
-        } else {
-            emptyList()
-        }
-        // So whatever read-ahead writes for these can be named in the Cached
-        // songs folder; its own requests carry nothing but an id.
-        AudioCache.noteSongs(upcomingSongs)
-        val preferAudio = AppSettings.preferMusicOnly.value
-        val request = preferAudio to upcomingSongs.map { it.videoId }
-        if (request == preferredPrefetchRequest) return
-        preferredPrefetchRequest = request
-        preferredPrefetchJob?.cancel()
-
-        fun warm(songs: List<Song>) {
-            AudioCache.prefetchQueue(
-                songs.map { song ->
-                    // The title, artist and runtime the item was built with —
-                    // see [Song.toMediaItem]. Read from the queued item because
-                    // read-ahead has no other way to reach this metadata.
-                    AudioCache.Upcoming(
-                        mediaId = song.videoId,
-                        target = TrackMatcher.targetOf(song),
-                    )
-                },
-            )
-        }
-
-        val next = upcomingSongs.firstOrNull()
-        if (!preferAudio || next?.isVideo != true) {
-            preferredPrefetchJob = null
-            warm(upcomingSongs)
-            return
-        }
-
-        // Do not warm the video's bytes while its catalogue lookup is in
-        // flight: if that lookup succeeds, playback will ask for a different
-        // media id and every byte spent on the video would be wasted. An
-        // unchanged result is the fallback and is warmed on the same path.
-        AudioCache.cancel()
-        preferredPrefetchJob = scope.launch {
-            val preferred = runCatching { YtMusicRepository.resolveAudio(next) }
-                .onFailure {
-                    TrackLog.d(
-                        "BitChord",
-                        "music-only queue warm-up fell back to video: ${it.message}",
-                        about = next.videoId,
-                    )
-                }
-                .getOrDefault(next)
-            if (preferredPrefetchRequest != request) return@launch
-            warm(listOf(preferred) + upcomingSongs.drop(1))
-        }
+        // Local files are already on disk. The inherited queue warmer drops
+        // their local URI and incorrectly asks online resolvers for their IDs.
+        cancelPrefetch()
     }
 
     /** Stops both rendition selection and byte read-ahead, and makes resume retry. */
