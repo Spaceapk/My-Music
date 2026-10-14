@@ -67,7 +67,7 @@ val listenTogetherServer: String = (
  * comes. Blanking this line is the one step that turns a beta into a release,
  * so it is the one place to get right.
  */
-val betaSuffix = ""
+val betaSuffix = "beta"
 
 android {
     namespace = "com.music.bitchord"
@@ -75,13 +75,13 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.music.bitchord"
+        applicationId = "org.nexlibre.starmusic"
         // 26 keeps reach wide; real-time blur (RenderEffect) kicks in on API 31+,
         // Haze falls back to a translucent scrim below that.
         minSdk = 26
         targetSdk = 36
-        versionCode = 26
-        versionName = "1.8"
+        versionCode = 1
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -118,8 +118,8 @@ android {
     productFlavors {
         create("dev") {
             dimension = "env"
-            applicationId = "com.dev.bitchord"
-            resValue("string", "app_name", "BitChord Dev")
+            applicationId = "org.nexlibre.starmusic.dev"
+            resValue("string", "app_name", "Star Music Dev")
         }
         create("prod") {
             dimension = "env"

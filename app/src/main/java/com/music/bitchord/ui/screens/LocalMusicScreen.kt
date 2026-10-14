@@ -121,6 +121,7 @@ import java.util.Locale
 private const val LOCAL_TAB_SONGS = 0
 private const val LOCAL_TAB_ARTISTS = 1
 private const val LOCAL_TAB_ALBUMS = 2
+private const val LOCAL_TAB_PLAYLISTS = 3
 
 /**
  * Local Music folder view with three tabs: Songs (default), Artists, Albums.
@@ -351,6 +352,12 @@ fun LocalMusicScreen(
                     leaveDrillDown()
                 },
             )
+            if (!isDownloads) LocalTab(
+                icon = Icons.AutoMirrored.Rounded.QueueMusic,
+                label = stringResource(R.string.playlists),
+                selected = selectedTab == LOCAL_TAB_PLAYLISTS,
+                onClick = { selectedTab = LOCAL_TAB_PLAYLISTS; leaveDrillDown() },
+            )
         }
 
         // ── Content ──────────────────────────────────────────────────────────
@@ -369,6 +376,9 @@ fun LocalMusicScreen(
             modifier = Modifier.fillMaxSize(),
         ) { key ->
             when {
+                key == "tab:$LOCAL_TAB_PLAYLISTS" && !isDownloads -> {
+                    DevicePlaylistsTab(songs, onSongClick, bodyContentPadding)
+                }
                 // Nothing to tab through. The tab row stays put rather than
                 // being swapped out with the list, so the page still reads as
                 // itself while it says why it's empty.
