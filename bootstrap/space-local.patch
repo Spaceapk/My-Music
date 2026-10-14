@@ -554,10 +554,18 @@ index 2c606f0..0c1bf62 100644
      }
  
 diff --git a/app/src/main/java/com/music/bitchord/MainActivity.kt b/app/src/main/java/com/music/bitchord/MainActivity.kt
-index a1f42d5..b710ee5 100644
+index a1f42d5..b5617d7 100644
 --- a/app/src/main/java/com/music/bitchord/MainActivity.kt
 +++ b/app/src/main/java/com/music/bitchord/MainActivity.kt
-@@ -338,9 +338,9 @@ class MainActivity : AppCompatActivity() {
+@@ -280,6 +280,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
+ import androidx.compose.ui.unit.IntOffset
+ import androidx.compose.foundation.layout.offset
+ import com.music.bitchord.ui.components.MiniPlayerPull
++import androidx.compose.material.icons.rounded.Settings
+ import androidx.compose.runtime.DisposableEffect
+ import androidx.compose.ui.layout.onSizeChanged
+ import com.music.bitchord.ui.player.LocalPlayerDock
+@@ -338,9 +339,9 @@ class MainActivity : AppCompatActivity() {
          // Before the composition, so a cold launch from a widget's artwork has
          // the request already standing by the time BitChordApp first reads it.
          PlayerDeepLink.consume(intent)
@@ -569,7 +577,7 @@ index a1f42d5..b710ee5 100644
          setContent {
              val theme by AppSettings.themeMode.collectAsStateWithLifecycle()
              val highPerformance by AppSettings.highPerformanceMode.collectAsStateWithLifecycle()
-@@ -434,8 +434,8 @@ class MainActivity : AppCompatActivity() {
+@@ -434,8 +435,8 @@ class MainActivity : AppCompatActivity() {
          // one that just arrived and not the one the task was started with.
          setIntent(intent)
          PlayerDeepLink.consume(intent)
@@ -580,7 +588,7 @@ index a1f42d5..b710ee5 100644
      }
  }
  
-@@ -1088,12 +1088,7 @@ private fun BitChordApp(
+@@ -1088,12 +1089,7 @@ private fun BitChordApp(
      val queueLabel = stringResource(R.string.queue)
      val sharedLinkLabel = stringResource(R.string.shared_link)
      val tabs = remember(homeLabel, exploreLabel, libraryLabel, searchLabel) {
@@ -594,7 +602,7 @@ index a1f42d5..b710ee5 100644
      }
  
      val scope = rememberCoroutineScope()
-@@ -1909,6 +1904,18 @@ private fun BitChordApp(
+@@ -1909,6 +1905,18 @@ private fun BitChordApp(
      } else {
          Manifest.permission.READ_EXTERNAL_STORAGE
      }
@@ -613,7 +621,7 @@ index a1f42d5..b710ee5 100644
      // The Search tab's Library source reads the Local Music folder, so it asks
      // for the same permission opening that folder does.
      val onSearchSourceChange: (SearchSource) -> Unit = { source ->
-@@ -2981,43 +2988,32 @@ private fun BitChordApp(
+@@ -2981,43 +2989,32 @@ private fun BitChordApp(
                              contentPadding = listPadding,
                          )
                      } else when (key.removePrefix(TAB_KEY).toIntOrNull() ?: selectedTab) {
@@ -682,7 +690,7 @@ index a1f42d5..b710ee5 100644
                          TAB_EXPLORE -> selectedMoodGenre?.let { category ->
                              MoodGenrePlaylistsScreen(
                                  title = category.title,
-@@ -3694,17 +3690,10 @@ private fun BitChordApp(
+@@ -3694,17 +3691,10 @@ private fun BitChordApp(
                              // there is a batch to report on — see
                              // [TopBarDownloadButton], which decides that for
                              // itself rather than being told.
@@ -704,7 +712,7 @@ index a1f42d5..b710ee5 100644
                          }
                      },
                  )
-@@ -4133,7 +4122,7 @@ private fun BitChordApp(
+@@ -4133,7 +4123,7 @@ private fun BitChordApp(
              // The library toggle needs tokens only YouTube can mint, and the
              // rating it comes back with is more authoritative than anything
              // the library feed knew — so the menu asks as it opens.
@@ -713,6 +721,20 @@ index a1f42d5..b710ee5 100644
              // "Remove from this playlist" is only a sentence on a playlist
              // page the account can actually edit, and only for a row that
              // carries the per-entry id a removal is expressed in.
+diff --git a/app/src/main/java/com/music/bitchord/playback/cast/CastController.kt b/app/src/main/java/com/music/bitchord/playback/cast/CastController.kt
+index 2456957..7c49b01 100644
+--- a/app/src/main/java/com/music/bitchord/playback/cast/CastController.kt
++++ b/app/src/main/java/com/music/bitchord/playback/cast/CastController.kt
+@@ -111,6 +111,9 @@ object CastController {
+      * the Cast row never appears.
+      */
+     fun ensureStarted(context: Context) {
++        // Space Music has no network playback destinations.
++        return
++        @Suppress("UNREACHABLE_CODE")
+         if (started) return
+         started = true
+         val app = context.applicationContext
 diff --git a/app/src/main/java/com/music/bitchord/ui/MainViewModel.kt b/app/src/main/java/com/music/bitchord/ui/MainViewModel.kt
 index efc0a64..30d32a6 100644
 --- a/app/src/main/java/com/music/bitchord/ui/MainViewModel.kt
@@ -4592,3 +4614,27 @@ index f4a26dd..8d4583f 100644
      <string name="listen_together_switch_failed_stayed_in_party">Couldn’t join party: %1$s. Remaining in party %2$s.</string>
      <string name="listen_together_switch_failed">Couldn’t join party: %1$s.</string>
      <string name="listen_together_ping">%1$d ms</string>
+diff --git a/scripts/test-device.sh b/scripts/test-device.sh
+index eb00785..587e270 100755
+--- a/scripts/test-device.sh
++++ b/scripts/test-device.sh
+@@ -10,7 +10,7 @@ timeout 180s adb install --no-incremental "$apk"
+ timeout 180s adb install --no-incremental "$test_apk"
+ adb shell svc wifi disable
+ adb shell svc data disable
+-timeout 120s adb shell am instrument -w -r -e class com.music.bitchord.DevicePlaylistStoreTest,com.music.bitchord.OfflinePlaylistPlaybackTest,com.music.bitchord.ExampleInstrumentedTest org.nexlibre.starmusic.test/androidx.test.runner.AndroidJUnitRunner | tee device-tests.txt
++timeout 120s adb shell am instrument -w -r -e class com.music.bitchord.DevicePlaylistStoreTest,com.music.bitchord.OfflinePlaylistPlaybackTest,com.music.bitchord.ExampleInstrumentedTest org.nexlibre.spacemusic.test/androidx.test.runner.AndroidJUnitRunner | tee device-tests.txt
+ grep -q 'OK (' device-tests.txt
+ ! grep -q 'FAILURES\|INSTRUMENTATION_FAILED\|shortMsg=' device-tests.txt
+ timeout 15s adb shell svc wifi enable
+@@ -19,8 +19,8 @@ timeout 15s adb logcat -c
+ (timeout 90s adb logcat -v threadtime > device-startup-log.txt 2>&1) &
+ startup_logger=$!
+ trap 'kill "$startup_logger" 2>/dev/null || true; timeout 10s adb logcat -d -b crash > device-crash-log.txt 2>&1 || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
+-timeout 60s adb shell am start -W -n org.nexlibre.starmusic/com.music.bitchord.MainActivity
++timeout 60s adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
+ sleep 12
+ timeout 15s adb logcat -d -b crash > device-crash-log.txt
+ ! grep -q 'FATAL EXCEPTION' device-crash-log.txt
+-timeout 15s adb shell pidof org.nexlibre.starmusic
++timeout 15s adb shell pidof org.nexlibre.spacemusic
