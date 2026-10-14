@@ -97,6 +97,11 @@ jobs:
         with:
           api-level: 35
           arch: x86_64
+          cores: 4
+          ram-size: 3072M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swiftshader -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
           disable-animations: true
           script: TEST_APP_APK=dist/test-release.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
       - name: Retain signed APK and verification evidence
