@@ -3000,7 +3000,7 @@ private fun BitChordApp(
                                 androidx.compose.material3.OutlinedTextField(
                                     value = localQuery, onValueChange = { localQuery = it },
                                     placeholder = { Text(stringResource(R.string.search)) },
-                                    modifier = Modifier.fillMaxWidth().padding(listPadding).padding(horizontal = 16.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(top = listPadding.calculateTopPadding()).padding(horizontal = 16.dp),
                                     singleLine = true,
                                 )
                                 LocalMusicScreen(

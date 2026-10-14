@@ -16,6 +16,16 @@ import org.junit.Assert.*
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
     @Test
+    fun localOnlyApplicationCannotAccessNetwork() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val permissions = context.packageManager.getPackageInfo(
+            context.packageName, android.content.pm.PackageManager.GET_PERMISSIONS,
+        ).requestedPermissions.orEmpty()
+        assertFalse(permissions.contains(android.Manifest.permission.INTERNET))
+        assertFalse(permissions.contains(android.Manifest.permission.ACCESS_NETWORK_STATE))
+    }
+
+    @Test
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext

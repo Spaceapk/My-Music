@@ -121,7 +121,7 @@ android {
         create("dev") {
             dimension = "env"
             applicationId = "org.nexlibre.spacemusic.dev"
-            resValue("string", "app_name", "Star Music Dev")
+            resValue("string", "app_name", "Space Music Dev")
         }
         create("prod") {
             dimension = "env"
