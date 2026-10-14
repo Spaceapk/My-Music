@@ -114,6 +114,8 @@ jobs:
             dist/Star-Music-1.0.0-beta.apk
             dist/signature-verification.txt
             device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
       - name: Publish beta after all checks pass
         if: steps.release.outputs.exists == 'false'
         env:
