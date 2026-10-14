@@ -36,6 +36,8 @@ jobs:
         run: ./gradlew :app:lintProdDebug :app:lintVitalProdRelease --build-cache --stacktrace
       - name: Build release and test APKs
         run: ./gradlew :app:assembleProdRelease :app:assembleProdDebug :app:assembleProdDebugAndroidTest --build-cache --stacktrace
+      - name: Build instrumentation for the optimized release
+        run: ./gradlew :app:assembleProdReleaseAndroidTest -PstarTestBuildType=release --build-cache --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:

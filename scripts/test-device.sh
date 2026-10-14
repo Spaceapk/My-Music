@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-trap 'timeout 10s adb logcat -d -b crash || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
+trap 'timeout 10s adb logcat -d -b crash > device-crash-log.txt 2>&1 || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
 apk=${TEST_APP_APK:-$(find built -name '*prod*x86_64*debug.apk' -o -name '*prod*universal*debug.apk' | head -1)}
 if [ -z "$apk" ]; then apk=$(find built -path '*/prod/debug/*' -name '*universal*.apk' | head -1); fi
 test_apk=${TEST_INSTRUMENTATION_APK:-$(find built -name '*androidTest.apk' | head -1)}
@@ -18,7 +18,7 @@ timeout 15s adb shell svc data enable
 timeout 15s adb logcat -c
 (timeout 90s adb logcat -v threadtime > device-startup-log.txt 2>&1) &
 startup_logger=$!
-trap 'kill "$startup_logger" 2>/dev/null || true; timeout 10s adb logcat -d -b crash || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
+trap 'kill "$startup_logger" 2>/dev/null || true; timeout 10s adb logcat -d -b crash > device-crash-log.txt 2>&1 || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
 timeout 60s adb shell am start -W -n org.nexlibre.starmusic/com.music.bitchord.MainActivity
 sleep 12
 timeout 15s adb logcat -d -b crash > device-crash-log.txt

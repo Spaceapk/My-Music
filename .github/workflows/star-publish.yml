@@ -76,7 +76,7 @@ jobs:
           mkdir -p dist
           universal=$(find built -path '*/prod/release/*' -name '*universal*.apk' | head -1)
           x86=$(find built -path '*/prod/release/*' -name '*x86_64*.apk' | head -1)
-          tests=$(find built -name '*androidTest.apk' | head -1)
+          tests=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
           test -n "$universal"; test -n "$x86"; test -n "$tests"
           signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
           "$signer" sign --ks .signing/star-release.p12 --ks-key-alias star-music --ks-pass env:STAR_PASSWORD --key-pass env:STAR_PASSWORD --out dist/Star-Music-1.0.0-beta.apk "$universal"
@@ -116,6 +116,7 @@ jobs:
             device-tests.txt
             device-startup-log.txt
             device-crash-log.txt
+            device-full-log.txt
       - name: Publish beta after all checks pass
         if: steps.release.outputs.exists == 'false'
         env:
