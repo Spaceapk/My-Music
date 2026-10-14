@@ -1266,4 +1266,6 @@
     <string name="star_delete_playlist">¿Eliminar esta lista? Se conservarán tus archivos de audio.</string>
     <string name="star_playlist_hint">Crea una lista y añade música de este dispositivo. No necesitas cuenta ni conexión.</string>
     <string name="star_save_error">No se pudo guardar la lista</string>
+    <string name="chinese_simplified">Chino simplificado</string>
+    <string name="chinese_traditional">Chino tradicional</string>
 </resources>

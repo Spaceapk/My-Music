@@ -1326,4 +1326,6 @@
     <string name="star_delete_playlist">Удалить плейлист? Аудиофайлы сохранятся.</string>
     <string name="star_playlist_hint">Создайте плейлист из музыки на устройстве. Аккаунт и интернет не нужны.</string>
     <string name="star_save_error">Не удалось сохранить плейлист</string>
+    <string name="chinese_simplified">Китайский (упрощённый)</string>
+    <string name="chinese_traditional">Китайский (традиционный)</string>
 </resources>

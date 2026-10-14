@@ -8,5 +8,6 @@ Base: BitChord, commit fe95bb60aa9cd205cf4ab8bd25a5bec71a595b4f.
 - Persistencia atómica de metadatos, URI y ruta local, sin llamadas a servicios en línea.
 - Actualizador Android dirigido al repositorio de Star Music.
 - Automatización independiente para verificar, compilar y preparar el APK.
+- Ajustes necesarios para verificar la base importada: SDK 37.0, nombres de chino simplificado/tradicional y etiquetas de región en las pruebas de idiomas. La prueba de integración con Genius queda disponible mediante RUN_LIVE_GENIUS_TESTS=true; sus pruebas de análisis local se mantienen obligatorias.
 
 Estado: pendiente de completar y verificar compilación, pruebas Android, firma y publicación.

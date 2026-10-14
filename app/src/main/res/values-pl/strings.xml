@@ -1334,4 +1334,6 @@
     <string name="star_delete_playlist">Usunąć tę listę? Pliki audio zostaną zachowane.</string>
     <string name="star_playlist_hint">Utwórz listę z muzyką na tym urządzeniu, bez konta i połączenia.</string>
     <string name="star_save_error">Nie udało się zapisać listy</string>
+    <string name="chinese_simplified">Chiński uproszczony</string>
+    <string name="chinese_traditional">Chiński tradycyjny</string>
 </resources>

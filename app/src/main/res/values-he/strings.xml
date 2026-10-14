@@ -1299,4 +1299,6 @@
     <string name="star_delete_playlist">למחוק רשימה זו? קובצי השמע יישמרו.</string>
     <string name="star_playlist_hint">יצירת רשימה ממוזיקה במכשיר, ללא חשבון או חיבור.</string>
     <string name="star_save_error">לא ניתן לשמור את הרשימה</string>
+    <string name="chinese_simplified">סינית מפושטת</string>
+    <string name="chinese_traditional">סינית מסורתית</string>
 </resources>

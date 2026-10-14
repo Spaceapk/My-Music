@@ -1211,4 +1211,6 @@
     <string name="star_delete_playlist">Xóa danh sách này? Các tệp âm thanh sẽ được giữ lại.</string>
     <string name="star_playlist_hint">Tạo danh sách từ nhạc trên thiết bị, không cần tài khoản hoặc kết nối.</string>
     <string name="star_save_error">Không thể lưu danh sách</string>
+    <string name="chinese_simplified">Tiếng Trung giản thể</string>
+    <string name="chinese_traditional">Tiếng Trung phồn thể</string>
 </resources>

@@ -1277,4 +1277,6 @@
     <string name="star_delete_playlist">ลบรายการนี้หรือไม่? ไฟล์เสียงจะยังคงอยู่</string>
     <string name="star_playlist_hint">สร้างรายการจากเพลงในอุปกรณ์นี้ ไม่ต้องมีบัญชีหรืออินเทอร์เน็ต</string>
     <string name="star_save_error">ไม่สามารถบันทึกรายการได้</string>
+    <string name="chinese_simplified">จีนตัวย่อ</string>
+    <string name="chinese_traditional">จีนตัวเต็ม</string>
 </resources>

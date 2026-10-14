@@ -109,6 +109,8 @@ class GeniusTest {
 
     @Test
     fun `live genius search and scraping test with noisy titles`() = kotlinx.coroutines.runBlocking {
+        // External-service integration, opt-in; parser tests above remain mandatory.
+        org.junit.Assume.assumeTrue("Set RUN_LIVE_GENIUS_TESTS=true to exercise the live service", System.getenv("RUN_LIVE_GENIUS_TESTS") == "true")
         println("--- TEST 1: Queen - Bohemian Rhapsody (Official Video) ---")
         val lyrics1 = Genius.lyrics("Bohemian Rhapsody (Official Video)", "Queen")
         assertNotNull(lyrics1)

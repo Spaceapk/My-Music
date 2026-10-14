@@ -1294,4 +1294,6 @@
     <string name="star_delete_playlist">Diese Wiedergabeliste löschen? Die Audiodateien bleiben erhalten.</string>
     <string name="star_playlist_hint">Erstelle eine Liste mit Musik von diesem Gerät. Kein Konto und keine Verbindung erforderlich.</string>
     <string name="star_save_error">Liste konnte nicht gespeichert werden</string>
+    <string name="chinese_simplified">Chinesisch (vereinfacht)</string>
+    <string name="chinese_traditional">Chinesisch (traditionell)</string>
 </resources>

@@ -1294,4 +1294,6 @@
     <string name="star_delete_playlist">यह सूची हटाएँ? ऑडियो फ़ाइलें बनी रहेंगी।</string>
     <string name="star_playlist_hint">इस डिवाइस के संगीत से सूची बनाएँ। खाता या इंटरनेट की जरूरत नहीं।</string>
     <string name="star_save_error">सूची सहेजी नहीं जा सकी</string>
+    <string name="chinese_simplified">सरलीकृत चीनी</string>
+    <string name="chinese_traditional">पारंपरिक चीनी</string>
 </resources>

@@ -1233,4 +1233,6 @@
     <string name="star_delete_playlist">Eliminare questa playlist? I file audio verranno conservati.</string>
     <string name="star_playlist_hint">Crea una playlist con la musica del dispositivo, senza account o connessione.</string>
     <string name="star_save_error">Impossibile salvare la playlist</string>
+    <string name="chinese_simplified">Cinese semplificato</string>
+    <string name="chinese_traditional">Cinese tradizionale</string>
 </resources>

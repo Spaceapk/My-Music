@@ -1251,4 +1251,6 @@
     <string name="star_delete_playlist">Bu liste silinsin mi? Ses dosyaları korunacak.</string>
     <string name="star_playlist_hint">Bu cihazdaki müziklerle liste oluşturun. Hesap veya bağlantı gerekmez.</string>
     <string name="star_save_error">Liste kaydedilemedi</string>
+    <string name="chinese_simplified">Basitleştirilmiş Çince</string>
+    <string name="chinese_traditional">Geleneksel Çince</string>
 </resources>

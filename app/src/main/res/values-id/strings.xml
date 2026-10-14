@@ -1271,4 +1271,6 @@
     <string name="star_delete_playlist">Hapus daftar ini? Berkas audio tetap disimpan.</string>
     <string name="star_playlist_hint">Buat daftar dari musik di perangkat ini, tanpa akun atau koneksi.</string>
     <string name="star_save_error">Daftar tidak dapat disimpan</string>
+    <string name="chinese_simplified">Mandarin sederhana</string>
+    <string name="chinese_traditional">Mandarin tradisional</string>
 </resources>
