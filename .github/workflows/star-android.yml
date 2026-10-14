@@ -70,7 +70,8 @@ jobs:
       - name: Verify persistence and offline playback on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: 33
+          target: google_apis
           arch: x86_64
           cores: 4
           ram-size: 3072M

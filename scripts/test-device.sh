@@ -15,8 +15,11 @@ grep -q 'OK (' device-tests.txt
 timeout 15s adb shell svc wifi enable
 timeout 15s adb shell svc data enable
 timeout 15s adb logcat -c
+(timeout 90s adb logcat -v threadtime > device-startup-log.txt 2>&1) &
+startup_logger=$!
+trap 'kill "$startup_logger" 2>/dev/null || true; free -h; sudo dmesg | tail -60' EXIT
 timeout 60s adb shell am start -W -n org.nexlibre.starmusic/com.music.bitchord.MainActivity
-sleep 8
+sleep 12
 timeout 15s adb logcat -d -b crash > device-crash-log.txt
 ! grep -q 'FATAL EXCEPTION' device-crash-log.txt
 timeout 15s adb shell pidof org.nexlibre.starmusic

@@ -95,7 +95,8 @@ jobs:
         if: steps.release.outputs.exists == 'false'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: 33
+          target: google_apis
           arch: x86_64
           cores: 4
           ram-size: 3072M
@@ -129,7 +130,7 @@ jobs:
           text = p.read_text().replace('**Beta 1.0.0 en preparación: todavía no hay un APK verificado publicado.**', '**[Descargar Star Music Beta 1.0.0 — APK Android](https://github.com/nexlibre/Star-Music/releases/download/v1.0.0-beta/Star-Music-1.0.0-beta.apk)**')
           p.write_text(text)
           p = Path('CHANGELOG.md')
-          p.write_text(p.read_text().replace('Estado: pendiente de completar y verificar compilación, pruebas Android, firma y publicación.', 'Estado: compilación, pruebas de regresión, persistencia y reproducción sin red en Android 35, instalación de release y firma verificadas automáticamente. Las pruebas automatizadas no sustituyen pruebas en todos los dispositivos físicos.'))
+          p.write_text(p.read_text().replace('Estado: pendiente de completar y verificar compilación, pruebas Android, firma y publicación.', 'Estado: compilación, pruebas de regresión, persistencia y reproducción sin red en Android 13 (API 33), instalación de release y firma verificadas automáticamente. Las pruebas automatizadas no sustituyen pruebas en todos los dispositivos físicos.'))
           PY
           git config user.name nexlibre
           git config user.email 134002775+nexlibre@users.noreply.github.com
@@ -147,7 +148,7 @@ jobs:
 
           Instalación: descarga Star-Music-1.0.0-beta.apk. Requiere Android 8.0 o posterior. Se instala como una aplicación independiente.
 
-          Validación: compilación release, pruebas de regresión, persistencia tras recarga, reproducción de audio local con Wi-Fi y datos desactivados, instalación y arranque del APK release firmado en Android 35. Pendiente de validación manual en distintos teléfonos físicos.
+          Validación: compilación release, pruebas de regresión, persistencia tras recarga, reproducción de audio local con Wi-Fi y datos desactivados, instalación y arranque del APK release firmado en Android 13 (API 33). Pendiente de validación manual en distintos teléfonos físicos.
 
           Código GPL-3.0. Créditos a kushagrasinghx y los colaboradores de BitChord. El historial, la licencia y los avisos originales se conservan. No hay afiliación con el proyecto original.
           NOTES
