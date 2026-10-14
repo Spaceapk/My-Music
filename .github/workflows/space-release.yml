@@ -1,0 +1,190 @@
+name: Publish signed Space Music
+on:
+  push:
+    paths: ['.github/workflows/space-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: space-release-publication
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      VERIFIED_RUN: '38640621164'
+      VERIFIED_SHA: a4d469ed8d62ce5b548181a7784b58f05417b421
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate source and successful Android verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN" --jq .conclusion)" = success
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN" --jq .head_sha)" = "$VERIFIED_SHA"
+          git diff --exit-code "$VERIFIED_SHA" HEAD -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties
+          if gh release view v1.0.0-beta --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release already exists; refusing to replace its APK or signing identity.'
+            exit 1
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install signing tools
+        run: sdkmanager 'build-tools;36.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-android-build
+          path: built
+          github-token: ${{ github.token }}
+          run-id: '38640621164'
+      - name: Sign optimized APK and encrypt persistent key backup
+        env:
+          SPACE_KEYSTORE_B64: ${{ secrets.SPACE_KEYSTORE_B64 }}
+          SPACE_KEYSTORE_PASSWORD: ${{ secrets.SPACE_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          mkdir -p dist
+          if [ -n "$SPACE_KEYSTORE_B64" ]; then
+            test -n "$SPACE_KEYSTORE_PASSWORD"
+            printf '%s' "$SPACE_KEYSTORE_B64" | base64 -d > "$keydir/space-release.p12"
+            export SPACE_SIGN_PASSWORD="$SPACE_KEYSTORE_PASSWORD"
+          else
+            if [ -f .signing/space-release-key.cms ]; then
+              echo 'Restore the existing private signing backup; a different signing key will not be generated.'
+              exit 1
+            fi
+            SPACE_SIGN_PASSWORD=$(openssl rand -base64 48)
+            export SPACE_SIGN_PASSWORD
+            echo "::add-mask::$SPACE_SIGN_PASSWORD"
+            keytool -genkeypair -keystore "$keydir/space-release.p12" -storetype PKCS12 \
+              -alias space-music -keyalg RSA -keysize 4096 -validity 10000 \
+              -dname 'CN=Space Music, OU=Android, O=nexlibre' \
+              -storepass:env SPACE_SIGN_PASSWORD -keypass:env SPACE_SIGN_PASSWORD
+          fi
+          printf '%s' "$SPACE_SIGN_PASSWORD" > "$keydir/password.txt"
+          apk=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
+          tests=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          test -n "$apk"; test -n "$tests"
+          align="$ANDROID_HOME/build-tools/36.0.0/zipalign"
+          signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          "$align" -f -P 16 4 "$apk" "$keydir/aligned.apk"
+          "$signer" sign --ks "$keydir/space-release.p12" --ks-key-alias space-music \
+            --ks-pass env:SPACE_SIGN_PASSWORD --key-pass env:SPACE_SIGN_PASSWORD \
+            --out dist/Space-Music-1.0.0-beta.apk "$keydir/aligned.apk"
+          "$signer" sign --ks "$keydir/space-release.p12" --ks-key-alias space-music \
+            --ks-pass env:SPACE_SIGN_PASSWORD --key-pass env:SPACE_SIGN_PASSWORD \
+            --out dist/test-runner.apk "$tests"
+          "$signer" verify --verbose --print-certs dist/Space-Music-1.0.0-beta.apk | tee dist/signature-verification.txt
+          "$signer" verify dist/test-runner.apk
+          "$align" -c -P 16 4 dist/Space-Music-1.0.0-beta.apk
+          tar -C "$keydir" -czf "$keydir/space-signing.tar.gz" space-release.p12 password.txt
+          openssl cms -encrypt -binary -aes-256-cbc \
+            -in "$keydir/space-signing.tar.gz" -out dist/space-release-key.cms -outform DER \
+            -recip docs/space-signing-public.pem -keyopt rsa_padding_mode:oaep -keyopt rsa_oaep_md:sha256
+          (cd dist && sha256sum Space-Music-1.0.0-beta.apk > SHA256SUMS.txt)
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install signed optimized APK and verify offline playback
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          cores: 4
+          ram-size: 3072M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swiftshader -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: TEST_APP_APK=dist/Space-Music-1.0.0-beta.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
+      - name: Retain signed APK, encrypted backup and verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: space-signed-release
+          path: |
+            dist/Space-Music-1.0.0-beta.apk
+            dist/space-release-key.cms
+            dist/signature-verification.txt
+            dist/SHA256SUMS.txt
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+          if-no-files-found: warn
+      - name: Publish verified signed APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          mkdir -p .signing
+          cp dist/space-release-key.cms .signing/space-release-key.cms
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('README.md')
+          text = p.read_text()
+          start = text.index('## Estado')
+          end = text.index('## Licencia', start)
+          text = text[:start] + '''## Descarga e instalación
+
+          **[Descargar Space Music Beta 1.0.0 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.0-beta/Space-Music-1.0.0-beta.apk)**
+
+          APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
+
+          Pasaron las pruebas de regresión, lint, compilación, verificación de firma y alineación, instalación y arranque del APK release firmado en Android 13 (API 33), persistencia de listas y reproducción local sin conexión. Pendientes pruebas manuales en distintos teléfonos físicos.
+
+          Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
+
+          ## Firma y actualizaciones
+
+          La firma de Space Music es independiente de Star Music. Su respaldo cifrado se conserva en .signing/space-release-key.cms; el material de recuperación permanece privado. Las futuras versiones deben reutilizar el mismo almacén y alias space-music, mediante SPACE_KEYSTORE_B64 y SPACE_KEYSTORE_PASSWORD. La automatización rechaza crear una nueva identidad si ya existe la clave respaldada.
+
+          ''' + text[end:]
+          p.write_text(text)
+          p = Path('CHANGELOG.md')
+          text = p.read_text().replace('versión inicial verificada para pruebas', 'release optimizada con firma propia')
+          text = text.replace('Pendientes las pruebas manuales en teléfonos físicos y la publicación con firma estable.', 'Publicada la release optimizada con firma propia, respaldo privado y verificación adicional del APK firmado en Android 13. Pendientes pruebas manuales en teléfonos físicos.')
+          text = text.replace('El APK debug generado por Actions es una compilación de prueba, con firma de desarrollo; no representa una release definitiva con clave de publicación estable.', 'El APK de publicación es el release optimizado firmado con la clave independiente de Space Music. Los APK debug son exclusivamente para pruebas.')
+          p.write_text(text)
+          PY
+          git config user.name nexlibre
+          git config user.email 134002775+nexlibre@users.noreply.github.com
+          git add README.md CHANGELOG.md
+          git add -f .signing/space-release-key.cms
+          git commit -m 'Publish verified Space Music release and retain encrypted signing identity'
+          git push origin HEAD:main
+          publish_sha=$(git rev-parse HEAD)
+          cat > dist/RELEASE-NOTES.md <<'NOTES'
+          Space Music Beta 1.0.0 — reproductor de música local, sin cuentas ni permiso de Internet.
+
+          APK universal completo, optimizado y firmado con la clave independiente de Space Music. Android 8.0 o posterior; arm64-v8a, armeabi-v7a y x86_64.
+
+          Conserva el reproductor, temas, ajustes de audio, ecualizador, listas locales persistentes, widgets y reproducción en segundo plano.
+
+          Verificados: compilación, regresiones, lint, firma, alineación, instalación y arranque del APK release firmado, persistencia de listas y reproducción local sin conexión en Android 13 (API 33). Pendientes pruebas manuales en distintos teléfonos físicos.
+
+          Si instalaste la versión de prueba, debes desinstalarla antes de instalar esta porque sus firmas son distintas. La desinstalación borra sus datos locales.
+
+          GPL-3.0. Derivada de Star Music y BitChord, con créditos e historial conservados.
+          NOTES
+          gh release create v1.0.0-beta dist/Space-Music-1.0.0-beta.apk dist/SHA256SUMS.txt \
+            dist/signature-verification.txt device-tests.txt \
+            --repo "$GITHUB_REPOSITORY" --target "$publish_sha" --prerelease \
+            --title 'Space Music Beta 1.0.0 — APK completo firmado' --notes-file dist/RELEASE-NOTES.md
