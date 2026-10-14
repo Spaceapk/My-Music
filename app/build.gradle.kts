@@ -71,6 +71,7 @@ val betaSuffix = "beta"
 
 android {
     namespace = "com.music.bitchord"
+    ndkVersion = providers.gradleProperty("spaceNdkVersion").getOrElse("27.0.12077973")
     // Build instrumentation against the same variant that will be installed.
     testBuildType = providers.gradleProperty("starTestBuildType").getOrElse("debug")
     // InnerTubeX's AAR requires compiling against 37; targetSdk (runtime behaviour) stays 36.

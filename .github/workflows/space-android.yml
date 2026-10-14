@@ -28,6 +28,17 @@ jobs:
         run: |
           sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'cmake;3.22.1'
           if [ ! -d "$ANDROID_HOME/platforms/android-37" ]; then ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"; fi
+      - name: Use installed Android NDK
+        run: |
+          set -euo pipefail
+          ndk=$(find "$ANDROID_HOME/ndk" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          if [ -z "$ndk" ]; then
+            sdkmanager 'ndk;27.0.12077973'
+            ndk="$ANDROID_HOME/ndk/27.0.12077973"
+          fi
+          test -f "$ndk/source.properties"
+          echo "ORG_GRADLE_PROJECT_spaceNdkVersion=${ndk##*/}" >> "$GITHUB_ENV"
+          cat "$ndk/source.properties"
       - name: Regression tests
         run: |
           chmod +x gradlew
