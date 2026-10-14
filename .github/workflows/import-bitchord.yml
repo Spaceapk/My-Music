@@ -21,5 +21,12 @@ jobs:
           git config user.email "134002775+nexlibre@users.noreply.github.com"
           git remote add upstream https://github.com/kushagrasinghx/BitChord.git
           git fetch upstream main
-          git merge --allow-unrelated-histories --no-edit fe95bb60aa9cd205cf4ab8bd25a5bec71a595b4f
+          git merge --allow-unrelated-histories --no-commit fe95bb60aa9cd205cf4ab8bd25a5bec71a595b4f
+          mkdir -p docs/upstream-workflows
+          for file in .github/workflows/*.yml; do
+            [ "$file" = ".github/workflows/import-bitchord.yml" ] && continue
+            mv "$file" docs/upstream-workflows/
+          done
+          git add .
+          git commit -m "Import BitChord history; archive upstream-specific automation"
           git push origin HEAD:main
