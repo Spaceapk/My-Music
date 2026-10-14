@@ -31,11 +31,11 @@ jobs:
       - name: Regression tests
         run: |
           chmod +x gradlew
-          ./gradlew :shared:jvmTest :app:testProdDebugUnitTest --stacktrace
+          ./gradlew :shared:jvmTest :app:testProdDebugUnitTest --build-cache --stacktrace
       - name: Android lint verification
-        run: ./gradlew :app:lintProdDebug :app:lintVitalProdRelease --stacktrace
+        run: ./gradlew :app:lintProdDebug :app:lintVitalProdRelease --build-cache --stacktrace
       - name: Build release and test APKs
-        run: ./gradlew :app:assembleProdRelease :app:assembleProdDebug :app:assembleProdDebugAndroidTest --stacktrace
+        run: ./gradlew :app:assembleProdRelease :app:assembleProdDebug :app:assembleProdDebugAndroidTest --build-cache --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:
