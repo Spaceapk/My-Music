@@ -2,7 +2,7 @@
 
 Versión Android independiente de [BitChord](https://github.com/kushagrasinghx/BitChord), desarrollada por nexlibre.
 
-**Beta 1.0.0 en preparación: todavía no hay un APK verificado publicado.**
+**[Descargar Star Music Beta 1.0.0 — APK Android](https://github.com/nexlibre/Star-Music/releases/download/v1.0.0-beta/Star-Music-1.0.0-beta.apk)**
 
 [Versiones y descargas](https://github.com/nexlibre/Star-Music/releases) · [Compilaciones](https://github.com/nexlibre/Star-Music/actions)
 

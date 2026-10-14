@@ -11,4 +11,4 @@ Base: BitChord, commit fe95bb60aa9cd205cf4ab8bd25a5bec71a595b4f.
 - Verificación estática con línea base de hallazgos heredados cotejados contra el código original; los hallazgos nuevos siguen bloqueando la compilación. Consulta docs/LINT-BASELINE.md. Correcciones de recursos de porcentaje literal y plurales necesarias para ejecutar lint.
 - Ajustes necesarios para verificar la base importada: SDK 37.0, nombres de chino simplificado/tradicional y etiquetas de región en las pruebas de idiomas. Se retiran seis traducciones huérfanas de opciones que no están presentes en el código, detectadas por lint. La prueba de integración con Genius queda disponible mediante RUN_LIVE_GENIUS_TESTS=true; sus pruebas de análisis local se mantienen obligatorias.
 
-Estado: pendiente de completar y verificar compilación, pruebas Android, firma y publicación.
+Estado: compilación, pruebas de regresión, persistencia y reproducción sin red en Android 13 (API 33), instalación de release y firma verificadas automáticamente. Las pruebas automatizadas no sustituyen pruebas en todos los dispositivos físicos.
