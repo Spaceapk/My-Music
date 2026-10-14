@@ -205,6 +205,10 @@ android {
         compose = true
         buildConfig = true
     }
+    lint {
+        // Only fingerprints independently verified in the pinned upstream code.
+        baseline = file("lint-baseline.xml")
+    }
     testOptions {
         unitTests {
             // Unit tests run against a stub android.jar whose methods throw

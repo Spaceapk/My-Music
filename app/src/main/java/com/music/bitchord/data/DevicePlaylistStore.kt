@@ -14,6 +14,13 @@ data class DevicePlaylist(val id: String, val name: String, val songs: List<Song
 
 /** Star Music device-only playlists. Atomic writes preserve the previous file on failure. */
 class DevicePlaylistStore(context: Context, filename: String = "star-device-playlists.json") {
+    companion object {
+        private var deviceStore: DevicePlaylistStore? = null
+        /** One writer and one observable state across local-tab navigation. */
+        fun forDevice(context: Context): DevicePlaylistStore = synchronized(this) {
+            deviceStore ?: DevicePlaylistStore(context.applicationContext).also { deviceStore = it }
+        }
+    }
     private val file = AtomicFile(File(context.filesDir, filename))
     private val state = MutableStateFlow(read())
     val playlists = state.asStateFlow()

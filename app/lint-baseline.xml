@@ -1,0 +1,510 @@
+<?xml version='1.0' encoding='utf-8'?>
+<issues format="6" by="lint 8.10.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.1)" variant="prodDebug" version="8.10.1">
+    <issue id="NewApi" message="Call requires API level 33 (current min is 26): `RuntimeShader`" errorLine1="        return runtimeShaders.getOrPut(key) { RuntimeShader(string) }" errorLine2="                                              ~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/backdrop/RuntimeShaderCache.kt" line="24" column="47" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="@OptIn(UnstableApi::class)" errorLine2="       ~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/CanvasArtworkPlayer.kt" line="86" column="8" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                DefaultMediaSourceFactory(CanvasCache.dataSourceFactory(OkHttpDataSource.Factory(Http.client)))," errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/CanvasArtworkPlayer.kt" line="197" column="17" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                DefaultMediaSourceFactory(CanvasCache.dataSourceFactory(OkHttpDataSource.Factory(Http.client)))," errorLine2="                                          ~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/CanvasArtworkPlayer.kt" line="197" column="43" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                DefaultMediaSourceFactory(CanvasCache.dataSourceFactory(OkHttpDataSource.Factory(Http.client)))," errorLine2="                                                      ~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/CanvasArtworkPlayer.kt" line="197" column="55" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        val viaMedia3 = media3Decoders()" errorLine2="                        ~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/data/sources/DeviceCodecs.kt" line="111" column="25" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    val spatial: SpatialAudioProcessor = SpatialAudioProcessor()," errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="33" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    val spatial: SpatialAudioProcessor = SpatialAudioProcessor()," errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="33" column="42" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    val equalizer: EqualizerProcessor = EqualizerProcessor()," errorLine2="                   ~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="34" column="20" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    val equalizer: EqualizerProcessor = EqualizerProcessor()," errorLine2="                                        ~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="34" column="41" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    val transition: TransitionFilterProcessor = TransitionFilterProcessor()," errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="35" column="21" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    val transition: TransitionFilterProcessor = TransitionFilterProcessor()," errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="35" column="49" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        spatial.configure(sampleRate, channelCount)" errorLine2="                ~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="44" column="17" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        equalizer.configure(sampleRate, channelCount)" errorLine2="                  ~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="45" column="19" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        transition.configure(sampleRate, channelCount)" errorLine2="                   ~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="46" column="20" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        spatial.process(block)" errorLine2="                ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="78" column="17" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        equalizer.process(block)" errorLine2="                  ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="79" column="19" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        transition.process(block)" errorLine2="                   ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="80" column="20" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        spatial.flush()" errorLine2="                ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="86" column="17" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        equalizer.flush()" errorLine2="                  ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="87" column="19" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        transition.flush()" errorLine2="                   ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="88" column="20" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        spatial.reset()" errorLine2="                ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="94" column="17" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        equalizer.reset()" errorLine2="                  ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="95" column="19" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        transition.reset()" errorLine2="                   ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/DspChain.kt" line="96" column="20" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="fun com.music.bitchord.playback.SpatialAudioProcessor.asFloatAudioProcessor(): FloatAudioProcessor =" errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="35" column="33" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            this@asFloatAudioProcessor.configure(sampleRate, channelCount)" errorLine2="                                       ~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="38" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            this@asFloatAudioProcessor.process(block)" errorLine2="                                       ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="40" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun flush() = this@asFloatAudioProcessor.flush()" errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="42" column="59" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun reset() = this@asFloatAudioProcessor.reset()" errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="43" column="59" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="fun com.music.bitchord.playback.EqualizerProcessor.asFloatAudioProcessor(): FloatAudioProcessor =" errorLine2="                                ~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="47" column="33" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            this@asFloatAudioProcessor.configure(sampleRate, channelCount)" errorLine2="                                       ~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="50" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            this@asFloatAudioProcessor.process(block)" errorLine2="                                       ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="52" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun flush() = this@asFloatAudioProcessor.flush()" errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="54" column="59" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun reset() = this@asFloatAudioProcessor.reset()" errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="55" column="59" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="fun com.music.bitchord.playback.TransitionFilterProcessor.asFloatAudioProcessor(): FloatAudioProcessor =" errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="59" column="33" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            this@asFloatAudioProcessor.configure(sampleRate, channelCount)" errorLine2="                                       ~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="62" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            this@asFloatAudioProcessor.process(block)" errorLine2="                                       ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="64" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun flush() = this@asFloatAudioProcessor.flush()" errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="66" column="59" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun reset() = this@asFloatAudioProcessor.reset()" errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/audio/FloatAudioProcessor.kt" line="67" column="59" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            if (!holdUntilAligned || VersionAudioAligner.getCachedOffsetMs(song.videoId, target.videoId) != null) {" errorLine2="                                     ~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1178" column="38" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            if (!holdUntilAligned || VersionAudioAligner.getCachedOffsetMs(song.videoId, target.videoId) != null) {" errorLine2="                                                         ~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1178" column="58" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                VersionAudioAligner.getCachedOffsetMs(song.videoId, target.videoId) != null" errorLine2="                ~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1247" column="17" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                VersionAudioAligner.getCachedOffsetMs(song.videoId, target.videoId) != null" errorLine2="                                    ~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1247" column="37" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                    VersionAudioAligner.getCachedOffsetMs(song.videoId, targetId) == null" errorLine2="                    ~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4054" column="21" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                    VersionAudioAligner.getCachedOffsetMs(song.videoId, targetId) == null" errorLine2="                                        ~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4054" column="41" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            AudioCache.contentsChanged.drop(1).collect {" errorLine2="            ~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/MainViewModel.kt" line="1412" column="13" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        val songs = AudioCache.cachedSongs().map { it.song }" errorLine2="                    ~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/MainViewModel.kt" line="2762" column="21" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        val songs = AudioCache.cachedSongs().map { it.song }" errorLine2="                               ~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/MainViewModel.kt" line="2762" column="32" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                    AudioCache.cachedSongs().map { it.song }" errorLine2="                    ~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/MainViewModel.kt" line="2879" column="21" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                    AudioCache.cachedSongs().map { it.song }" errorLine2="                               ~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/MainViewModel.kt" line="2879" column="32" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        val token = SessionToken(app, ComponentName(app, PlaybackService::class.java))" errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/widget/MediaWidgetActions.kt" line="45" column="58" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        val token = SessionToken(context, ComponentName(context, PlaybackService::class.java))" errorLine2="                                                                 ~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/PlayerConnection.kt" line="82" column="66" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                    AudioCache.clear {" errorLine2="                    ~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="1497" column="21" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                    AudioCache.clear {" errorLine2="                               ~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="1497" column="32" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="class SmbDataSource : BaseDataSource(/* isNetwork = */ true) {" errorLine2="                      ~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="25" column="23" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="class SmbDataSource : BaseDataSource(/* isNetwork = */ true) {" errorLine2="                      ~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="25" column="23" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    override fun open(dataSpec: DataSpec): Long {" errorLine2="                 ~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="32" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    override fun open(dataSpec: DataSpec): Long {" errorLine2="                                ~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="32" column="33" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        val uri = dataSpec.uri" errorLine2="                           ~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="33" column="28" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            position = dataSpec.position.coerceAtLeast(0)" errorLine2="                                ~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="39" column="33" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            endPosition = if (dataSpec.length != -1L) {" errorLine2="                                       ~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="40" column="40" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                (position + dataSpec.length).coerceAtMost(length)" errorLine2="                                     ~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="41" column="38" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        transferStarted(dataSpec)" errorLine2="        ~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="52" column="9" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        NerdStats.recordSource(dataSpec.key, &quot;SMB&quot;)" errorLine2="                                        ~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="53" column="41" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    override fun read(buffer: ByteArray, offset: Int, readLength: Int): Int {" errorLine2="                 ~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="57" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        bytesTransferred(read)" errorLine2="        ~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="72" column="9" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    override fun getUri(): Uri? = openedUri" errorLine2="                 ~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="76" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="    override fun close() {" errorLine2="                 ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="78" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        transferEnded()" errorLine2="        ~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="82" column="9" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun createDataSource(): DataSource = RoutingDataSource(downstream.createDataSource())" errorLine2="                     ~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="90" column="22" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        override fun createDataSource(): DataSource = RoutingDataSource(downstream.createDataSource())" errorLine2="                                                                                   ~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="90" column="84" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun addTransferListener(transferListener: androidx.media3.datasource.TransferListener) {" errorLine2="                         ~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="96" column="26" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun addTransferListener(transferListener: androidx.media3.datasource.TransferListener) {" errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="96" column="64" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                inner.addTransferListener(transferListener)" errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="97" column="23" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                smb.addTransferListener(transferListener)" errorLine2="                    ~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="98" column="21" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun open(dataSpec: DataSpec): Long {" errorLine2="                         ~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="101" column="26" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun open(dataSpec: DataSpec): Long {" errorLine2="                                        ~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="101" column="41" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                active = if (dataSpec.uri.scheme == SmbConfig.SCHEME) smb else inner" errorLine2="                                      ~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="102" column="39" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                return active.open(dataSpec)" errorLine2="                              ~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="103" column="31" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun read(buffer: ByteArray, offset: Int, length: Int): Int =" errorLine2="                         ~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="106" column="26" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="                active.read(buffer, offset, length)" errorLine2="                       ~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="107" column="24" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun getUri(): Uri? = active.uri" errorLine2="                         ~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="109" column="26" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun getUri(): Uri? = active.uri" errorLine2="                                                 ~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="109" column="50" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun close() = active.close()" errorLine2="                         ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="111" column="26" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="            override fun close() = active.close()" errorLine2="                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/SmbDataSource.kt" line="111" column="43" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        incoming(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="568" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        incoming(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                                           ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="568" column="44" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        incoming(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="568" column="53" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        incoming(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                                                                              ~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="568" column="79" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        outgoing(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="569" column="18" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        outgoing(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                                           ~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="569" column="44" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        outgoing(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="569" column="53" />
+    </issue>
+    <issue id="UnsafeOptInUsageError" message="This declaration is opt-in and its usage should be marked with `@androidx.media3.common.util.UnstableApi` or `@OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)`" errorLine1="        outgoing(TransitionFilterProcessor.OPEN_HZ, TransitionFilterProcessor.OFF_HZ)" errorLine2="                                                                              ~~~~~~">
+        <location file="src/main/java/com/music/bitchord/playback/TransitionFilterProcessor.kt" line="569" column="79" />
+    </issue>
+    <issue id="FlowOperatorInvokedInComposition" message="Flow operator functions should not be invoked within composition" errorLine1="        return if (cast.casting) outputs.map { it.copy(isActive = false) } else outputs" errorLine2="                                         ~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/AndroidPlayerHost.kt" line="105" column="42" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        status = context.getString(R.string.connected)" errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/AccountAlerts.kt" line="489" column="34" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        status = context.getString(" errorLine2="                                 ^">
+        <location file="src/main/java/com/music/bitchord/ui/components/AccountAlerts.kt" line="493" column="34" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            it.message ?: context.getString(R.string.failed)," errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/AccountAlerts.kt" line="495" column="43" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                            context.getString(R.string.share_your_lyrics)," errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/AndroidLyricsShareSheet.kt" line="208" column="45" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="    LocalContext.current.getString(R.string.app_name).removeSuffix(&quot; Dev&quot;)" errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/DiscordScreen.kt" line="899" column="5" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                context.getString(R.string.listen_together_share_text, partyCode)" errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/ListenTogetherScreen.kt" line="206" column="17" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            context.getString(R.string.copy_code)," errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/ListenTogetherScreen.kt" line="465" column="29" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(" errorLine2="                    ^">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1109" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.radio_started, song.title)," errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1485" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        showQueueNotice(context.getString(R.string.party_queue_full, 25))" errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1500" column="41" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                showQueueNotice(context.getString(R.string.song_added_to_queue))" errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1519" column="33" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        showQueueNotice(context.getString(R.string.party_queue_full, 25))" errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1530" column="41" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                showQueueNotice(context.getString(R.string.song_will_play_next))" errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1549" column="33" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="            val credit = subtitle ?: context.getString(" errorLine2="                                     ^">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1582" column="38" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.couldnt_find, name)," errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1602" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            showQueueNotice(context.getString(R.string.party_queue_full, 25))" errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1646" column="45" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        context.getString(R.string.couldnt_open_link)," errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1710" column="25" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                Toast.makeText(context, context.getString(R.string.no_tracks_here), Toast.LENGTH_SHORT).show()" errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1846" column="41" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        val message = it.message ?: context.getString(R.string.couldnt_load_tracks)" errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1851" column="53" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                .makeText(context, context.getString(R.string.storage_required_save), Toast.LENGTH_SHORT)" errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1892" column="36" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="            Toast.makeText(context, context.getString(R.string.storage_required_read), Toast.LENGTH_SHORT).show()" errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="1904" column="37" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                context.getString(R.string.wifi_only_download_refusal)," errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="2044" column="17" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.already_downloaded)" errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="2049" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        context.getString(R.string.artist)," errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="2325" column="25" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                context.getString(R.string.artist)," errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="2336" column="33" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                context.getString(R.string.couldnt_find, name)," errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="2343" column="33" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                    subtitle = playlist.owner ?: context.getString(R.string.spotify)," errorLine2="                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="2693" column="66" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                        context.getString(R.string.local_music)," errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="3213" column="41" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    openPage(id, song.artist, context.getString(R.string.artist), BrowseType.ARTIST)" errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4204" column="47" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                        added == 1 -&gt; context.getString(R.string.song_added_to_playlist)" errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4392" column="55" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                            context.getString(R.string.song_already_in_playlist)" errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4394" column="45" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                        else -&gt; context.getString(R.string.failed)" errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4395" column="49" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            context.getString(" errorLine2="                            ^">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4423" column="29" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                context.getString(" errorLine2="                                ^">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4564" column="33" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                onFailure = { UiState.Error(context.getString(R.string.failed)) }," errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4590" column="61" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                context.getString(if (saved) R.string.playlist_reordered else R.string.reorder_failed)," errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4677" column="33" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                    lastfmError = e.message ?: context.getString(R.string.login_failed)" errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4929" column="64" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            lastfmError = e.message ?: context.getString(R.string.login_failed)" errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4932" column="56" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                status = context.getString(validation.error.toMessageRes()) to false" errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/PartyServerEditor.kt" line="58" column="26" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        Toast.makeText(context, context.getString(messageRes), Toast.LENGTH_SHORT).show()" errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/PartyServerEditor.kt" line="82" column="49" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                context.getString(R.string.listen_together_switched_to_default)," errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/PartyServerEditor.kt" line="98" column="17" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    status = context.getString(validation.error.toMessageRes()) to false" errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/PartyServerEditor.kt" line="128" column="30" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            context.getString(R.string.listen_together_server_online, probe.latencyMs) to true" errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/PartyServerEditor.kt" line="139" column="29" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                            context.getString(R.string.listen_together_server_offline) to false" errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/PartyServerEditor.kt" line="141" column="29" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        Intent.createChooser(sendIntent(uri), context.getString(R.string.share_your_replay))," errorLine2="                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/replay/ReplayShareSheet.kt" line="192" column="63" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                append(context.getString(R.string.replay_hours_across, grouped(summary.hours)))" errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/replay/ReplayStories.kt" line="565" column="24" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                append(context.getString(R.string.replay_across))" errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/replay/ReplayStories.kt" line="567" column="24" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.export_succeeded, context.countOfMonths(months))" errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="319" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.export_failed, it.message ?: context.getString(R.string.unknown_error))" errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="322" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.export_failed, it.message ?: context.getString(R.string.unknown_error))" errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="322" column="77" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.import_succeeded, context.countOfMonths(it.months), it.from)" errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="334" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.import_failed, it.message ?: context.getString(R.string.unknown_error))" errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="337" column="21" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    context.getString(R.string.import_failed, it.message ?: context.getString(R.string.unknown_error))" errorLine2="                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="337" column="77" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        Toast.makeText(context, context.getString(R.string.image_cache_cleared), Toast.LENGTH_SHORT).show()" errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="1165" column="49" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                        Toast.makeText(context, context.getString(R.string.song_cache_cleared), Toast.LENGTH_SHORT).show()" errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="1498" column="49" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                        lastfmError = e.message ?: context.getString(R.string.login_failed)" errorLine2="                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="1675" column="68" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                lastfmError = e.message ?: context.getString(R.string.login_failed)" errorLine2="                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SettingsSheet.kt" line="1678" column="60" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                testResult = context.getString(R.string.connected)" errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SourcesScreen.kt" line="425" column="46" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                testResult = context.getString(" errorLine2="                                             ^">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SourcesScreen.kt" line="428" column="46" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                                    it.message ?: context.getString(R.string.failed)," errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/SourcesScreen.kt" line="430" column="51" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="            status = context.getString(R.string.spotify_import_invalid)" errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/SpotifyImportAlert.kt" line="76" column="22" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="        status = context.getString(R.string.spotify_import_fetching)" errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/SpotifyImportAlert.kt" line="82" column="18" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                    status = context.getString(R.string.spotify_import_matching, done, total)" errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/SpotifyImportAlert.kt" line="87" column="30" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                if (songs.isEmpty()) error(context.getString(R.string.spotify_import_none))" errorLine2="                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/SpotifyImportAlert.kt" line="89" column="44" />
+    </issue>
+    <issue id="LocalContextGetResourceValueCall" message="Querying resource values using LocalContext.current" errorLine1="                status = context.getString(R.string.spotify_import_failed, e.message.orEmpty())" errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/components/SpotifyImportAlert.kt" line="95" column="26" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="    }.collectAsStateWithLifecycle(initialValue = AudioOutputStatus.current.value.activeDeviceId)" errorLine2="                                                                           ~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/player/AudioOutput.kt" line="75" column="76" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="            val name = AppSettings.discordActivityName.value.ifEmpty { appName() }" errorLine2="                                                       ~~~~~">
+        <location file="src/main/java/com/music/bitchord/ui/screens/DiscordScreen.kt" line="833" column="56" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.webdavUrl.value," errorLine2="                                                        ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4950" column="57" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.webdavUsername.value," errorLine2="                                                             ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4955" column="62" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.webdavPassword.value," errorLine2="                                                             ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4959" column="62" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.smbHost.value," errorLine2="                                                      ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4992" column="55" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.smbShare.value," errorLine2="                                                       ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="4997" column="56" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.smbBasePath.value," errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="5001" column="59" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.smbUsername.value," errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="5005" column="59" />
+    </issue>
+    <issue id="StateFlowValueCalledInComposition" message="StateFlow.value should not be called within composition" errorLine1="                        initial = AppSettings.smbPassword.value," errorLine2="                                                          ~~~~~">
+        <location file="src/main/java/com/music/bitchord/MainActivity.kt" line="5009" column="59" />
+    </issue>
+</issues>

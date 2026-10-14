@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, padding: PaddingValues) {
     val context = LocalContext.current.applicationContext
-    val loaded = remember(context) { runCatching { DevicePlaylistStore(context) } }
+    val loaded = remember(context) { runCatching { DevicePlaylistStore.forDevice(context) } }
     val store = loaded.getOrNull()
     if (store == null) {
         Text(stringResource(R.string.star_save_error), Modifier.padding(20.dp))
