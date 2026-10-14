@@ -6,13 +6,19 @@ Conserva el motor de audio, temas, Liquid Glass, biblioteca por canciones/artist
 
 Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a Star Music.
 
-## Estado
+## Descarga e instalación
 
-**[Compilación verificada y APK de prueba](https://github.com/nexlibre/Space-Music/actions/runs/38640621164)**
+**[Descargar Space Music Beta 1.0.0 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.0-beta/Space-Music-1.0.0-beta.apk)**
 
-Pasaron las pruebas de regresión, lint, compilación, instalación y arranque en Android 13 (API 33), persistencia de listas y decodificación de audio local sin conexión. En los artefactos de la ejecución, `space-android-build` contiene los APK.
+APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
 
-El APK debug es una compilación de prueba con firma de desarrollo. La publicación definitiva con una clave estable y las pruebas manuales en teléfonos físicos siguen pendientes. No se reutilizan las claves ni secretos de Star Music.
+Pasaron las pruebas de regresión, lint, compilación, verificación de firma y alineación, instalación y arranque del APK release firmado en Android 13 (API 33), persistencia de listas y reproducción local sin conexión. Pendientes pruebas manuales en distintos teléfonos físicos.
+
+Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
+
+## Firma y actualizaciones
+
+La firma de Space Music es independiente de Star Music. Su respaldo cifrado se conserva en .signing/space-release-key.cms; el material de recuperación permanece privado. Las futuras versiones deben reutilizar el mismo almacén y alias space-music, mediante SPACE_KEYSTORE_B64 y SPACE_KEYSTORE_PASSWORD. La automatización rechaza crear una nueva identidad si ya existe la clave respaldada.
 
 ## Licencia y créditos
 
