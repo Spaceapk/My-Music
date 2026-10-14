@@ -75,3 +75,14 @@
 # AndroidJUnitRunner calls Trace from its separate APK. Gradle excludes the
 # shared dependency from the runner, so it must survive shrinking in the app.
 -keep class androidx.tracing.** { *; }
+
+# The independent instrumentation APK shares Kotlin and playback dependencies
+# with the app. Keep the runtime facades and the public API it exercises; R8
+# otherwise inlines them out of the app while Gradle removes duplicate test deps.
+-keep class kotlin.** { *; }
+-keep interface androidx.media3.common.Player { *; }
+-keep interface androidx.media3.common.Player$Listener { *; }
+-keep interface androidx.media3.exoplayer.ExoPlayer { *; }
+-keep class androidx.media3.exoplayer.ExoPlayer$Builder { *; }
+-keep class androidx.media3.common.MediaItem { *; }
+-keep class androidx.media3.common.MediaItem$LocalConfiguration { *; }
