@@ -42,13 +42,15 @@ jobs:
       - name: Regression tests
         run: |
           chmod +x gradlew
-          ./gradlew :shared:jvmTest :app:testProdDebugUnitTest --build-cache --stacktrace
+          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :shared:jvmTest :app:testProdDebugUnitTest --build-cache --stacktrace
       - name: Android lint verification
-        run: ./gradlew :app:lintProdDebug :app:lintVitalProdRelease --build-cache --stacktrace
-      - name: Build release and test APKs
-        run: ./gradlew :app:assembleProdRelease :app:assembleProdDebug :app:assembleProdDebugAndroidTest --build-cache --stacktrace
+        run: ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :app:lintProdDebug :app:lintVitalProdRelease --build-cache --stacktrace
+      - name: Build debug and test APKs
+        run: ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :app:assembleProdDebug :app:assembleProdDebugAndroidTest --build-cache --stacktrace
+      - name: Build optimized release
+        run: ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :app:assembleProdRelease --build-cache --stacktrace
       - name: Build instrumentation for the optimized release
-        run: ./gradlew :app:assembleProdReleaseAndroidTest -PstarTestBuildType=release --build-cache --stacktrace
+        run: ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :app:assembleProdReleaseAndroidTest -PstarTestBuildType=release --build-cache --stacktrace
       - name: Export APK signing tool
         run: |
           mkdir -p signing-tools
