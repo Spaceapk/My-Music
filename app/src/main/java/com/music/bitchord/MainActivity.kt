@@ -2960,20 +2960,15 @@ private fun BitChordApp(
                                 if (!LocalMediaRepository.hasStoragePermission(context)) {
                                     androidx.compose.material3.Button(onClick = { mediaPermissionLauncher.launch(mediaPermission) }) { Text(stringResource(R.string.library)) }
                                 }
-                                androidx.compose.material3.OutlinedTextField(
-                                    value = spaceQuery, onValueChange = { spaceQuery = it },
-                                    placeholder = { Text(stringResource(R.string.search)) },
-                                    modifier = Modifier.fillMaxWidth().padding(top = listPadding.calculateTopPadding()).padding(horizontal = 16.dp),
-                                    singleLine = true,
-                                )
                                 LocalMusicScreen(
-                                    songs = deviceSongs.filter { spaceQuery.isBlank() || it.title.contains(spaceQuery, true) || it.artist.contains(spaceQuery, true) || it.albumName.orEmpty().contains(spaceQuery, true) },
+                                    songs = deviceSongs,
+                                    query = spaceQuery, onQueryChange = { spaceQuery = it },
                                     currentSong = player.song, isPlaying = player.isPlaying,
                                     onSongClick = { songs, index -> playFrom(songs, index, QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) },
                                     onSongLongPress = openSongMenu,
                                     onSongSwipe = onSongSwipe,
                                     onShuffle = { songs -> if (songs.isNotEmpty()) { QueueShuffle.enableForNextQueue(); playFrom(songs, songs.indices.random(), QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) } },
-                                    contentPadding = PaddingValues(bottom = 140.dp),
+                                    contentPadding = listPadding,
                                     emptyMessage = (deviceState as? UiState.Error)?.message,
                                 )
                             }

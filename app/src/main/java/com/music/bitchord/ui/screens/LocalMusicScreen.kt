@@ -177,6 +177,8 @@ fun LocalMusicScreen(
     onDeleteDownloads: ((List<Song>) -> Unit)? = null,
     /** Copies the selected Downloads rows to the WebDAV server; null hides the action. */
     onUploadToWebDav: ((List<Song>) -> Unit)? = null,
+    query: String? = null,
+    onQueryChange: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     // Which top-level tab is selected.
@@ -185,7 +187,8 @@ fun LocalMusicScreen(
     // Narrows whichever tab is showing — songs by title/artist/album, artists
     // and albums by name. Not saved across process death: a filter left on a
     // folder that was never reopened is more surprising than one that reset.
-    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var internalSearchQuery by rememberSaveable { mutableStateOf("") }
+    val searchQuery = query ?: internalSearchQuery
     val sortOrder by if (isDownloads) {
         AppSettings.downloadedMusicSort.collectAsStateWithLifecycle()
     } else {
@@ -289,7 +292,7 @@ fun LocalMusicScreen(
             )
         } else LocalSearchField(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = { internalSearchQuery = it; onQueryChange?.invoke(it) },
             sortOrder = sortOrder,
             onSortOrderChange = {
                 if (isDownloads) AppSettings.setDownloadedMusicSort(it)

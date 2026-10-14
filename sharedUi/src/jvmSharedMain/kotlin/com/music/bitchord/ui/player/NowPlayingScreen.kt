@@ -1953,10 +1953,10 @@ fun NowPlayingScreen(
                             )
                         },
                         romanizationToggle = {
-                            
+
                         },
                         translationToggle = {
-                            
+
                         },
                     ) { panelModifier ->
                         LyricsTranslationMotion(
@@ -3329,14 +3329,14 @@ fun NowPlayingScreen(
                                 .align(Alignment.BottomStart)
                                 .graphicsLayer { alpha = translateFade },
                         ) {
-                            
+
                         }
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
                                 .graphicsLayer { alpha = translateFade },
                         ) {
-                            
+
                         }
                     }
                     // The bar arrives and leaves without a transition of its own:
