@@ -192,7 +192,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val typeaheadResults: StateFlow<List<SearchResult>> = _typeaheadResults.asStateFlow()
 
     /** Where the Search tab looks — see [setSearchSource]. */
-    private val _searchSource = MutableStateFlow(SearchSource.YOUTUBE)
+    private val _searchSource = MutableStateFlow(SearchSource.LIBRARY)
     val searchSource: StateFlow<SearchSource> = _searchSource.asStateFlow()
 
     /** Every track in the Local Music folder, read when the Library source is picked. */
@@ -204,6 +204,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      * places never disagree about what is on the device. Null while the field
      * is empty — there is nothing asked yet.
      */
+    val deviceSongs = _librarySongs.asStateFlow()
     val libraryResults: StateFlow<UiState<List<Song>>?> = combine(_librarySongs, _query) { state, query ->
         val term = query.trim()
         when {
@@ -1389,8 +1390,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         startSearchPipeline()
         startSuggestPipeline()
         startTypeaheadMediaPipeline()
-        loadHome()
-        loadExplore()
+        loadLibrarySongs()
         if (_signedIn.value) {
             loadLibrary()
             loadAccount()
@@ -1436,7 +1436,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             // A leftover APK only means "Install Now" for the session that
             // downloaded it — see AppUpdateChecker.clearCache.
             AppUpdateChecker.clearCache(getApplication())
-            AppUpdateChecker.check()
+            // Space Music never contacts an update service.
         }
     }
 

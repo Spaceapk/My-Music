@@ -10,7 +10,7 @@ timeout 180s adb install --no-incremental "$apk"
 timeout 180s adb install --no-incremental "$test_apk"
 adb shell svc wifi disable
 adb shell svc data disable
-timeout 120s adb shell am instrument -w -r -e class com.music.bitchord.DevicePlaylistStoreTest,com.music.bitchord.OfflinePlaylistPlaybackTest,com.music.bitchord.ExampleInstrumentedTest org.nexlibre.starmusic.test/androidx.test.runner.AndroidJUnitRunner | tee device-tests.txt
+timeout 120s adb shell am instrument -w -r -e class com.music.bitchord.DevicePlaylistStoreTest,com.music.bitchord.OfflinePlaylistPlaybackTest,com.music.bitchord.ExampleInstrumentedTest org.nexlibre.spacemusic.test/androidx.test.runner.AndroidJUnitRunner | tee device-tests.txt
 grep -q 'OK (' device-tests.txt
 ! grep -q 'FAILURES\|INSTRUMENTATION_FAILED\|shortMsg=' device-tests.txt
 timeout 15s adb shell svc wifi enable
@@ -19,8 +19,8 @@ timeout 15s adb logcat -c
 (timeout 90s adb logcat -v threadtime > device-startup-log.txt 2>&1) &
 startup_logger=$!
 trap 'kill "$startup_logger" 2>/dev/null || true; timeout 10s adb logcat -d -b crash > device-crash-log.txt 2>&1 || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
-timeout 60s adb shell am start -W -n org.nexlibre.starmusic/com.music.bitchord.MainActivity
+timeout 60s adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
 sleep 12
 timeout 15s adb logcat -d -b crash > device-crash-log.txt
 ! grep -q 'FATAL EXCEPTION' device-crash-log.txt
-timeout 15s adb shell pidof org.nexlibre.starmusic
+timeout 15s adb shell pidof org.nexlibre.spacemusic

@@ -77,7 +77,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "org.nexlibre.starmusic"
+        applicationId = "org.nexlibre.spacemusic"
         // 26 keeps reach wide; real-time blur (RenderEffect) kicks in on API 31+,
         // Haze falls back to a translucent scrim below that.
         minSdk = 26
@@ -120,7 +120,7 @@ android {
     productFlavors {
         create("dev") {
             dimension = "env"
-            applicationId = "org.nexlibre.starmusic.dev"
+            applicationId = "org.nexlibre.spacemusic.dev"
             resValue("string", "app_name", "Star Music Dev")
         }
         create("prod") {
@@ -439,10 +439,10 @@ val verifyDevInstall = tasks.register("verifyDevInstall") {
             .drop(1)
             .mapNotNull { line -> line.split('\t').takeIf { it.size == 2 && it[1] == "device" }?.get(0) }
         serials.forEach { serial ->
-            logger.lifecycle("verifyDevInstall: compiling org.nexlibre.starmusic.dev on $serial")
+            logger.lifecycle("verifyDevInstall: compiling org.nexlibre.spacemusic.dev on $serial")
             ProcessBuilder(
                 adbPath, "-s", serial, "shell", "cmd", "package", "compile",
-                "-m", "verify", "-f", "org.nexlibre.starmusic.dev",
+                "-m", "verify", "-f", "org.nexlibre.spacemusic.dev",
             ).inheritIO().start().waitFor()
         }
     }

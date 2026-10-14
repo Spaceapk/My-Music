@@ -280,6 +280,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.layout.offset
 import com.music.bitchord.ui.components.MiniPlayerPull
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.layout.onSizeChanged
 import com.music.bitchord.ui.player.LocalPlayerDock
@@ -338,9 +339,9 @@ class MainActivity : AppCompatActivity() {
         // Before the composition, so a cold launch from a widget's artwork has
         // the request already standing by the time BitChordApp first reads it.
         PlayerDeepLink.consume(intent)
-        JamInviteLink.consume(intent)
+        // No online invitations in Space Music.
         // Likewise for a link tapped or shared from another app — see [MusicLink].
-        MusicLink.consume(intent)
+        // No remote music links in Space Music.
         setContent {
             val theme by AppSettings.themeMode.collectAsStateWithLifecycle()
             val highPerformance by AppSettings.highPerformanceMode.collectAsStateWithLifecycle()
@@ -434,8 +435,8 @@ class MainActivity : AppCompatActivity() {
         // one that just arrived and not the one the task was started with.
         setIntent(intent)
         PlayerDeepLink.consume(intent)
-        JamInviteLink.consume(intent)
-        MusicLink.consume(intent)
+        // No online invitations in Space Music.
+        // No remote music links in Space Music.
     }
 }
 
@@ -1088,12 +1089,7 @@ private fun BitChordApp(
     val queueLabel = stringResource(R.string.queue)
     val sharedLinkLabel = stringResource(R.string.shared_link)
     val tabs = remember(homeLabel, exploreLabel, libraryLabel, searchLabel) {
-        listOf(
-            BottomTab(homeLabel, BitChordIcons.Home),
-            BottomTab(exploreLabel, BitChordIcons.TabExplore),
-            BottomTab(libraryLabel, BitChordIcons.TabLibrary),
-            BottomTab(searchLabel, BitChordIcons.TabSearch),
-        )
+        listOf(BottomTab(libraryLabel, BitChordIcons.TabLibrary))
     }
 
     val scope = rememberCoroutineScope()
@@ -1908,6 +1904,18 @@ private fun BitChordApp(
         Manifest.permission.READ_MEDIA_AUDIO
     } else {
         Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+    val spaceLifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(spaceLifecycle) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) viewModel.loadLibrarySongs()
+        }
+        spaceLifecycle.addObserver(observer)
+        onDispose { spaceLifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(Unit) {
+        if (!LocalMediaRepository.hasStoragePermission(context)) mediaPermissionLauncher.launch(mediaPermission)
+        else viewModel.loadLibrarySongs()
     }
     // The Search tab's Library source reads the Local Music folder, so it asks
     // for the same permission opening that folder does.
@@ -2981,43 +2989,32 @@ private fun BitChordApp(
                             contentPadding = listPadding,
                         )
                     } else when (key.removePrefix(TAB_KEY).toIntOrNull() ?: selectedTab) {
-                        TAB_HOME -> HomeScreen(
-                            state = homeState,
-                            listState = homeListState,
-                            currentSong = player.song,
-                            isPlaying = player.isPlaying,
-                            title = stringResource(R.string.listen_now),
-                            signedIn = signedIn,
-                            onSignIn = { webSession = WebSessionMode.SIGN_IN },
-                            onItemClick = { item, shelfTitle ->
-                                val song = shelfSong(item)
-                                // Hoisted because ShelfItem lives in :shared, and
-                                // Kotlin will not smart-cast a public nullable
-                                // property declared in another module.
-                                val browseId = item.browseId
-                                when {
-                                    song != null -> playRadio(
-                                        song,
-                                        QueueSource(shelfTitle, PlaybackSourceType.HOME),
-                                    )
-                                    browseId != null -> viewModel.openDetail(
-                                        browseId = browseId,
-                                        title = item.title,
-                                        subtitle = item.subtitle,
-                                        thumbnailUrl = item.thumbnailUrl,
-                                    )
+                        TAB_HOME -> {
+                            val deviceState by viewModel.deviceSongs.collectAsStateWithLifecycle()
+                            var localQuery by rememberSaveable { mutableStateOf("") }
+                            val deviceSongs = (deviceState as? UiState.Success)?.data.orEmpty()
+                            Column {
+                                if (!LocalMediaRepository.hasStoragePermission(context)) {
+                                    Button(onClick = { mediaPermissionLauncher.launch(mediaPermission) }) { Text(stringResource(R.string.library)) }
                                 }
-                            },
-                            onItemLongPress = onShelfLongPress,
-                            onRetry = viewModel::loadHome,
-                            refreshing = MainViewModel.Feed.HOME in refreshing,
-                            onRefresh = { viewModel.refresh(MainViewModel.Feed.HOME) },
-                            pullState = homePull,
-                            contentPadding = listPadding,
-                            onLoadMore = viewModel::loadMoreHome,
-                            loadingMore = homeLoadingMore,
-                            recentlyPlayedLoading = homeRecentlyPlayedLoading,
-                        )
+                                androidx.compose.material3.OutlinedTextField(
+                                    value = localQuery, onValueChange = { localQuery = it },
+                                    placeholder = { Text(stringResource(R.string.search)) },
+                                    modifier = Modifier.fillMaxWidth().padding(listPadding).padding(horizontal = 16.dp),
+                                    singleLine = true,
+                                )
+                                LocalMusicScreen(
+                                    songs = deviceSongs.filter { localQuery.isBlank() || it.title.contains(localQuery, true) || it.artist.contains(localQuery, true) },
+                                    currentSong = player.song, isPlaying = player.isPlaying,
+                                    onSongClick = { songs, index -> playFrom(songs, index, QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) },
+                                    onSongLongPress = openSongMenu,
+                                    onSongSwipe = onSongSwipe,
+                                    onShuffle = { songs -> if (songs.isNotEmpty()) { QueueShuffle.enableForNextQueue(); playFrom(songs, songs.indices.random(), QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) } },
+                                    contentPadding = PaddingValues(bottom = 140.dp),
+                                    emptyMessage = (deviceState as? UiState.Error)?.message,
+                                )
+                            }
+                        }
                         TAB_EXPLORE -> selectedMoodGenre?.let { category ->
                             MoodGenrePlaylistsScreen(
                                 title = category.title,
@@ -3694,17 +3691,10 @@ private fun BitChordApp(
                             // there is a batch to report on — see
                             // [TopBarDownloadButton], which decides that for
                             // itself rather than being told.
-                            TopBarDownloadButton(onClick = { showDownloadManager = true })
-                            TopBarAccountButton(
-                                account = account,
-                                onClick = {
-                                    if (signedIn) {
-                                        viewModel.loadChannels()
-                                        showAccountSelector = true
-                                    } else showSettings = true
-                                },
-                                onSwipeProfile = { forward -> viewModel.stepProfile(forward) },
-                            )
+                            IconButton(onClick = { showSettings = true }) {
+                                Icon(Icons.Rounded.Settings, contentDescription = stringResource(R.string.settings))
+                            }
+
                         }
                     },
                 )
@@ -4133,7 +4123,7 @@ private fun BitChordApp(
             // The library toggle needs tokens only YouTube can mint, and the
             // rating it comes back with is more authoritative than anything
             // the library feed knew — so the menu asks as it opens.
-            LaunchedEffect(song.videoId) { viewModel.loadSongMenu(song.videoId) }
+            // Device tracks do not have online account actions.
             // "Remove from this playlist" is only a sentence on a playlist
             // page the account can actually edit, and only for a row that
             // carries the per-entry id a removal is expressed in.

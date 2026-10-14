@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Tells Wi-Fi from mobile data, so the matching quality ceiling applies. -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <!-- Saving a track to Music outlives the screen it was asked from. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Touch feedback. The system's own haptics switch is honoured on top of
@@ -30,7 +26,6 @@
       per-app "install unknown apps" switch is still the user's to flip; this
       only lets the request reach the installer.
     -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Reading local audio files across the device -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
@@ -47,6 +42,8 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
     <application
         android:name=".BitChordApplication"
         android:allowBackup="true"
@@ -130,11 +127,6 @@
               still what some OEM shortcuts and headset "open music" buttons
               fire, so it costs one filter to be reachable from them too.
             -->
-            <intent-filter>
-                <action android:name="android.intent.action.MUSIC_PLAYER" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.APP_MUSIC" />
-            </intent-filter>
 
             <!--
               "Play <something>" said out loud, and the search a media app is
@@ -142,10 +134,6 @@
               query means "play music" with nothing said about what, which is
               resumed rather than searched — see [MusicLink].
             -->
-            <intent-filter>
-                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
 
             <!--
               YouTube Music links: a song, an album, a playlist or an artist,
@@ -168,32 +156,11 @@
               Schemes and paths still multiply out: every scheme × every path
               prefix listed here is one accepted shape.
             -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="music.youtube.com" />
-                <data android:pathPrefix="/watch" />
-                <data android:pathPrefix="/playlist" />
-                <data android:pathPrefix="/browse" />
-                <data android:pathPrefix="/channel" />
-                <data android:pathPrefix="/search" />
-            </intent-filter>
             <!--
               youtu.be short links, which are a bare video id and nothing else.
               Kept in their own filter because the path there *is* the id, so it
               can't share the path prefixes above.
             -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="youtu.be" />
-            </intent-filter>
 
             <!-- Public Listen Together invites. autoVerify makes a tap open
                  BitChord directly once the domain publishes its assetlinks
@@ -209,14 +176,6 @@
             </intent-filter>
 
             <!-- Custom scheme for Listen Together invites on custom server deployments. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="bitchord"
-                    android:host="party" />
-            </intent-filter>
 
             <!--
               Share → BitChord, from YT Music's own share sheet or from
@@ -224,11 +183,6 @@
               wrote around the URL, so the URL is picked out of it rather than
               parsed whole.
             -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
         </activity>
 
         <service
@@ -245,19 +199,13 @@
         <receiver
             android:name="androidx.media3.session.MediaButtonReceiver"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
         </receiver>
 
         <!--
           Downloads. Not exported: it is started by the app and by its own
           cancel action, and nothing outside has any business queueing work.
         -->
-        <service
-            android:name=".download.DownloadService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
+
 
         <!--
           Home-screen widgets. Two providers so the picker lists a 2×2 and a 4×2,
@@ -337,9 +285,7 @@
         </provider>
 
         <!-- Where the Cast framework asks how this app wants to cast. -->
-        <meta-data
-            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="com.music.bitchord.playback.cast.CastOptionsProvider" />
+
     </application>
 
 </manifest>

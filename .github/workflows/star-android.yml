@@ -1,14 +1,14 @@
-name: Star Music Android verification
+name: Space Music Android verification
 on:
   push:
-    branches: [main]
+    branches: [main, space-local]
     paths-ignore: ['README.md', 'CHANGELOG.md', 'docs/**', '.signing/**']
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: star-android-${{ github.ref }}
+  group: space-android-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: star-android-build
+          name: space-android-build
           path: |
             app/build/outputs/apk/
             app/build/reports/
@@ -62,7 +62,7 @@ jobs:
           packages: platform-tools
       - uses: actions/download-artifact@v4
         with:
-          name: star-android-build
+          name: space-android-build
           path: built
       - name: Enable KVM
         run: |
@@ -86,7 +86,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: star-device-test-diagnostics
+          name: space-device-test-diagnostics
           path: |
             device-tests.txt
             device-startup-log.txt

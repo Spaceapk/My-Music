@@ -46,7 +46,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         // The player is drawn by the shared UI module; this is what it reads
         // underneath — settings, the Canvas decoder, outputs, the party.
-        AndroidStreamHooks.installEarly()
+        // Disabled for the local-only Space Music application: AndroidStreamHooks.installEarly()
         PlayerPlatform.install(AndroidPlayerHost(this))
         com.music.bitchord.ui.AppUi.install(com.music.bitchord.ui.AndroidAppUiHost)
         // The shared data layer (lyrics, the YouTube Music client) logs to
@@ -82,7 +82,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
         // nothing that runs after startup can see any of them half open.
         val backgroundInit = thread(name = "startup-init") {
             SourceRegistry.init(this)
-            AndroidStreamHooks.initInnerTubeX(this)
+            // Disabled for the local-only Space Music application: AndroidStreamHooks.initInnerTubeX(this)
             // Its own directory: canvas clips are looping video, not audio, and
             // belong in a cache AudioCache's own limit and eviction policy were
             // never sized for. See CanvasCache's doc for why this one exists at
@@ -112,6 +112,8 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
             CoroutineScope(Dispatchers.IO).launch { Innertube.ensureSessionScope() }
         }
         AppSettings.init(this, authStore)
+        AppSettings.setAnimatedCanvas(false)
+        AppSettings.setLyricsSources(emptySet())
         // Before anything resolves a track: an addon with `checkValidLossless`
         // is gated on this, and the gate reads "no" until it has looked.
         com.music.bitchord.playback.audio.LosslessOutput.init(this)
@@ -119,7 +121,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
         // mid-session is something the rest of the party never sees. The socket
         // and the clock offset are not restored — both are re-established on
         // the next connect, which is the only way to be sure they are current.
-        ListenTogether.init(this)
+        // Disabled for the local-only Space Music application: ListenTogether.init(this)
         SearchHistory.init(this)
         LastPlayed.init(this)
         com.music.bitchord.playback.PartyPersonalQueueStash.init(this)
@@ -135,7 +137,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
         // both live in this process — one owner, one directory.
         ListeningStats.init(this)
         // After AppSettings, whose switch decides whether half of it runs.
-        ArtistFacts.init(this)
+        // Disabled for the local-only Space Music application: ArtistFacts.init(this)
         // One cache directory can only be opened once per process, and
         // PlaybackService shares this one — so it's opened here, not there.
         AudioCache.init(this)
@@ -143,7 +145,7 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
         // listener's own session cookie needs a Context, and nothing in the
         // suspend call chain that reaches it (a track's canvas lookup) has
         // one to hand — see SpotifyToken's doc for why.
-        SpotifyToken.init(this)
+        // Disabled for the local-only Space Music application: SpotifyToken.init(this)
         // A sideloaded update is just a new APK over the old one, so app data —
         // including whatever the old build left in these caches — survives it
         // untouched. Wipe both on the first launch of a higher versionCode so a
@@ -157,9 +159,9 @@ class BitChordApplication : Application(), SingletonImageLoader.Factory {
             }
         }
         // Initialize LastFM with saved settings if available
-        initLastfm()
+        // Disabled for the local-only Space Music application: initLastfm()
         // The public "apps open right now" count; see Presence.
-        com.music.bitchord.data.presence.AndroidPresence.install(this)
+        // Disabled for the local-only Space Music application: com.music.bitchord.data.presence.AndroidPresence.install(this)
         backgroundInit.join()
     }
 

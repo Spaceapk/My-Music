@@ -111,6 +111,9 @@ object CastController {
      * the Cast row never appears.
      */
     fun ensureStarted(context: Context) {
+        // Space Music has no network playback destinations.
+        return
+        @Suppress("UNREACHABLE_CODE")
         if (started) return
         started = true
         val app = context.applicationContext

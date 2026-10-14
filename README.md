@@ -1,19 +1,15 @@
-# Star Music
+# Space Music
 
-Versión Android independiente de [BitChord](https://github.com/kushagrasinghx/BitChord), desarrollada por nexlibre.
+Reproductor Android de música local derivado de [Star Music](https://github.com/nexlibre/Star-Music), basado en [BitChord](https://github.com/kushagrasinghx/BitChord).
 
-**[Descargar Star Music Beta 1.0.0 — APK Android](https://github.com/nexlibre/Star-Music/releases/download/v1.0.0-beta/Star-Music-1.0.0-beta.apk)**
+Conserva el motor de audio, temas, Liquid Glass, biblioteca por canciones/artistas/álbumes, listas locales persistentes, ecualizador y ajustes de reproducción. La pantalla inicial muestra archivos del dispositivo y búsqueda local. No requiere cuentas y el manifiesto elimina el permiso de Internet, también de las dependencias.
 
-[Versiones y descargas](https://github.com/nexlibre/Star-Music/releases) · [Compilaciones](https://github.com/nexlibre/Star-Music/actions)
+Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a Star Music.
 
-## Listas locales
+## Estado
 
-En Biblioteca → Música local → Listas puedes crear, renombrar y eliminar listas, añadir canciones del dispositivo, quitarlas y cambiar su orden con los botones subir/bajar. Las listas se guardan en el dispositivo; no requieren cuenta ni conexión. Eliminar una lista o una entrada no borra el archivo de música. La reproducción necesita que el archivo siga disponible y que Android mantenga el permiso de acceso a música.
+Implementación inicial pendiente de verificación Android. No hay todavía un APK publicado y verificado de Space Music. GitHub Actions compila y prueba la aplicación; no se reutilizan las claves ni secretos de Star Music.
 
-## Identidad y créditos
+## Licencia y créditos
 
-Nombre: Star Music. Identificador Android: `org.nexlibre.starmusic`. Icono propio de estrella musical.
-
-BitChord y sus funcionalidades originales son obra de **kushagrasinghx y sus colaboradores**. Star Music es una derivación independiente, sin afiliación con el proyecto original. El historial original se conserva. Consulta [el README original](README-UPSTREAM.md), [la licencia GPL-3.0](LICENSE) y los avisos de terceros incluidos en el código.
-
-Las modificaciones se describen en [CHANGELOG.md](CHANGELOG.md). Los workflows originales se conservan como referencia en `docs/upstream-workflows`; la automatización de Star Music se mantiene separada.
+GPL-3.0: se conserva LICENSE y el historial original. Los nombres de paquetes internos se mantienen para conservar compatibilidad del código. Funciones remotas heredadas permanecen en el código compartido, pero Space Music no dispone de permiso de red ni de accesos de inicio a sus pantallas.
