@@ -1,14 +1,17 @@
-# Star Music 1.0.0-beta
+# Space Music — cambios
 
-Base: BitChord, commit fe95bb60aa9cd205cf4ab8bd25a5bec71a595b4f.
+## 1.0.0 — versión inicial en verificación
 
-- Importación íntegra del código y conservación del historial original.
-- Nombre Star Music, icono musical propio e identificador Android independiente. Marca propia en notificaciones, tarjetas para compartir y carpeta de descargas. Se conserva el namespace interno para reducir cambios y evitar regresiones.
-- Nueva pestaña de listas de archivos locales, con creación, renombrado, borrado, selección múltiple, eliminación de entradas y orden manual.
-- Persistencia atómica de metadatos, URI y ruta local, sin llamadas a servicios en línea.
-- Actualizador Android dirigido al repositorio de Star Music.
-- Automatización independiente para verificar, compilar y preparar el APK.
-- Verificación estática con línea base de hallazgos heredados cotejados contra el código original; los hallazgos nuevos siguen bloqueando la compilación. Consulta docs/LINT-BASELINE.md. Correcciones de recursos de porcentaje literal y plurales necesarias para ejecutar lint.
-- Ajustes necesarios para verificar la base importada: SDK 37.0, nombres de chino simplificado/tradicional y etiquetas de región en las pruebas de idiomas. Se retiran seis traducciones huérfanas de opciones que no están presentes en el código, detectadas por lint. La prueba de integración con Genius queda disponible mediante RUN_LIVE_GENIUS_TESTS=true; sus pruebas de análisis local se mantienen obligatorias.
+- Derivación de Star Music y BitChord; historial y licencia GPL-3.0 conservados.
+- Nombre independiente y paquete Android org.nexlibre.spacemusic.
+- Biblioteca inicial del dispositivo, búsqueda local, canciones, artistas, álbumes y listas persistentes.
+- Temas, Liquid Glass, reproductor, ecualizador, reproducción en segundo plano, widgets y ajustes locales heredados.
+- Eliminados del inicio y ajustes: cuentas, streaming, servidores, integraciones, descargas y actualizaciones en línea.
+- Android Auto muestra música local; búsquedas y solicitudes de reproducción usan archivos locales.
+- Sin permiso de Internet ni de lectura del estado de red en el APK final.
+- Carátulas y letras incrustadas se leen del archivo. No se consultan proveedores remotos.
+- GitHub Actions comprueba regresiones, compilación, permisos, persistencia de listas, decodificación sin conexión y arranque en Android.
 
-Estado: compilación, pruebas de regresión, persistencia y reproducción sin red en Android 13 (API 33), instalación de release y firma verificadas automáticamente. Las pruebas automatizadas no sustituyen pruebas en todos los dispositivos físicos.
+Pendiente: resultado de las verificaciones y pruebas manuales en teléfonos físicos. El APK debug generado por Actions es una compilación de prueba, con firma de desarrollo; no representa una release definitiva con clave de publicación estable.
+
+La lógica remota heredada se conserva parcialmente como código sin acceso desde la interfaz local. La eliminación del permiso de Internet impide conexiones de red de toda la aplicación, incluidas sus dependencias.
