@@ -77,7 +77,7 @@ elif sys.argv[1] == 'verify':
         for attempt in range(15):
             dump = adb('shell', 'dumpsys', 'media_session')
             Path('device-playlist-session.txt').write_text(dump)
-            if title in dump and re.search(r'\bstate=' + str(state) + r'\b', dump): return
+            if title in dump and re.search(r'\bstate=(?:[A-Z_]+\()?'+ str(state) + r'\b', dump): return
             time.sleep(1)
         raise AssertionError(f'Media session did not reach {title}, state {state}')
     session_state(TRACKS[1], 3)
