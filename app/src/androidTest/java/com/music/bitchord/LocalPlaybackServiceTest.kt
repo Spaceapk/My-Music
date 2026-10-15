@@ -100,11 +100,16 @@ class LocalPlaybackServiceTest {
     private fun grantLocalPermissions() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val packageName = instrumentation.targetContext.packageName
-        instrumentation.uiAutomation.grantRuntimePermission(packageName,
-            if (android.os.Build.VERSION.SDK_INT >= 33) android.Manifest.permission.READ_MEDIA_AUDIO
-            else android.Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (android.os.Build.VERSION.SDK_INT >= 33) {
-            instrumentation.uiAutomation.grantRuntimePermission(packageName, android.Manifest.permission.POST_NOTIFICATIONS)
+        // UiAutomation.grantRuntimePermission was added after API 26.
+        // The shell command is available throughout our supported API range.
+        val permissions = if (android.os.Build.VERSION.SDK_INT >= 33) {
+            listOf(android.Manifest.permission.READ_MEDIA_AUDIO, android.Manifest.permission.POST_NOTIFICATIONS)
+        } else listOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        permissions.forEach { permission ->
+            instrumentation.uiAutomation.executeShellCommand("pm grant $packageName $permission").use { descriptor ->
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(descriptor).use { it.readBytes() }
+            }
+            assertEquals(android.content.pm.PackageManager.PERMISSION_GRANTED, instrumentation.targetContext.checkSelfPermission(permission))
         }
     }
 
