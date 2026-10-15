@@ -76,15 +76,18 @@ class LocalPlaybackServiceTest {
             }
             scenario.recreate()
             instrumentation.runOnMainSync {
-                assertEquals(731, player.mediaItemCount)
-                assertNotNull(player.currentMediaItem)
+                assertEquals("local-service-365", player.currentMediaItem!!.mediaId)
+                assertEquals(731 - 365, player.mediaItemCount - player.currentMediaItemIndex)
+                assertEquals("local-service-730", player.getMediaItemAt(player.mediaItemCount - 1).mediaId)
                 player.pause()
                 player.seekToNextMediaItem()
                 player.play()
             }
             scenario.recreate()
             instrumentation.runOnMainSync {
-                assertEquals(731, player.mediaItemCount)
+                assertEquals("local-service-366", player.currentMediaItem!!.mediaId)
+                assertEquals(731 - 366, player.mediaItemCount - player.currentMediaItemIndex)
+                assertEquals("local-service-730", player.getMediaItemAt(player.mediaItemCount - 1).mediaId)
                 assertNull(player.playerError)
             }
         } finally {

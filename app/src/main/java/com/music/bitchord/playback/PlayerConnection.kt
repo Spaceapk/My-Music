@@ -563,19 +563,10 @@ fun Song.toMediaItem(): MediaItem {
     // is what a downloaded track played from search used to do, four times over,
     // before giving up.
     //
-    // Both halves are checked, not just the record: a claim about a folder this
-    // app does not own — see [Downloads] — outlives the file it names whenever
-    // one is deleted from a file manager, and trusting either unchecked sent the
-    // player a `file://` uri to a path that had simply stopped existing.
-    //
-    // [localUri] needs it just as much as the lookup does, and for a reason that
-    // is easy to miss: it is not only set from a folder read that just verified
-    // the file. It also round-trips off the player's own item through
-    // [MediaItem.toSong], so an item waiting in the live queue can carry a URI
-    // that has become stale since it was created. Checking only the lookup
-    // leaves that path unguarded.
-    val offlineUri = localUri?.takeUnless(Downloads::isMissingLocalFile)
-        ?: Downloads.verifiedSavedUri(videoId)
+    // Keep explicit local references even when a file has been deleted.
+    // Space Music cannot replace them with online streams: ExoPlayer must
+    // report the local file error so the service can show a useful message.
+    val offlineUri = localUri ?: Downloads.verifiedSavedUri(videoId)
     val uriString = offlineUri ?: when {
         videoId.startsWith("content://") || videoId.startsWith("file://") -> videoId
         // Title, artist and runtime ride along in the URI because they are what
