@@ -144,6 +144,7 @@ interface PlayerSettingsSource {
     val hideSongStatus: StateFlow<Boolean>
     val hideVolumeBar: StateFlow<Boolean>
     val lastPlayerScreen: StateFlow<LastPlayerScreen>
+    val ambientMode: StateFlow<Boolean> get() = NoAmbientMode
     val legacyMeshGradient: StateFlow<Boolean>
     val lyricsBlur: StateFlow<Boolean>
     val lyricsOffsetMs: StateFlow<Int>
@@ -322,3 +323,5 @@ internal fun rememberRemoteArtworkUrl(song: Song?): String? =
 @Composable
 internal fun AudioPipelineDialog(hazeState: HazeState, isPlaying: Boolean, onDismiss: () -> Unit) =
     PlayerPlatform.host.AudioPipelineDialog(hazeState, isPlaying, onDismiss)
+
+private val NoAmbientMode: StateFlow<Boolean> = kotlinx.coroutines.flow.MutableStateFlow(false)

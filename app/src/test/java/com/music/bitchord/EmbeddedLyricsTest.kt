@@ -28,6 +28,48 @@ import kotlin.io.path.createTempDirectory
  */
 class EmbeddedLyricsTest {
 
+    @Test fun `plain embedded lyrics are displayed without invented timing`() {
+        val raw = "Primera línea\nSegunda línea"
+        val lines = EmbeddedLyrics.parseLocal("\uFEFF" + raw)!!
+        assertEquals(raw, lines.single().text)
+        assertEquals(0L, lines.single().timeMs)
+        assertNull(EmbeddedLyrics.parseLocal("  "))
+    }
+
+    @Test fun `standard unsynced FLAC field is accepted case insensitively`() {
+        val value = "unsyncedlyrics=Primera línea\nSegunda línea".toByteArray()
+        fun little(n: Int) = byteArrayOf(n.toByte(), (n shr 8).toByte(), (n shr 16).toByte(), (n shr 24).toByte())
+        val comment = little(0) + little(1) + little(value.size) + value
+        val bytes = "fLaC".toByteArray() + byteArrayOf(0x84.toByte(), 0, (comment.size shr 8).toByte(), comment.size.toByte()) + comment
+        assertEquals("Primera línea\nSegunda línea", EmbeddedLyrics.fromBytes(bytes))
+    }
+
+    @Test fun `mp3 USLT accepts UTF8 and UTF16 in ID3 v23 and v24`() {
+        for (version in listOf(3, 4)) for (encoding in listOf(1, 3)) {
+            val charset = if (encoding == 1) Charsets.UTF_16 else Charsets.UTF_8
+            val text = "Letra con acentos: canción"
+            val description = if (encoding == 1) byteArrayOf(0xff.toByte(), 0xfe.toByte(), 0, 0) else byteArrayOf(0)
+            val body = byteArrayOf(encoding.toByte()) + "spa".toByteArray() + description + text.toByteArray(charset)
+            fun length(n: Int, sync: Boolean): ByteArray = (3 downTo 0).map { ((n shr (it * if (sync) 7 else 8)) and if (sync) 127 else 255).toByte() }.toByteArray()
+            val frame = "USLT".toByteArray() + length(body.size, version == 4) + byteArrayOf(0, 0) + body
+            val tag = "ID3".toByteArray() + byteArrayOf(version.toByte(), 0, 0) + length(frame.size, true) + frame
+            assertEquals(text, EmbeddedLyrics.fromBytes(tag))
+            assertNull(EmbeddedLyrics.fromBytes(tag.copyOf(14)))
+        }
+    }
+
+    @Test fun `local file uses matching sidecar and ignores unrelated lyric file`() {
+        val directory = createTempDirectory().toFile()
+        try {
+            val audio = File(directory, "Song.flac").apply { writeText("audio") }
+            File(directory, "Other.lrc").writeText("wrong")
+            assertNull(EmbeddedLyrics.sidecar(audio.path))
+            File(directory, "Song.LRC").writeText("[00:01.00]local text")
+            assertEquals("[00:01.00]local text", EmbeddedLyrics.sidecar(audio.path))
+            assertEquals("audio", audio.readText())
+        } finally { directory.deleteRecursively() }
+    }
+
     private val lrc = "[00:01.00]first line\n[00:05.00]second line"
 
     @Test

@@ -343,7 +343,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             emptySet()
         }
         val key = videoId to sources
-        if (lyricsFor == key) return
+        if (lyricsFor == key && localUri == null) return
         // The duration lands a beat after the track, and a database match needs
         // it. Turned away here rather than inside the job below: claiming the
         // lookup first and giving it up asynchronously means the very re-trigger
@@ -365,7 +365,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         _lyrics.value = null
         _lyricsSource.value = null
         lyricsJob?.cancel()
-        if (sources.isEmpty()) {
+        if (!AppSettings.syncedLyrics.value) {
             // Switched off, or every source unticked. Nothing to look up, and
             // nothing to say about it — the player drops the lyric strip
             // rather than reporting a track with no lyrics.
@@ -387,6 +387,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     _lyricsChecked.value = true
                     return@launch
                 }
+            }
+            if (localUri != null) {
+                _lyricsChecked.value = true
+                return@launch
             }
             if (durationMs <= 0L) {
                 // Duration arrives a beat after the track does; wait for it.

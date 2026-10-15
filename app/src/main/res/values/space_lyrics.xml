@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Ambient mode</string>
+    <string name="ambient_mode_subtitle">Moving artwork colours in the player. Pauses with playback and respects Reduce animation.</string>
+    <string name="import_local_lyrics">Import lyrics (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Lyrics saved for this song. Open the lyrics panel to read them.</string>
+    <string name="local_lyrics_import_failed">Could not import. Choose a UTF-8 or UTF-16 LRC/TXT file up to 1 MB.</string>
+</resources>

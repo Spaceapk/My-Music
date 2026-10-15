@@ -73,14 +73,22 @@ object EmbeddedLyrics {
                 ?: return@withContext null
             // The same last pass the network sources get, so a downloaded track
             // and a streamed one draw their backing vocals the same way.
-            LrcLib.parseLrc(raw).takeIf { lines -> lines.any { it.text.isNotBlank() } }
+            parseLocal(raw)
                 ?.withBackgroundVocals()
         }
 
     /** The raw LRC text for the file, preferring this app's word-timed field. */
     private fun read(context: Context, uri: Uri): String? =
-        sidecar(uri.path.takeIf { uri.scheme == "file" })
-            ?: open(context, uri)?.use { fromBytes(it.readAtMost(MAX_TAG_BYTES)) }
+        LocalLyricsStore.read(context, uri.toString())
+            ?: sidecar(uri.path.takeIf { uri.scheme == "file" })
+            ?: open(context, uri)?.buffered()?.use { stream ->
+                stream.mark(4)
+                val magic = ByteArray(4)
+                val count = stream.read(magic)
+                stream.reset()
+                if (count == 4 && magic.contentEquals(FLAC_MAGIC)) readFlac(stream)
+                else fromBytes(stream.readAtMost(MAX_TAG_BYTES))
+            }
 
     /**
      * The `lyrics.lrc` written next to the offline package playlist at [path].
@@ -96,9 +104,13 @@ object EmbeddedLyrics {
      * the writers can be tested on a real directory, without a device.
      */
     internal fun sidecar(path: String?): String? {
-        val playlist = path?.let(::File)?.takeIf { it.name.endsWith(".m3u8", ignoreCase = true) }
-            ?: return null
-        val file = File(playlist.parentFile ?: return null, "lyrics.lrc")
+        val audio = path?.let(::File) ?: return null
+        val directory = audio.parentFile ?: return null
+        val file = if (audio.extension.equals("m3u8", true)) File(directory, "lyrics.lrc")
+            else directory.listFiles()?.firstOrNull {
+                it.nameWithoutExtension.equals(audio.nameWithoutExtension, true) &&
+                    it.extension.lowercase() in setOf("lrc", "txt")
+            } ?: return null
         // Bounded for the same reason [MAX_TAG_BYTES] is: this is read into a
         // string, and the size on disk is the only thing that says how big one.
         if (!file.isFile || file.length() !in 1..MAX_TAG_BYTES.toLong()) return null
@@ -117,6 +129,7 @@ object EmbeddedLyrics {
      */
     internal fun fromBytes(head: ByteArray): String? {
         val found = when {
+            head.startsWith(ID3_MAGIC) -> id3(head)
             head.startsWith(FLAC_MAGIC) -> flac(head)
             head.startsWith(MATROSKA_MAGIC) -> matroska(head)
             head.isMp4() -> mp4(head)
@@ -131,6 +144,75 @@ object EmbeddedLyrics {
         } else {
             context.contentResolver.openInputStream(uri)
         }
+
+    /** Unsynchronised text stays intact; never invent timestamps for plain lyrics. */
+    internal fun parseLocal(raw: String): List<LyricLine>? {
+        val text = raw.trimStart('\uFEFF').trim()
+        if (text.isEmpty()) return null
+        val timed = LrcLib.parseLrc(text)
+        return timed.takeIf { lines -> lines.any { it.text.isNotBlank() } }
+            ?: listOf(LyricLine(0L, text))
+    }
+
+    // ID3v2.3/v2.4 USLT: encoding, language, terminated description, lyrics.
+    private fun id3(bytes: ByteArray): String? {
+        if (bytes.size < 10) return null
+        val version = bytes[3].toInt() and 255
+        if (version !in 3..4) return null
+        fun sync(at: Int): Int = (0..3).fold(0) { n, i ->
+            (n shl 7) or (bytes[at + i].toInt() and 127)
+        }
+        val end = minOf(bytes.size, 10 + sync(6))
+        // Global unsynchronisation inserts 00 after FF. Decode before walking frames.
+        val payload = bytes.copyOfRange(10, end).let { data ->
+            if (bytes[5].toInt() and 0x80 == 0) data else {
+                val out = ByteArrayOutputStream()
+                var i = 0
+                while (i < data.size) {
+                    out.write(data[i].toInt())
+                    if (data[i].toInt() and 255 == 255 && i + 1 < data.size && data[i + 1] == 0.toByte()) i++
+                    i++
+                }
+                out.toByteArray()
+            }
+        }
+        var pos = 0
+        if (bytes[5].toInt() and 0x40 != 0) {
+            if (payload.size < 4) return null
+            val size = if (version == 4) (0..3).fold(0) { n, i -> (n shl 7) or (payload[i].toInt() and 127) }
+                else readU32(payload, 0).toInt() + 4
+            if (size < 4 || size > payload.size) return null
+            pos = size
+        }
+        while (pos + 10 <= payload.size) {
+            val name = String(payload, pos, 4, Charsets.US_ASCII)
+            val size = if (version == 4) (0..3).fold(0) { n, i -> (n shl 7) or (payload[pos + 4 + i].toInt() and 127) }
+                else readU32(payload, pos + 4).toInt()
+            val start = pos + 10
+            if (size <= 0 || size > payload.size - start) return null
+            val flags = payload[pos + 9].toInt() and 255
+            if (name == "USLT" && flags == 0 && size > 4) {
+                val encoding = payload[start].toInt() and 255
+                val charset = when (encoding) {
+                    0 -> Charsets.ISO_8859_1
+                    1 -> Charsets.UTF_16
+                    2 -> Charsets.UTF_16BE
+                    3 -> Charsets.UTF_8
+                    else -> return null
+                }
+                val step = if (encoding in 1..2) 2 else 1
+                var at = start + 4
+                while (at + step <= start + size) {
+                    if (payload[at] == 0.toByte() && (step == 1 || payload[at + 1] == 0.toByte())) {
+                        return String(payload, at + step, start + size - at - step, charset).trimEnd('\u0000')
+                    }
+                    at += step
+                }
+            }
+            pos = start + size
+        }
+        return null
+    }
 
     // ---- MP4 / M4A ----------------------------------------------------------
 
@@ -219,6 +301,32 @@ object EmbeddedLyrics {
         return String(bytes, dataAt + 12, start + size - (dataAt + 12), Charsets.UTF_8)
     }
 
+    /** Skip artwork/padding without loading it or losing comments after a large cover. */
+    private fun readFlac(stream: InputStream): String? {
+        if (stream.readAtMost(4).size != 4) return null
+        repeat(256) {
+            val header = stream.readAtMost(4)
+            if (header.size != 4) return null
+            val flags = header[0].toInt() and 255
+            val length = ((header[1].toInt() and 255) shl 16) or
+                ((header[2].toInt() and 255) shl 8) or (header[3].toInt() and 255)
+            if (flags and 127 == FLAC_VORBIS_COMMENT) {
+                if (length > MAX_TAG_BYTES) return null
+                val comment = stream.readAtMost(length)
+                if (comment.size != length) return null
+                return vorbisComment(comment, 0, comment.size)
+            }
+            var left = length.toLong()
+            while (left > 0) {
+                val skipped = stream.skip(left)
+                if (skipped > 0) left -= skipped
+                else if (stream.read() < 0) return null else left--
+            }
+            if (flags and 128 != 0) return null
+        }
+        return null
+    }
+
     // ---- FLAC ---------------------------------------------------------------
 
     /**
@@ -255,12 +363,13 @@ object EmbeddedLyrics {
             return v
         }
         val vendor = u32() ?: return null
+        if (vendor < 0 || vendor > end - pos) return null
         pos += vendor
         val count = u32() ?: return null
         var plain: String? = null
         repeat(count.coerceAtMost(4_096)) {
             val length = u32() ?: return plain
-            if (length < 0 || pos + length > end) return plain
+            if (length < 0 || length > end - pos) return plain
             val entry = String(bytes, pos, length, Charsets.UTF_8)
             pos += length
             val name = entry.substringBefore('=').uppercase()
@@ -268,7 +377,7 @@ object EmbeddedLyrics {
             // This app's own field wins outright; the standard one is held in
             // case it turns out to be the only one there.
             if (name == WORD_LYRICS_FIELD && value.isNotBlank()) return value
-            if (name == "LYRICS" && plain == null && value.isNotBlank()) plain = value
+            if (name in setOf("LYRICS", "UNSYNCEDLYRICS", "UNSYNCED LYRICS", "SYNCEDLYRICS") && plain == null && value.isNotBlank()) plain = value
         }
         return plain
     }
@@ -385,6 +494,7 @@ object EmbeddedLyrics {
     }
 
     private const val FLAC_VORBIS_COMMENT = 4
+    private val ID3_MAGIC = "ID3".toByteArray(Charsets.US_ASCII)
     private val FLAC_MAGIC = "fLaC".toByteArray(Charsets.US_ASCII)
     private val MATROSKA_MAGIC = byteArrayOf(0x1A, 0x45, 0xDF.toByte(), 0xA3.toByte())
     private val DATA_ATOM = "data".toByteArray(Charsets.ISO_8859_1)

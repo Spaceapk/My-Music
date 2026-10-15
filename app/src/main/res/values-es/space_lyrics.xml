@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Modo ambiente</string>
+    <string name="ambient_mode_subtitle">Colores de la carátula en movimiento. Se detiene al pausar y respeta Reducir animaciones.</string>
+    <string name="import_local_lyrics">Importar letra (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Letra guardada para esta canción. Abre el panel de letras para leerla.</string>
+    <string name="local_lyrics_import_failed">No se pudo importar. Elige un LRC/TXT UTF-8 o UTF-16 de hasta 1 MB.</string>
+</resources>

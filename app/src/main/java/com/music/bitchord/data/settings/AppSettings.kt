@@ -470,6 +470,7 @@ object AppSettings {
      * Kept as a switch because people asked for the old look back, and neither
      * reason is one a listener has to agree with.
      */
+    val ambientMode = MutableStateFlow(false)
     val legacyMeshGradient = MutableStateFlow(false)
 
     /** Restores the expanded player to the surface the listener left open. */
@@ -847,6 +848,7 @@ object AppSettings {
         spotifyCanvasAutoHide.value = prefs.getBoolean(KEY_SPOTIFY_CANVAS_AUTO_HIDE, true)
         prioritizeSpotifyCanvas.value = prefs.getBoolean(KEY_PRIORITIZE_SPOTIFY_CANVAS, false)
         fullBleedArtwork.value = prefs.getBoolean(KEY_FULL_BLEED_ARTWORK, true)
+        ambientMode.value = prefs.getBoolean("space_ambient_mode", false)
         legacyMeshGradient.value = prefs.getBoolean(KEY_LEGACY_MESH_GRADIENT, false)
         lastPlayerScreen.value = runCatching {
             LastPlayerScreen.valueOf(
@@ -1397,6 +1399,11 @@ object AppSettings {
     fun setFullBleedArtwork(value: Boolean) {
         fullBleedArtwork.value = value
         prefs.edit().putBoolean(KEY_FULL_BLEED_ARTWORK, value).apply()
+    }
+
+    fun setAmbientMode(value: Boolean) {
+        ambientMode.value = value
+        prefs.edit().putBoolean("space_ambient_mode", value).apply()
     }
 
     fun setLegacyMeshGradient(value: Boolean) {
