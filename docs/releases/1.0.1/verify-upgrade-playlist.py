@@ -123,6 +123,8 @@ elif sys.argv[1] in ('capture_dark', 'capture_light', 'capture_glass'):
     expected = 'LIGHT' if mode == 'light' else 'DARK'
     assert next(e.text for e in persisted if e.get('name') == 'theme_mode') == expected
     tap('Settings')
+    find('Search settings')
+    time.sleep(0.5)
     Path('device-settings-' + mode + '.png').write_bytes(subprocess.check_output(['adb', 'exec-out', 'screencap', '-p'], timeout=30))
     print('Captured configured ' + mode + ' library and settings themes')
 else:
