@@ -6,6 +6,10 @@ if [ -z "$apk" ]; then apk=$(find built -path '*/prod/debug/*' -name '*universal
 test_apk=${TEST_INSTRUMENTATION_APK:-$(find built -path '*/androidTest/prod/debug/*' -name '*.apk' | head -1)}
 test -n "$apk"
 test -n "$test_apk"
+# google_apis test images allow root. API 26's shell user cannot toggle Wi-Fi;
+# svc otherwise throws SecurityException before instrumentation even starts.
+timeout 30s adb root
+timeout 30s adb wait-for-device
 timeout 180s adb install -r --no-incremental "$apk"
 timeout 180s adb install -r --no-incremental "$test_apk"
 adb shell svc wifi disable
