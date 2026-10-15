@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.music.bitchord.R
 import com.music.bitchord.ui.components.ReorderableSongList
@@ -63,15 +64,19 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             if (selected != null) IconButton(onClick = { selectedId = null }) {
                 Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back))
             }
-            Text(selected?.name ?: stringResource(R.string.playlists), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
+            Text(selected?.name ?: stringResource(R.string.playlists), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (selected == null) IconButton(onClick = { name = ""; editing = true }, enabled = !busy) {
                 Icon(Icons.Rounded.Add, stringResource(R.string.create_playlist))
-            } else {
+            }
+        }
+        if (selected != null) Row(
+            Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.End,
+        ) {
                 IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) { Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs)) }
                 IconButton(onClick = { reordering = true }, enabled = !busy && selected.songs.size > 1) { Icon(Icons.Rounded.DragHandle, stringResource(R.string.reorder_songs)) }
                 IconButton(onClick = { name = selected.name; editing = true }, enabled = !busy) { Icon(Icons.Rounded.Edit, stringResource(R.string.rename)) }
                 IconButton(onClick = { deleting = true }, enabled = !busy) { Icon(Icons.Rounded.Delete, stringResource(R.string.delete)) }
-            }
         }
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (selected == null) {
