@@ -157,3 +157,60 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
         dismissButton = { TextButton(onClick = { adding = false }) { Text(stringResource(R.string.cancel)) } })
     error?.let { message -> AlertDialog(onDismissRequest = { error = null }, title = { Text(stringResource(R.string.star_save_error)) }, text = { Text(message) }, confirmButton = { TextButton(onClick = { error = null }) { Text(stringResource(R.string.back)) } }) }
 }
+
+/** Shared by the song menu and library batch selection; never uses account playlists. */
+@Composable
+fun DevicePlaylistPickerDialog(songs: List<Song>, onDismiss: () -> Unit) {
+    val context = LocalContext.current.applicationContext
+    val store = remember(context) { runCatching { DevicePlaylistStore.forDevice(context) } }.getOrNull()
+    if (store == null) {
+        AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.star_save_error)) },
+            confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
+        return
+    }
+    val playlists by store.playlists.collectAsStateWithLifecycle()
+    var selectedId by remember { mutableStateOf<String?>(null) }
+    var name by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() },
+        title = { Text(stringResource(R.string.add_to_playlist)) },
+        text = {
+            Column {
+                LazyColumn(Modifier.heightIn(max = 260.dp)) {
+                    items(playlists, key = { it.id }) { playlist ->
+                        Row(Modifier.fillMaxWidth().clickable(enabled = !busy) {
+                            selectedId = playlist.id; name = ""
+                        }, verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(selected = selectedId == playlist.id, enabled = !busy,
+                                onClick = { selectedId = playlist.id; name = "" })
+                            Text(playlist.name, maxLines = 2)
+                        }
+                    }
+                }
+                OutlinedTextField(value = name, enabled = !busy, singleLine = true,
+                    onValueChange = { name = it; if (it.isNotBlank()) selectedId = null },
+                    label = { Text(stringResource(R.string.new_playlist)) })
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = !busy && (name.isNotBlank() || playlists.any { it.id == selectedId }), onClick = {
+                val id = selectedId
+                val title = name.trim()
+                busy = true
+                scope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            if (id == null) store.createWithSongs(title, songs) else store.add(id, songs)
+                        }
+                        onDismiss()
+                    } catch (e: Exception) { error = e.localizedMessage }
+                    finally { busy = false }
+                }
+            }) { Text(stringResource(R.string.save)) }
+        },
+        dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
+}

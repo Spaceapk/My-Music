@@ -4080,7 +4080,7 @@ private fun BitChordApp(
                 },
                 onAddToPlaylist = {
                     songActions = null
-                    viewModel.loadPlaylists()
+                    if (song.localUri == null) viewModel.loadPlaylists()
                     playlistTarget = song
                 },
                 onRemoveFromPlaylist = editable?.let {
@@ -4259,7 +4259,11 @@ private fun BitChordApp(
         // One sheet for both, because they are one decision: the list of
         // playlists with a way to make another. `creatingPlaylist` opens it
         // straight onto the form, which is what the Library tile means.
-        if (playlistTarget != null || creatingPlaylist) {
+        val localPlaylistTarget = playlistTarget?.takeIf { it.localUri != null }
+        if (localPlaylistTarget != null) {
+            com.music.bitchord.ui.screens.DevicePlaylistPickerDialog(listOf(localPlaylistTarget)) { playlistTarget = null }
+        }
+        if ((playlistTarget != null && localPlaylistTarget == null) || creatingPlaylist) {
             val target = playlistTarget
             val dismiss = {
                 playlistTarget = null

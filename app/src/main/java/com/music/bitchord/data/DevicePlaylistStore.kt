@@ -69,6 +69,11 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
         require(name.trim().isNotEmpty())
         update { it + DevicePlaylist(UUID.randomUUID().toString(), name.trim(), emptyList()) }
     }
+    fun createWithSongs(name: String, songs: List<Song>) {
+        require(name.trim().isNotEmpty())
+        require(songs.all { it.localUri?.let { uri -> uri.startsWith("content://") || uri.startsWith("file://") } == true })
+        update { it + DevicePlaylist(UUID.randomUUID().toString(), name.trim(), songs.distinctBy { song -> song.localUri }) }
+    }
     fun rename(id: String, name: String) {
         require(name.trim().isNotEmpty())
         update { list -> list.map { if (it.id == id) it.copy(name = name.trim()) else it } }

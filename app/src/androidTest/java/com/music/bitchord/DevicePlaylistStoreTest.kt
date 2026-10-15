@@ -13,10 +13,10 @@ class DevicePlaylistStoreTest {
         val filename = "test-${UUID.randomUUID()}.json"
         try {
             val store = DevicePlaylistStore(context, filename)
-            store.create("  My files  ")
-            val id = store.playlists.value.single().id
             val a = Song("local:1", "First", "Artist", null, localUri = "content://media/external/audio/media/1", localPath = "/storage/emulated/0/Music/a.flac")
             val b = Song("local:2", "Second", "Artist", null, localUri = "file:///storage/emulated/0/Music/b.flac")
+            store.createWithSongs("  My files  ", listOf(a, b, a))
+            val id = store.playlists.value.single().id
             store.add(id, listOf(a, b, a))
             assertEquals(2, store.playlists.value.single().songs.size)
             store.reorder(id, listOf(b.localUri!!, a.localUri!!))
@@ -41,6 +41,8 @@ class DevicePlaylistStoreTest {
         try {
             val store = DevicePlaylistStore(context, filename)
             assertTrue(runCatching { store.create(" ") }.isFailure)
+            assertTrue(runCatching { store.createWithSongs("Remote", listOf(Song("online", "Online", "Artist", null))) }.isFailure)
+            assertTrue(store.playlists.value.isEmpty())
             store.create("Local")
             val id = store.playlists.value.single().id
             assertTrue(runCatching { store.add(id, listOf(Song("online", "Online", "Artist", null))) }.isFailure)
