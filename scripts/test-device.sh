@@ -8,8 +8,12 @@ test -n "$apk"
 test -n "$test_apk"
 # google_apis test images allow root. API 26's shell user cannot toggle Wi-Fi;
 # svc otherwise throws SecurityException before instrumentation even starts.
-timeout 30s adb root
-timeout 30s adb wait-for-device
+for attempt in 1 2 3; do
+  timeout 30s adb root || true
+  timeout 30s adb wait-for-device
+  if [ "$(timeout 15s adb shell id -u | tr -d '\r')" = 0 ]; then break; fi
+done
+test "$(timeout 15s adb shell id -u | tr -d '\r')" = 0
 timeout 180s adb install -r --no-incremental "$apk"
 timeout 180s adb install -r --no-incremental "$test_apk"
 adb shell svc wifi disable

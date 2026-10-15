@@ -19,7 +19,7 @@ class LocalMediaFilterTest {
     }
 
     @Test
-    fun rejectsWaveAndRecorderFiles() {
+    fun rejectsRecorderFiles() {
         assertFalse(
             LocalMediaRepository.isEligibleLocalMusic(
                 durationMs = 180_000,
@@ -34,6 +34,11 @@ class LocalMediaFilterTest {
                 path = "/storage/emulated/0/Voice Recorder/voice-note.mp3",
             ),
         )
+    }
+
+    @Test
+    fun keepsWaveMusicOutsideRecorderFolders() {
+        assertTrue(LocalMediaRepository.isEligibleLocalMusic(180_000, "Song.wav", "/storage/emulated/0/Music/Song.wav"))
     }
 
     @Test
