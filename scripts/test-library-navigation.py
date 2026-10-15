@@ -62,7 +62,7 @@ for label in labels:
     tap(label)
     Path('device-navigation-' + label.lower() + '.png').write_bytes(adb('exec-out', 'screencap', '-p'))
 root = snapshot()
-assert any(n.get('text') == 'Create playlist' for n in root.iter('node')), 'Playlists did not open'
+assert any('Create playlist' in (n.get('text'), n.get('content-desc')) for n in root.iter('node')), 'Playlists did not open'
 # A configuration change must preserve selection in the hoisted saveable state.
 adb('shell', 'settings', 'put', 'system', 'accelerometer_rotation', '0')
 adb('shell', 'settings', 'put', 'system', 'user_rotation', '1')
