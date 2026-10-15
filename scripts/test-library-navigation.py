@@ -20,8 +20,19 @@ def snapshot():
 def tab(label, selected=None):
     for _ in range(10):
         root = snapshot()
-        nodes = [n for n in root.iter('node') if label in
-                 (n.get('text'), n.get('content-desc')) and n.get('clickable') == 'true']
+        parents = {child: parent for parent in root.iter() for child in parent}
+        nodes = []
+        for child in root.iter('node'):
+            if child.get('content-desc') != label:
+                continue
+            node = child
+            # Compose exports the icon label as a child of the selectable tab.
+            # The tab owns focus and selected state; UIAutomator may report its
+            # clickable attribute as false even though coordinate taps work.
+            while node in parents and node.get('focusable') != 'true':
+                node = parents[node]
+            if node.get('focusable') == 'true':
+                nodes.append(node)
         if len(nodes) == 1 and (selected is None or nodes[0].get('selected') == str(selected).lower()):
             return nodes[0]
         time.sleep(1)
