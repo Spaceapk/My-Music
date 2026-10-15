@@ -26,6 +26,12 @@ jobs:
         run: |
           set -euo pipefail
           test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .head_sha)" = "$VERIFIED_SHA"
+          for attempt in $(seq 1 40); do
+            state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .status)
+            if [ "$state" = completed ]; then break; fi
+            echo "Waiting for source Android verification: $state"
+            sleep 15
+          done
           test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .conclusion)" = success
           git diff --exit-code "$VERIFIED_SHA" HEAD -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties
       - uses: actions/setup-java@v4
