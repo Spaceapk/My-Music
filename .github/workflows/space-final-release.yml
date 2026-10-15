@@ -1,4 +1,4 @@
-name: Validate indexed music and signed playlist upgrade without publishing
+name: Validate visible MediaStore fixtures and playlist upgrade without publishing
 on:
   push:
     branches: [space-reviewed-publication]
