@@ -26,8 +26,12 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
     val playlists = state.asStateFlow()
 
     private fun read(): List<DevicePlaylist> {
-        if (!file.baseFile.exists()) return emptyList()
-        val array = JSONArray(file.openRead().use { it.readBytes().toString(Charsets.UTF_8) })
+        // openRead restores AtomicFile's backup first. Checking only the base
+        // file before this would discard playlists after an interrupted write.
+        val input = try { file.openRead() } catch (e: java.io.FileNotFoundException) {
+            if (!file.baseFile.exists()) return emptyList() else throw e
+        }
+        val array = JSONArray(input.use { it.readBytes().toString(Charsets.UTF_8) })
         return (0 until array.length()).map { i ->
             val p = array.getJSONObject(i)
             val tracks = p.getJSONArray("songs")

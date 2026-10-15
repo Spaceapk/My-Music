@@ -35,6 +35,29 @@ class DevicePlaylistStoreTest {
             assertTrue(DevicePlaylistStore(context, filename).playlists.value.isEmpty())
         } finally { context.deleteFile(filename) }
     }
+    @Test fun interruptedWriteRecoversBackupWithoutDeletingOriginalAudio() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val filename = "test-${UUID.randomUUID()}.json"
+        val audio = java.io.File(context.filesDir, "original-${UUID.randomUUID()}.flac")
+        val base = java.io.File(context.filesDir, filename)
+        val backup = java.io.File(context.filesDir, "$filename.bak")
+        try {
+            audio.writeText("original bytes must survive playlist edits")
+            val song = Song("local-backup", "Original", "Test", null,
+                localUri = android.net.Uri.fromFile(audio).toString(), localPath = audio.absolutePath)
+            val store = DevicePlaylistStore(context, filename)
+            store.createWithSongs("Recoverable", listOf(song))
+            val id = store.playlists.value.single().id
+            assertTrue(base.renameTo(backup))
+            val recovered = DevicePlaylistStore(context, filename)
+            assertEquals(song.localUri, recovered.playlists.value.single().songs.single().localUri)
+            recovered.remove(id, 0)
+            recovered.delete(id)
+            assertEquals("original bytes must survive playlist edits", audio.readText())
+        } finally {
+            context.deleteFile(filename); backup.delete(); audio.delete()
+        }
+    }
     @Test fun onlineTracksAndBlankNamesAreRejected() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val filename = "test-${UUID.randomUUID()}.json"
