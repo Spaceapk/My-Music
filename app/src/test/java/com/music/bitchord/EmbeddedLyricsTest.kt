@@ -70,6 +70,16 @@ class EmbeddedLyricsTest {
         } finally { directory.deleteRecursively() }
     }
 
+    @Test fun `m4a metadata after large audio is read without scanning audio bytes`() {
+        val text = "[00:01.00]Trailing M4A lyric"
+        val data = box("data", byteArrayOf(0, 0, 0, 1, 0, 0, 0, 0) + text.toByteArray())
+        val item = box("\u00a9lyr", data)
+        val moov = box("moov", box("udta", box("meta", ByteArray(4) + box("ilst", item))))
+        val bytes = box("ftyp", "isom".toByteArray()) + box("mdat", ByteArray(9 * 1024 * 1024)) + moov
+        assertEquals(text, EmbeddedLyrics.fromStream(bytes.inputStream()))
+        assertNull(EmbeddedLyrics.fromStream(bytes.copyOf(bytes.size - 3).inputStream()))
+    }
+
     private val lrc = "[00:01.00]first line\n[00:05.00]second line"
 
     @Test

@@ -81,16 +81,19 @@ object EmbeddedLyrics {
     private fun read(context: Context, uri: Uri): String? =
         LocalLyricsStore.read(context, uri.toString())
             ?: sidecar(uri.path.takeIf { uri.scheme == "file" })
-            ?: open(context, uri)?.buffered()?.use { stream ->
-                stream.mark(16)
-                val magic = stream.readAtMost(12)
-                stream.reset()
-                when {
-                    magic.startsWith(FLAC_MAGIC) -> readFlac(stream)
-                    magic.isMp4() || (magic.size == 12 && String(magic, 4, 4, Charsets.US_ASCII) == "ftyp") -> readMp4(stream)
-                    else -> fromBytes(stream.readAtMost(MAX_TAG_BYTES))
-                }
-            }
+            ?: open(context, uri)?.use(::fromStream)
+
+    internal fun fromStream(input: InputStream): String? {
+        val stream = input.buffered()
+        stream.mark(16)
+        val magic = stream.readAtMost(12)
+        stream.reset()
+        return when {
+            magic.startsWith(FLAC_MAGIC) -> readFlac(stream)
+            magic.size >= 8 && String(magic, 4, 4, Charsets.US_ASCII) == "ftyp" -> readMp4(stream)
+            else -> fromBytes(stream.readAtMost(MAX_TAG_BYTES))
+        }
+    }
 
     /**
      * The `lyrics.lrc` written next to the offline package playlist at [path].
