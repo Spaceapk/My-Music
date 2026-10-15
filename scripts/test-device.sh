@@ -42,3 +42,5 @@ for attempt in $(seq 1 20); do
 done
 timeout 15s adb logcat -d -b crash > device-crash-log.txt
 ! grep -q 'FATAL EXCEPTION' device-crash-log.txt
+
+python3 scripts/test-library-navigation.py
