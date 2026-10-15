@@ -16,12 +16,16 @@ encoded = Path('docs/releases/1.0.1/upgrade-tone.flac.b64').read_bytes()
 for suffix in ['A', 'B']:
     Path('SpaceUpgradeTone' + suffix + '.flac').write_bytes(base64.b64decode(encoded))
 PY_FIXTURE
-adb shell mkdir -p /sdcard/Music
+adb shell mkdir -p /storage/emulated/0/Music
 for suffix in A B; do
-  adb push "SpaceUpgradeTone$suffix.flac" "/sdcard/Music/SpaceUpgradeTone$suffix.flac"
-  adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d "file:///sdcard/Music/SpaceUpgradeTone$suffix.flac"
-done
+  track="SpaceUpgradeTone$suffix"
+  adb push "$track.flac" "/storage/emulated/0/Music/$track.flac"
+  adb shell ls -l "/storage/emulated/0/Music/$track.flac"
+  adb shell content insert --uri content://media/external/audio/media --bind "_data:s:/storage/emulated/0/Music/$track.flac" --bind "_display_name:s:$track.flac" --bind "title:s:$track" --bind mime_type:s:audio/flac --bind duration:l:31000 --bind is_music:i:1 --bind is_alarm:i:0 --bind is_notification:i:0 --bind is_ringtone:i:0 --bind artist:s:Test --bind album:s:SpaceUpgrade
+ done
 adb shell content query --uri content://media/external/audio/media --projection _id:title:duration:is_music > device-media-fixture.txt
+grep -q SpaceUpgradeToneA device-media-fixture.txt
+grep -q SpaceUpgradeToneB device-media-fixture.txt
 python3 docs/releases/1.0.1/verify-upgrade-playlist.py seed
 TEST_APP_APK=dist/Space-Music-1.0.1-beta.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
 python3 docs/releases/1.0.1/verify-upgrade-playlist.py verify
