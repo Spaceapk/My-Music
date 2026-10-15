@@ -205,7 +205,8 @@ fun LocalMusicScreen(
     // can share tracks, so inferring an album's selection from those track ids
     // made one held playlist appear to select unrelated albums.
     var selectedAlbumKeys by remember { mutableStateOf<Set<String>>(emptySet()) }
-    val selectingDownloads = isDownloads && selectedDownloadIds.isNotEmpty()
+    val selectingDownloads = selectedDownloadIds.isNotEmpty()
+    var addingSelection by remember { mutableStateOf(false) }
 
     fun toggleDownloadSelection(song: Song) {
         selectedDownloadIds = selectedDownloadIds.let { selected ->
@@ -256,12 +257,31 @@ fun LocalMusicScreen(
     // right below the bar, so it only needs to clear the bar itself.
     val barHeight = topBarHeight()
 
+    if (addingSelection) {
+        DevicePlaylistPickerDialog(songs.filter { it.videoId in selectedDownloadIds }) {
+            addingSelection = false
+        }
+    }
     Column(modifier = modifier.fillMaxSize()) {
         // ── Search ───────────────────────────────────────────────────────────
         // Above the tabs rather than inside each one, since a query typed on
         // Songs is just as reasonable to carry over to Artists or Albums.
         if (selectingDownloads) {
-            DownloadSelectionBar(
+            if (!isDownloads) {
+                Row(Modifier.fillMaxWidth().padding(top = barHeight + TopBarContentGap, start = PAGE_GUTTER, end = PAGE_GUTTER),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { selectedDownloadIds = sortedSongs.mapTo(linkedSetOf()) { it.videoId } }) {
+                        Icon(Icons.Rounded.Check, stringResource(R.string.select_all))
+                    }
+                    Text("${selectedDownloadIds.size}", Modifier.weight(1f))
+                    IconButton(onClick = { addingSelection = true }) {
+                        Icon(Icons.AutoMirrored.Rounded.QueueMusic, stringResource(R.string.add_to_playlist))
+                    }
+                    IconButton(onClick = { selectedDownloadIds = emptySet() }) {
+                        Icon(Icons.Rounded.Close, stringResource(R.string.cancel))
+                    }
+                }
+            } else DownloadSelectionBar(
                 count = selectedDownloadIds.size,
                 allSelected = sortedSongs.isNotEmpty() && selectedDownloadIds.containsAll(sortedSongs.map { it.videoId }),
                 onSelectAll = { selectedDownloadIds = sortedSongs.mapTo(linkedSetOf()) { it.videoId } },
@@ -410,8 +430,7 @@ fun LocalMusicScreen(
                             if (selectingDownloads) toggleDownloadSelection(song) else onSongClick(tracks, index)
                         },
                         onSongLongPress = { song ->
-                            if (isDownloads) selectedDownloadIds = selectedDownloadIds + song.videoId
-                            else onSongLongPress(song)
+                            selectedDownloadIds = selectedDownloadIds + song.videoId
                         },
                         // Downloads redefines the hold as "select", so the ⋮ has to
                         // carry the actions sheet itself or the page loses it.
@@ -442,11 +461,9 @@ fun LocalMusicScreen(
                             if (selectingDownloads) toggleDownloadSelection(song) else onSongClick(tracks, index)
                         },
                         onSongLongPress = { song ->
-                            if (isDownloads) {
-                                selectedDownloadIds = selectedDownloadIds + song.videoId
-                                selectedTab = LOCAL_TAB_SONGS
-                                leaveDrillDown()
-                            } else onSongLongPress(song)
+                            selectedDownloadIds = selectedDownloadIds + song.videoId
+                            selectedTab = LOCAL_TAB_SONGS
+                            leaveDrillDown()
                         },
                         // Downloads redefines the hold as "select", so the ⋮ has to
                         // carry the actions sheet itself or the page loses it.
@@ -1735,6 +1752,8 @@ private fun LocalTab(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

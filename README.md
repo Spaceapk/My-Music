@@ -8,11 +8,11 @@ Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a
 
 ## Descarga e instalación
 
-**[Descargar Space Music Beta 1.0.0 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.0-beta/Space-Music-1.0.0-beta.apk)**
+**[Descargar Space Music Beta 1.0.1 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.1-beta/Space-Music-1.0.1-beta.apk)**
 
 APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
 
-Pasaron las pruebas de regresión, lint, compilación, verificación de firma y alineación, instalación y arranque del APK release firmado en Android 13 (API 33), persistencia de listas y reproducción local sin conexión. Pendientes pruebas manuales en distintos teléfonos físicos.
+Pruebas aprobadas en Android 8, 13 y 15: reproducción local, listas, arrastre, veinte arranques en frío y actualización desde 1.0.0. Conserva firma y datos: instala sobre la versión oficial anterior sin desinstalar. [Resultados y límites](docs/verification-1.0.1.md). Pendiente validación en teléfonos físicos.
 
 Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
 

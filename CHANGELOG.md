@@ -1,5 +1,13 @@
 # Space Music — cambios
 
+## 1.0.1 beta — estabilidad y listas locales
+
+- Restauración del reproductor en su hilo principal y errores locales recuperables.
+- Listas locales desde menús y selección múltiple, arrastre, deduplicación y recuperación atómica.
+- WAV visible en biblioteca; contraste adaptativo y navegación inferior simplificada.
+- Actualización con firma original y datos conservados.
+- 1.017 pruebas aprobadas y matriz firmada Android 8/13/15. [Informe](docs/verification-1.0.1.md).
+
 ## 1.0.0 — release optimizada con firma propia
 
 - Derivación de Star Music y BitChord; historial y licencia GPL-3.0 conservados.

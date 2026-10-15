@@ -100,3 +100,16 @@
 -keep class androidx.media3.session.SessionToken { public *; }
 -keep class androidx.media3.common.PlaybackException { public *; }
 -keep class okhttp3.Request$Builder { public *; }
+
+# Signed release instrumentation and actual local playback rely on coroutines
+# facades across the app/test APK boundary. The optimized beta previously
+# omitted BuildersKt (API 33/35 device tests, run 38665608435), resulting in
+# NoClassDefFoundError during playlist playback. Keep their runtime contract.
+-keep class kotlinx.coroutines.** { *; }
+
+# OkHttp's instance method newCall(Request) was optimized away from the signed
+# app even though the separate instrumentation APK invokes it (same run).
+# Preserve the callable API and the Request/Call types across this boundary.
+-keep class okhttp3.OkHttpClient { public *; }
+-keep interface okhttp3.Call { *; }
+-keep class okhttp3.Request { public *; }

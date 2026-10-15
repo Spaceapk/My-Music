@@ -1,0 +1,76 @@
+name: Publish reviewed signed Space Music 1.0.1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/space-publish-reviewed.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: publish-space-1.0.1
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERIFIED_RUN: '38738002276'
+      VERIFIED_SHA: 328dc2e1caf84d75ad4fe4057e34bea204ce1cfd
+      VISUAL_RUN: '38740288829'
+      VISUAL_SHA: 11f964d38a1276ab452a1e36053b6dc6b3d29137
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require accepted source and all signed-device and visual checks
+        run: |
+          set -euo pipefail
+          for pair in "$VERIFIED_RUN:$VERIFIED_SHA" "$VISUAL_RUN:$VISUAL_SHA"; do
+            run=${pair%%:*}; sha=${pair#*:}
+            test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$run --jq .head_sha)" = "$sha"
+            test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$run --jq .conclusion)" = success
+          done
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN/jobs > signed-jobs.json
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/$VISUAL_RUN/jobs > visual-jobs.json
+          python3 - <<'PY'
+          import json
+          for filename,prefix in [('signed-jobs.json','device ('),('visual-jobs.json','visual (')]:
+              jobs=[j for j in json.load(open(filename))['jobs'] if j['name'].startswith(prefix)]
+              assert len(jobs)==3 and all(j['conclusion']=='success' for j in jobs), jobs
+          PY
+          git diff --exit-code "$VERIFIED_SHA" HEAD -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-final-signed
+          path: dist
+          github-token: ${{ github.token }}
+          run-id: '38738002276'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: space-final-device-*
+          path: verification
+          github-token: ${{ github.token }}
+          run-id: '38738002276'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: space-visual-device-*
+          path: verification
+          github-token: ${{ github.token }}
+          run-id: '38740288829'
+      - name: Verify exact signed bytes and publish once
+        run: |
+          set -euo pipefail
+          echo 'a3e71c2f2404a08acbde34e99d8914931b7f81607aa86fe30d1cd5c171f690fb  dist/Space-Music-1.0.1-beta.apk' | sha256sum -c -
+          (cd dist && sha256sum -c SHA256SUMS.txt)
+          grep -q '5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce' dist/Space-Music-1.0.1-beta.apk.signature.txt
+          grep -q "name='org.nexlibre.spacemusic' versionCode='2'" dist/package-verification.txt
+          find verification -path '*/space-final-device-*/device-settings-*.png' -delete
+          cp docs/verification-1.0.1.md verification/
+          cp signed-jobs.json visual-jobs.json verification/
+          (cd verification && zip -qr ../dist/Space-Music-1.0.1-verification.zip .)
+          if gh release view v1.0.1-beta --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Refusing to replace an existing release.'; exit 1
+          fi
+          gh release create v1.0.1-beta dist/Space-Music-1.0.1-beta.apk dist/SHA256SUMS.txt dist/Space-Music-1.0.1-beta.apk.signature.txt dist/Space-Music-1.0.1-verification.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Space Music 1.0.1 beta · estabilidad y listas locales' --notes-file docs/space-1.0.1-notes.md --prerelease

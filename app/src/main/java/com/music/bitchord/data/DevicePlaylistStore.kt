@@ -26,8 +26,12 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
     val playlists = state.asStateFlow()
 
     private fun read(): List<DevicePlaylist> {
-        if (!file.baseFile.exists()) return emptyList()
-        val array = JSONArray(file.openRead().use { it.readBytes().toString(Charsets.UTF_8) })
+        // openRead restores AtomicFile's backup first. Checking only the base
+        // file before this would discard playlists after an interrupted write.
+        val input = try { file.openRead() } catch (e: java.io.FileNotFoundException) {
+            if (!file.baseFile.exists()) return emptyList() else throw e
+        }
+        val array = JSONArray(input.use { it.readBytes().toString(Charsets.UTF_8) })
         return (0 until array.length()).map { i ->
             val p = array.getJSONObject(i)
             val tracks = p.getJSONArray("songs")
@@ -69,6 +73,11 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
         require(name.trim().isNotEmpty())
         update { it + DevicePlaylist(UUID.randomUUID().toString(), name.trim(), emptyList()) }
     }
+    fun createWithSongs(name: String, songs: List<Song>) {
+        require(name.trim().isNotEmpty())
+        require(songs.all { it.localUri?.let { uri -> uri.startsWith("content://") || uri.startsWith("file://") } == true })
+        update { it + DevicePlaylist(UUID.randomUUID().toString(), name.trim(), songs.distinctBy { song -> song.localUri }) }
+    }
     fun rename(id: String, name: String) {
         require(name.trim().isNotEmpty())
         update { list -> list.map { if (it.id == id) it.copy(name = name.trim()) else it } }
@@ -80,6 +89,15 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
     }
     fun remove(id: String, index: Int) = update { list -> list.map { p ->
         if (p.id == id) p.copy(songs = p.songs.filterIndexed { i, _ -> i != index }) else p
+    } }
+    /** Apply a permutation only; reject stale edits rather than losing newer tracks. */
+    fun reorder(id: String, uris: List<String>) = update { list -> list.map { p ->
+        if (p.id == id) {
+            val existing = p.songs.associateBy { it.localUri }
+            require(uris.size == p.songs.size && uris.toSet().size == uris.size &&
+                uris.toSet() == existing.keys) { "Playlist changed; reopen the reorder view" }
+            p.copy(songs = uris.map { existing.getValue(it) })
+        } else p
     } }
     fun move(id: String, from: Int, to: Int) = update { list -> list.map { p ->
         if (p.id == id && from in p.songs.indices && to in p.songs.indices) {

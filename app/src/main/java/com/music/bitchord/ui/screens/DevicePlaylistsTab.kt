@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.music.bitchord.R
+import com.music.bitchord.ui.components.ReorderableSongList
 import com.music.bitchord.data.DevicePlaylistStore
 import com.music.bitchord.data.model.Song
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +42,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
     val selected = playlists.firstOrNull { it.id == selectedId }
     var editing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
+    var reordering by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -61,14 +64,19 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             if (selected != null) IconButton(onClick = { selectedId = null }) {
                 Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back))
             }
-            Text(selected?.name ?: stringResource(R.string.playlists), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
+            Text(selected?.name ?: stringResource(R.string.playlists), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (selected == null) IconButton(onClick = { name = ""; editing = true }, enabled = !busy) {
                 Icon(Icons.Rounded.Add, stringResource(R.string.create_playlist))
-            } else {
+            }
+        }
+        if (selected != null) Row(
+            Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.End,
+        ) {
                 IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) { Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs)) }
+                IconButton(onClick = { reordering = true }, enabled = !busy && selected.songs.size > 1) { Icon(Icons.Rounded.DragHandle, stringResource(R.string.reorder_songs)) }
                 IconButton(onClick = { name = selected.name; editing = true }, enabled = !busy) { Icon(Icons.Rounded.Edit, stringResource(R.string.rename)) }
                 IconButton(onClick = { deleting = true }, enabled = !busy) { Icon(Icons.Rounded.Delete, stringResource(R.string.delete)) }
-            }
         }
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (selected == null) {
@@ -96,6 +104,26 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
                                 IconButton(onClick = { change { store.remove(selected.id, index) } }, enabled = !busy) { Icon(Icons.Rounded.Close, stringResource(R.string.remove)) }
                             }
                         })
+                }
+            }
+        }
+    }
+    if (reordering && selected != null) {
+        val playlistId = selected.id
+        val order = remember(playlistId) { mutableStateListOf<Song>().apply { addAll(selected.songs) } }
+        androidx.compose.ui.window.Dialog(onDismissRequest = { reordering = false }) {
+            Surface(shape = MaterialTheme.shapes.large) {
+                Column(Modifier.fillMaxWidth().heightIn(max = 560.dp).padding(16.dp)) {
+                    Text(stringResource(R.string.reorder_songs), style = MaterialTheme.typography.titleLarge)
+                    Box(Modifier.weight(1f, fill = false)) { ReorderableSongList(order, enabled = !busy) }
+                    Row(Modifier.align(Alignment.End)) {
+                        TextButton(onClick = { reordering = false }) { Text(stringResource(R.string.cancel)) }
+                        TextButton(enabled = !busy, onClick = {
+                            val uris = order.map { requireNotNull(it.localUri) }
+                            change { store.reorder(playlistId, uris) }
+                            reordering = false
+                        }) { Text(stringResource(R.string.save_order)) }
+                    }
                 }
             }
         }
@@ -133,4 +161,61 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
         }) { Text(stringResource(R.string.save)) } },
         dismissButton = { TextButton(onClick = { adding = false }) { Text(stringResource(R.string.cancel)) } })
     error?.let { message -> AlertDialog(onDismissRequest = { error = null }, title = { Text(stringResource(R.string.star_save_error)) }, text = { Text(message) }, confirmButton = { TextButton(onClick = { error = null }) { Text(stringResource(R.string.back)) } }) }
+}
+
+/** Shared by the song menu and library batch selection; never uses account playlists. */
+@Composable
+fun DevicePlaylistPickerDialog(songs: List<Song>, onDismiss: () -> Unit) {
+    val context = LocalContext.current.applicationContext
+    val store = remember(context) { runCatching { DevicePlaylistStore.forDevice(context) } }.getOrNull()
+    if (store == null) {
+        AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.star_save_error)) },
+            confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
+        return
+    }
+    val playlists by store.playlists.collectAsStateWithLifecycle()
+    var selectedId by remember { mutableStateOf<String?>(null) }
+    var name by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() },
+        title = { Text(stringResource(R.string.add_to_playlist)) },
+        text = {
+            Column {
+                LazyColumn(Modifier.heightIn(max = 260.dp)) {
+                    items(playlists, key = { it.id }) { playlist ->
+                        Row(Modifier.fillMaxWidth().clickable(enabled = !busy) {
+                            selectedId = playlist.id; name = ""
+                        }, verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(selected = selectedId == playlist.id, enabled = !busy,
+                                onClick = { selectedId = playlist.id; name = "" })
+                            Text(playlist.name, maxLines = 2)
+                        }
+                    }
+                }
+                OutlinedTextField(value = name, enabled = !busy, singleLine = true,
+                    onValueChange = { name = it; if (it.isNotBlank()) selectedId = null },
+                    label = { Text(stringResource(R.string.new_playlist)) })
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = !busy && (name.isNotBlank() || playlists.any { it.id == selectedId }), onClick = {
+                val id = selectedId
+                val title = name.trim()
+                busy = true
+                scope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            if (id == null) store.createWithSongs(title, songs) else store.add(id, songs)
+                        }
+                        onDismiss()
+                    } catch (e: Exception) { error = e.localizedMessage }
+                    finally { busy = false }
+                }
+            }) { Text(stringResource(R.string.save)) }
+        },
+        dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
 }

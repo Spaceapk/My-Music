@@ -1,0 +1,93 @@
+name: Verify corrected Space Music instrumentation
+on:
+  push:
+    branches: [space-runner-validation]
+    paths: ['.github/workflows/space-runner-validation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require byte-identical application and instrumentation sources
+        run: git diff --exit-code e47d0d2255a607a570bff176251dfa56c58cc08b HEAD -- app shared sharedUi gradle build.gradle.kts settings.gradle.kts gradle.properties
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-android-build
+          path: repair
+          github-token: ${{ github.token }}
+          run-id: '38727743820'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: space-android-build
+          path: repair/
+  optimized-device-test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [26, 33, 35]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-android-build
+          path: built
+      - name: Sign optimized app and runner for isolated runtime verification
+        run: |
+          set -euo pipefail
+          mkdir -p validation
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          keytool -genkeypair -keystore "$keydir/test.p12" -storetype PKCS12 -alias test-only -keyalg RSA -keysize 2048 -validity 2 -dname 'CN=Space CI only' -storepass space-test-only -keypass space-test-only
+          apk=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
+          runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          signer=$(find built -name apksigner.jar | head -1)
+          test -n "$apk"; test -n "$runner"; test -n "$signer"
+          java -jar "$signer" sign --ks "$keydir/test.p12" --ks-key-alias test-only --ks-pass pass:space-test-only --key-pass pass:space-test-only --out validation/app.apk "$apk"
+          java -jar "$signer" sign --ks "$keydir/test.p12" --ks-key-alias test-only --ks-pass pass:space-test-only --key-pass pass:space-test-only --out validation/runner.apk "$runner"
+          java -jar "$signer" verify validation/app.apk
+          java -jar "$signer" verify validation/runner.apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Test actual optimized runtime offline
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: TEST_APP_APK=validation/app.apk TEST_INSTRUMENTATION_APK=validation/runner.apk bash scripts/test-device.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: space-optimized-device-${{ matrix.api }}-${{ github.run_attempt }}
+          path: |
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+            device-full-log.txt
+            device-*.png
