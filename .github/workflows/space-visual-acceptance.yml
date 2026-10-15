@@ -1,4 +1,4 @@
-name: Review Space Music final layout and settings themes
+name: Review rendered Space Music library and settings themes
 on:
   push:
     branches: [space-reviewed-publication]
