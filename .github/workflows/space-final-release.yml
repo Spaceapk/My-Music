@@ -1,4 +1,4 @@
-name: Validate MediaStore playlist upgrade UI without publishing
+name: Validate indexed music and signed playlist upgrade without publishing
 on:
   push:
     branches: [space-reviewed-publication]
@@ -118,6 +118,7 @@ jobs:
             device-crash-log.txt
             device-full-log.txt
             device-upgrade-ui.xml
+            device-package-fixture.txt
             device-media-fixture.txt
             device-*.png
   publish:
