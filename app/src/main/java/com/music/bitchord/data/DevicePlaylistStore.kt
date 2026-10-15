@@ -81,6 +81,15 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
     fun remove(id: String, index: Int) = update { list -> list.map { p ->
         if (p.id == id) p.copy(songs = p.songs.filterIndexed { i, _ -> i != index }) else p
     } }
+    /** Apply a permutation only; reject stale edits rather than losing newer tracks. */
+    fun reorder(id: String, uris: List<String>) = update { list -> list.map { p ->
+        if (p.id == id) {
+            val existing = p.songs.associateBy { it.localUri }
+            require(uris.size == p.songs.size && uris.toSet().size == uris.size &&
+                uris.toSet() == existing.keys) { "Playlist changed; reopen the reorder view" }
+            p.copy(songs = uris.map { existing.getValue(it) })
+        } else p
+    } }
     fun move(id: String, from: Int, to: Int) = update { list -> list.map { p ->
         if (p.id == id && from in p.songs.indices && to in p.songs.indices) {
             val tracks = p.songs.toMutableList()

@@ -151,7 +151,7 @@ fun ReorderPlaylistSheet(
  * the finger rather than jumping with the swap.
  */
 @Composable
-private fun ReorderableSongList(order: MutableList<Song>, enabled: Boolean) {
+fun ReorderableSongList(order: MutableList<Song>, enabled: Boolean) {
     val listState = rememberLazyListState()
     var held by remember { mutableStateOf<String?>(null) }
     var offset by remember { mutableFloatStateOf(0f) }

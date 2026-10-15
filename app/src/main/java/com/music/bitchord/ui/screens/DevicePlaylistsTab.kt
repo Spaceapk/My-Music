@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.music.bitchord.R
+import com.music.bitchord.ui.components.ReorderableSongList
 import com.music.bitchord.data.DevicePlaylistStore
 import com.music.bitchord.data.model.Song
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
     val selected = playlists.firstOrNull { it.id == selectedId }
     var editing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
+    var reordering by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -66,6 +68,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
                 Icon(Icons.Rounded.Add, stringResource(R.string.create_playlist))
             } else {
                 IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) { Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs)) }
+                IconButton(onClick = { reordering = true }, enabled = !busy && selected.songs.size > 1) { Icon(Icons.Rounded.DragHandle, stringResource(R.string.reorder_songs)) }
                 IconButton(onClick = { name = selected.name; editing = true }, enabled = !busy) { Icon(Icons.Rounded.Edit, stringResource(R.string.rename)) }
                 IconButton(onClick = { deleting = true }, enabled = !busy) { Icon(Icons.Rounded.Delete, stringResource(R.string.delete)) }
             }
@@ -96,6 +99,26 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
                                 IconButton(onClick = { change { store.remove(selected.id, index) } }, enabled = !busy) { Icon(Icons.Rounded.Close, stringResource(R.string.remove)) }
                             }
                         })
+                }
+            }
+        }
+    }
+    if (reordering && selected != null) {
+        val playlistId = selected.id
+        val order = remember(playlistId) { mutableStateListOf<Song>().apply { addAll(selected.songs) } }
+        androidx.compose.ui.window.Dialog(onDismissRequest = { reordering = false }) {
+            Surface(shape = MaterialTheme.shapes.large) {
+                Column(Modifier.fillMaxWidth().heightIn(max = 560.dp).padding(16.dp)) {
+                    Text(stringResource(R.string.reorder_songs), style = MaterialTheme.typography.titleLarge)
+                    Box(Modifier.weight(1f, fill = false)) { ReorderableSongList(order, enabled = !busy) }
+                    Row(Modifier.align(Alignment.End)) {
+                        TextButton(onClick = { reordering = false }) { Text(stringResource(R.string.cancel)) }
+                        TextButton(enabled = !busy, onClick = {
+                            val uris = order.map { requireNotNull(it.localUri) }
+                            change { store.reorder(playlistId, uris) }
+                            reordering = false
+                        }) { Text(stringResource(R.string.save_order)) }
+                    }
                 }
             }
         }
