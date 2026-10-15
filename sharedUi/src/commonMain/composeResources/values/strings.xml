@@ -89,7 +89,7 @@
     <string name="lyrics_provider_not_found">Lyrics not found</string>
     <string name="lyrics_romanization_unavailable">Romanization is unavailable for these lyrics</string>
     <string name="lyrics_romanized">Romanized pronunciation</string>
-    <string name="lyrics_saved_with_download">Lyrics saved with this download</string>
+    <string name="lyrics_saved_with_download">Local lyrics</string>
     <string name="lyrics_share_pick_limit">Card is full</string>
     <string name="lyrics_translated_to">Translated to %1$s</string>
     <string name="lyrics_translation_unavailable">Translation is unavailable right now</string>
@@ -99,7 +99,7 @@
     <string name="next_from">Next from: %1$s</string>
     <string name="next_in_queue">Next in queue</string>
     <string name="no_lyrics_for_track">No lyrics for this track</string>
-    <string name="no_lyrics_found">No lyrics found</string>
+    <string name="no_lyrics_found">No local lyrics. Import an LRC or TXT from the song menu.</string>
     <string name="now_playing">Now playing</string>
     <string name="open_lyrics">Lyrics</string>
     <string name="pause">Pause</string>

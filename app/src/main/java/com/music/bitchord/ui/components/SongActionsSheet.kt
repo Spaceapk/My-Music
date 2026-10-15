@@ -2,6 +2,11 @@ package com.music.bitchord.ui.components
 
 import com.music.bitchord.R
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
+import com.music.bitchord.data.lyrics.LocalLyricsStore
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -195,6 +200,22 @@ fun SongActionsSheet(
      */
     presentation: SongActionsPresentation = SongActionsPresentation.Sheet,
 ) {
+    val lyricsContext = LocalContext.current
+    val lyricsScope = rememberCoroutineScope()
+    val importSuccess = stringResource(R.string.local_lyrics_imported)
+    val importFailure = stringResource(R.string.local_lyrics_import_failed)
+    var lyricsImportTrack by rememberSaveable { mutableStateOf<String?>(null) }
+    val lyricsPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        val track = lyricsImportTrack
+        lyricsImportTrack = null
+        if (uri != null && track != null) lyricsScope.launch {
+            try {
+                LocalLyricsStore.importFile(lyricsContext, track, uri)
+                Toast.makeText(lyricsContext, importSuccess, Toast.LENGTH_LONG).show()
+            } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (_: Exception) { Toast.makeText(lyricsContext, importFailure, Toast.LENGTH_LONG).show() }
+        }
+    }
     var pickingSleepTimer by remember { mutableStateOf(false) }
     val menu = presentation == SongActionsPresentation.Menu
     // Read from the thumbnail the row that opened this sheet was already
@@ -217,6 +238,15 @@ fun SongActionsSheet(
     val isOffline = song.localUri != null
 
     val rows: @Composable ColumnScope.() -> Unit = {
+        if (isOffline) {
+            ActionRow(
+                icon = Icons.Rounded.FileUpload,
+                label = stringResource(R.string.import_local_lyrics),
+                accent = palette.accent,
+                onClick = { lyricsImportTrack = song.localUri; lyricsPicker.launch(arrayOf("*/*")) },
+            )
+        }
+
         // Leads the list whenever it's available: which recording is playing
         // is the one question that has to be answered before any of the rows
         // below mean anything — there is no point rating, queueing or

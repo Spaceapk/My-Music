@@ -1,5 +1,14 @@
 # Space Music — cambios
 
+## 1.0.2 beta — letras locales y modo ambiente
+
+- Letras FLAC con campos alternativos, MP3 USLT UTF-8/UTF-16/Latin-1 y texto sin sincronización.
+- Lectura de etiquetas después de carátulas FLAC grandes y del audio M4A.
+- Importación LRC/TXT por canción, persistencia atómica y archivo musical original intacto.
+- Modo ambiente opcional con colores de carátula; respeta pausa, segundo plano y reducción de animaciones.
+- Traducciones de los textos nuevos y matriz activa Android 12/13/15, manteniendo compatibilidad de instalación anterior.
+- [Resultados y límites de validación](docs/verification-1.0.2.md).
+
 ## 1.0.1 beta — estabilidad y listas locales
 
 - Restauración del reproductor en su hilo principal y errores locales recuperables.

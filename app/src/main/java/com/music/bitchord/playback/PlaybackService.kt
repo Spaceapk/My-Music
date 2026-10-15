@@ -5941,8 +5941,9 @@ class PlaybackService : MediaLibraryService() {
                 AppSettings.lyricsSources,
                 AppSettings.lyricsSourceOrder,
                 AppSettings.prioritizeSyllableSync,
-            ) { synced, sources, order, prio ->
-                synced to sources
+                com.music.bitchord.data.lyrics.LocalLyricsStore.revision,
+            ) { synced, sources, order, prio, revision ->
+                Triple(synced, sources, revision)
             }.distinctUntilChanged().collect {
                 loadLyricsForCurrentTrack()
             }
@@ -6559,7 +6560,7 @@ class PlaybackService : MediaLibraryService() {
             if (localUri != null) {
                 lines = EmbeddedLyrics.forUri(this@PlaybackService, localUri)
             }
-            if (lines == null) {
+            if (lines == null && localUri == null) {
                 val found = LyricsRepository.lyrics(
                     videoId = currentSong.videoId,
                     title = currentSong.title,
@@ -6573,7 +6574,8 @@ class PlaybackService : MediaLibraryService() {
                 lines = found?.lines
             }
             withContext(Dispatchers.Main) {
-                serviceLyrics = lines
+                // Plain lyrics are for reading, not a timed notification subtitle.
+                serviceLyrics = lines?.takeIf { sheet -> sheet.any { it.timeMs > 0L } }
                 if (player?.isPlaying == true) {
                     updateLyricSubtitle()
                 }

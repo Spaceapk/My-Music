@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Mode ambien</string>
+    <string name="ambient_mode_subtitle">Warna sampul bergerak di pemutar. Berhenti saat dijeda dan mengikuti pengaturan pengurangan animasi.</string>
+    <string name="import_local_lyrics">Impor lirik (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Lirik disimpan untuk lagu ini. Buka panel lirik untuk membacanya.</string>
+    <string name="local_lyrics_import_failed">Tidak dapat mengimpor. Pilih berkas LRC/TXT UTF-8 atau UTF-16 hingga 1 MB.</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">โหมดบรรยากาศ</string>
+    <string name="ambient_mode_subtitle">สีจากปกที่เคลื่อนไหวในเครื่องเล่น หยุดเมื่อพักเพลงและเคารพการตั้งค่าลดภาพเคลื่อนไหว</string>
+    <string name="import_local_lyrics">นำเข้าเนื้อเพลง (LRC / TXT)</string>
+    <string name="local_lyrics_imported">บันทึกเนื้อเพลงนี้แล้ว เปิดแผงเนื้อเพลงเพื่ออ่าน</string>
+    <string name="local_lyrics_import_failed">นำเข้าไม่ได้ เลือกไฟล์ LRC/TXT แบบ UTF-8 หรือ UTF-16 ขนาดไม่เกิน 1 MB</string>
+</resources>

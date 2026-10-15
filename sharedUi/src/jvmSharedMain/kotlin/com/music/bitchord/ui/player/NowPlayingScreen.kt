@@ -147,6 +147,9 @@ import com.music.bitchord.ui.haptics.Haptic
 import com.music.bitchord.ui.haptics.rememberHaptics
 import com.music.bitchord.ui.icons.BitChordIcons
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.compose.runtime.collectAsState
 import com.music.bitchord.data.canvas.CanvasSource
 import com.music.bitchord.data.lyrics.LyricLine
 import com.music.bitchord.data.lyrics.LyricsSource
@@ -821,6 +824,8 @@ fun NowPlayingScreen(
     // request is rebuilt on each pass and so would not be skipped.
     val canvasCover = remember(canvas?.url) { mutableFloatStateOf(0f) }
     // v1.5's backdrop, kept behind a switch — see [PlayerSettings.legacyMeshGradient].
+    val ambientMode by PlayerSettings.ambientMode.collectAsStateWithLifecycle()
+    val ambientLifecycle by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsState()
     val legacyMesh by PlayerSettings.legacyMeshGradient.collectAsStateWithLifecycle()
     // The backdrop's colours, taken off the artwork's own arrangement rather
     // than quantised out of it — see [ArtworkMesh].
@@ -2041,14 +2046,24 @@ fun NowPlayingScreen(
             legacyMesh && !canvasFirstPortrait
         val fullArtworkBackdropAlpha by animateFloatAsState(
             targetValue = if (
-                !legacyMeshBackdrop &&
+                !ambientMode && !legacyMeshBackdrop &&
                 (tabletArtworkBackdrop || lyricsOpen || queueOpen) &&
                 (tabletArtworkBackdrop || fullArtworkBlurImage != null)
             ) 1f else 0f,
             animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
             label = "fullArtworkBackdropCrossfade",
         )
-        if (legacyMeshBackdrop) {
+        if (ambientMode) {
+            MeshGradientBackground(
+                palette = rememberArtworkColors(remoteArt, canvasFrame),
+                trackKey = song.videoId,
+                continuous = isPlaying && ambientLifecycle.isAtLeast(Lifecycle.State.STARTED),
+                animated = isPlaying && ambientLifecycle.isAtLeast(Lifecycle.State.STARTED),
+                driftMillis = 12_000,
+                blurRadius = 0.dp,
+            )
+            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.35f)))
+        } else if (legacyMeshBackdrop) {
             // v1.5's backdrop, restored verbatim: no seam, because the blobs
             // are not anchored to anything on screen — they fill the player and
             // the artwork simply sits on top of them. Keyed on the track, so

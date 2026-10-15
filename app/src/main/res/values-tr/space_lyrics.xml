@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Ambiyans modu</string>
+    <string name="ambient_mode_subtitle">Oynatıcıda hareketli kapak renkleri. Duraklatıldığında durur ve azaltılmış animasyon ayarına uyar.</string>
+    <string name="import_local_lyrics">Şarkı sözü içe aktar (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Bu şarkının sözleri kaydedildi. Okumak için şarkı sözü panelini açın.</string>
+    <string name="local_lyrics_import_failed">İçe aktarılamadı. En fazla 1 MB boyutunda UTF-8 veya UTF-16 LRC/TXT dosyası seçin.</string>
+</resources>

@@ -1,7 +1,5 @@
 name: Space Music optimized compatibility
 on:
-  push:
-    paths: ['.github/workflows/space-compatibility.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -62,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [26, 33, 35]
+        api: [31, 33, 35]
     steps:
       - uses: actions/checkout@v4
         with:

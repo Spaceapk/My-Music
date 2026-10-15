@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">परिवेश मोड</string>
+    <string name="ambient_mode_subtitle">प्लेयर में कवर के रंगों की हल्की गति। रोकने पर रुकती है और कम एनिमेशन सेटिंग का पालन करती है।</string>
+    <string name="import_local_lyrics">गीत के बोल आयात करें (LRC / TXT)</string>
+    <string name="local_lyrics_imported">इस गाने के बोल सहेजे गए। पढ़ने के लिए बोल पैनल खोलें।</string>
+    <string name="local_lyrics_import_failed">आयात नहीं हुआ। 1 MB तक की UTF-8 या UTF-16 LRC/TXT फ़ाइल चुनें।</string>
+</resources>

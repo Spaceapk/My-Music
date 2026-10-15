@@ -206,6 +206,7 @@ fun SettingsScreen(
     val canvasOverCellular by AppSettings.canvasOverCellular.collectAsStateWithLifecycle()
     val fullBleedArtwork by AppSettings.fullBleedArtwork.collectAsStateWithLifecycle()
     val legacyMeshGradient by AppSettings.legacyMeshGradient.collectAsStateWithLifecycle()
+    val ambientMode by AppSettings.ambientMode.collectAsStateWithLifecycle()
     val syncedLyrics by AppSettings.syncedLyrics.collectAsStateWithLifecycle()
     val lyricsSources by AppSettings.lyricsSources.collectAsStateWithLifecycle()
     val translationLanguage by AppSettings.translationLanguage.collectAsStateWithLifecycle()
@@ -760,6 +761,16 @@ fun SettingsScreen(
                         onClick = { AppSettings.setFullBleedArtwork(!fullBleedArtwork) },
                     )
                 }
+            }
+            val ambientModeTitle = stringResource(R.string.ambient_mode)
+            row(ambientModeTitle, "ambient", "ambiente", "background", "carátula") {
+                SettingsRow(
+                    icon = Icons.Rounded.Gradient,
+                    title = ambientModeTitle,
+                    subtitle = stringResource(R.string.ambient_mode_subtitle),
+                    trailing = { Switch(checked = ambientMode, onCheckedChange = AppSettings::setAmbientMode) },
+                    onClick = { AppSettings.setAmbientMode(!ambientMode) },
+                )
             }
             val legacyMeshGradientTitle = stringResource(R.string.legacy_mesh_gradient)
             row(legacyMeshGradientTitle, "background", "player") {

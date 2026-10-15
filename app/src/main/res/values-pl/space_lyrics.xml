@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Tryb otoczenia</string>
+    <string name="ambient_mode_subtitle">Ruchome kolory okładki w odtwarzaczu. Zatrzymuje się podczas pauzy i uwzględnia ograniczenie animacji.</string>
+    <string name="import_local_lyrics">Importuj tekst (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Tekst tego utworu został zapisany. Otwórz panel tekstu, aby go przeczytać.</string>
+    <string name="local_lyrics_import_failed">Nie można zaimportować. Wybierz plik LRC/TXT UTF-8 lub UTF-16 o rozmiarze do 1 MB.</string>
+</resources>
