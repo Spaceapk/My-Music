@@ -30,8 +30,13 @@ private val DarkColors = darkColorScheme(
     surface = Color(0xFF0D0D0F),
     onSurface = Color.White,
     surfaceVariant = Color(0xFF1C1C1E),
-    onSurfaceVariant = Color(0xFF8E8E93),
-    outline = Color(0xFF2C2C2E),
+    onSurfaceVariant = Color(0xFFB8B8BE),
+    outline = Color(0xFF55555B),
+    surfaceTint = Color.White,
+    secondary = Color.White,
+    onSecondary = Color.Black,
+    tertiary = Color(0xFFE2E2E7),
+    onTertiary = Color.Black,
 )
 
 private val LightColors = lightColorScheme(
