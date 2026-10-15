@@ -1,4 +1,4 @@
-name: Publish verified Space Music 1.0.1 beta
+name: Publish verified Space Music 1.0.1 beta with visible media fixtures
 on:
   push:
     branches: [space-reviewed-publication]
