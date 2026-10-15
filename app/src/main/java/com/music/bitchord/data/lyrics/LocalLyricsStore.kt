@@ -19,6 +19,7 @@ object LocalLyricsStore {
         val directory = File(context.filesDir, "local-lyrics").apply { mkdirs() }
         return AtomicFile(File(directory, "$key.lrc"))
     }
+    @Synchronized
     fun read(context: Context, track: String): String? = runCatching {
         file(context, track).openRead().use { it.readBytes().toString(Charsets.UTF_8) }
     }.getOrNull()
@@ -41,10 +42,12 @@ object LocalLyricsStore {
             else -> bytes.toString(Charsets.UTF_8)
         }.trimStart('\uFEFF').trim()
         require(text.isNotEmpty() && '\u0000' !in text && '\uFFFD' !in text) { "Choose a UTF-8 or UTF-16 LRC/TXT file" }
-        val target = file(context, track)
-        val stream = target.startWrite()
-        try { stream.write(text.toByteArray(Charsets.UTF_8)); target.finishWrite(stream) }
-        catch (error: Throwable) { target.failWrite(stream); throw error }
-        revision.value += 1
+        synchronized(LocalLyricsStore) {
+            val target = file(context, track)
+            val stream = target.startWrite()
+            try { stream.write(text.toByteArray(Charsets.UTF_8)); target.finishWrite(stream) }
+            catch (error: Throwable) { target.failWrite(stream); throw error }
+            revision.value += 1
+        }
     }
 }
