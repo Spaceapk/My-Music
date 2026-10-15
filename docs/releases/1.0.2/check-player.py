@@ -52,12 +52,23 @@ def preferences(mode):
     adb('shell','chmod','600',path)
     adb('shell','rm','-f',path+'.bak')
 
+def open_lyrics():
+    nodes=list(tree().iter('node'))
+    descriptions={n.get('content-desc') for n in nodes}
+    texts={n.get('text') for n in nodes}
+    if ('Close lyrics' in descriptions or
+        {'Imported local lyric survives restart','Another imported line'} <= texts or
+        {'Primera linea local de prueba','Segunda linea local de prueba'} <= texts):
+        print('Lyrics panel already open, including restored player state')
+        return
+    tap('Lyrics')
+
 def start_song():
     adb('shell','am','start','-W','-n',PACKAGE+'/com.music.bitchord.MainActivity')
     tap('Songs')
     tap(TITLE)
     adb('shell','am','start','-W','-n',PACKAGE+'/com.music.bitchord.MainActivity','--ez','bitchord.openPlayer','true')
-    find('Lyrics')
+    find('More')
 
 # Publish a real FLAC containing timed Vorbis lyrics and a deterministic cover.
 fixture=base64.b64decode(Path('docs/releases/1.0.2/lyrics-tone.flac.b64').read_bytes())
@@ -75,7 +86,7 @@ for mode in ['DARK','LIGHT','GLASS']:
     screenshot('ambient-'+mode.lower())
     time.sleep(2)
     screenshot('ambient-'+mode.lower()+'-motion')
-    tap('Lyrics')
+    open_lyrics()
     find('Primera linea local de prueba')
     screenshot('lyrics-'+mode.lower())
     print('Embedded timed FLAC lyrics visible in '+mode)
@@ -92,17 +103,17 @@ tap('Downloads')
 tap('space-import-test.lrc')
 time.sleep(1)
 adb('shell','input','keyevent','4')
-tap('Lyrics')
+open_lyrics()
 find('Imported local lyric survives restart')
 screenshot('lyrics-imported')
 adb('shell','am','force-stop',PACKAGE)
 start_song()
-tap('Lyrics')
+open_lyrics()
 find('Imported local lyric survives restart')
 screenshot('lyrics-imported-restarted')
 adb('install','-r','--no-incremental','dist/Space-Music-1.0.2-beta.apk')
 start_song()
-tap('Lyrics')
+open_lyrics()
 find('Imported local lyric survives restart')
 screenshot('lyrics-imported-reinstalled')
 actual=adb('shell','sha256sum','/storage/emulated/0/Music/'+TITLE+'.flac').split()[0]
