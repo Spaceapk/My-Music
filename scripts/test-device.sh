@@ -20,7 +20,6 @@ grep -q 'OK (' device-tests.txt
 timeout 15s adb pull /sdcard/Android/data/org.nexlibre.spacemusic/files/playback-integration.png device-playback.png
 timeout 15s adb shell svc wifi enable
 timeout 15s adb shell svc data enable
-timeout 15s adb logcat -c
 (timeout 90s adb logcat -v threadtime > device-startup-log.txt 2>&1) &
 startup_logger=$!
 trap 'kill "$startup_logger" 2>/dev/null || true; timeout 10s adb logcat -d -b crash > device-crash-log.txt 2>&1 || true; timeout 10s adb logcat -d > device-full-log.txt 2>&1 || true; free -h; sudo dmesg | tail -60' EXIT
