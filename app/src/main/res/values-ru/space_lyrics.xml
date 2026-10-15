@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Атмосферный режим</string>
+    <string name="ambient_mode_subtitle">Движущиеся цвета обложки в плеере. Останавливается на паузе и учитывает уменьшение анимации.</string>
+    <string name="import_local_lyrics">Импортировать текст (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Текст этой песни сохранён. Откройте панель текста для чтения.</string>
+    <string name="local_lyrics_import_failed">Не удалось импортировать. Выберите файл LRC/TXT в UTF-8 или UTF-16 размером до 1 МБ.</string>
+</resources>

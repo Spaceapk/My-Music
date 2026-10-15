@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Modo ambiente</string>
+    <string name="ambient_mode_subtitle">Cores da capa em movimento no player. Para ao pausar e respeita a redução de animações.</string>
+    <string name="import_local_lyrics">Importar letra (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Letra salva para esta música. Abra o painel de letras para ler.</string>
+    <string name="local_lyrics_import_failed">Não foi possível importar. Escolha um arquivo LRC/TXT UTF-8 ou UTF-16 de até 1 MB.</string>
+</resources>

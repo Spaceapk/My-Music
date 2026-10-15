@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Chế độ môi trường</string>
+    <string name="ambient_mode_subtitle">Màu ảnh bìa chuyển động trong trình phát. Dừng khi tạm dừng và tuân theo cài đặt giảm chuyển động.</string>
+    <string name="import_local_lyrics">Nhập lời bài hát (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Đã lưu lời cho bài hát này. Mở bảng lời bài hát để đọc.</string>
+    <string name="local_lyrics_import_failed">Không thể nhập. Chọn tệp LRC/TXT UTF-8 hoặc UTF-16 có dung lượng tối đa 1 MB.</string>
+</resources>

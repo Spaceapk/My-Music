@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Modalità ambiente</string>
+    <string name="ambient_mode_subtitle">Colori della copertina in movimento nel lettore. Si ferma in pausa e rispetta la riduzione delle animazioni.</string>
+    <string name="import_local_lyrics">Importa testo (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Testo salvato per questo brano. Apri il pannello dei testi per leggerlo.</string>
+    <string name="local_lyrics_import_failed">Importazione non riuscita. Scegli un file LRC/TXT UTF-8 o UTF-16 fino a 1 MB.</string>
+</resources>

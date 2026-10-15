@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">מצב אווירה</string>
+    <string name="ambient_mode_subtitle">צבעי העטיפה נעים בנגן. התנועה נעצרת בהשהיה ומכבדת את הגדרת צמצום ההנפשות.</string>
+    <string name="import_local_lyrics">ייבוא מילות שיר (LRC / TXT)</string>
+    <string name="local_lyrics_imported">המילים נשמרו לשיר הזה. יש לפתוח את חלונית המילים כדי לקרוא אותן.</string>
+    <string name="local_lyrics_import_failed">הייבוא נכשל. יש לבחור קובץ LRC/TXT בקידוד UTF-8 או UTF-16 עד 1 MB.</string>
+</resources>

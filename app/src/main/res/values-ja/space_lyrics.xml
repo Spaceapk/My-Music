@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">アンビエントモード</string>
+    <string name="ambient_mode_subtitle">カバーの色がプレーヤー内でゆっくり動きます。一時停止中は止まり、アニメーションの軽減設定に従います。</string>
+    <string name="import_local_lyrics">歌詞をインポート（LRC / TXT）</string>
+    <string name="local_lyrics_imported">この曲の歌詞を保存しました。歌詞パネルを開いてください。</string>
+    <string name="local_lyrics_import_failed">インポートできません。1 MB 以下の UTF-8 または UTF-16 の LRC/TXT ファイルを選んでください。</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Mode ambiant</string>
+    <string name="ambient_mode_subtitle">Couleurs animées de la pochette dans le lecteur. Le mouvement cesse en pause et respecte la réduction des animations.</string>
+    <string name="import_local_lyrics">Importer les paroles (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Paroles enregistrées pour ce titre. Ouvrez le panneau des paroles pour les lire.</string>
+    <string name="local_lyrics_import_failed">Importation impossible. Choisissez un fichier LRC/TXT UTF-8 ou UTF-16 de 1 Mo maximum.</string>
+</resources>

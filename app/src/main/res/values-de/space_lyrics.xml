@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">Umgebungsmodus</string>
+    <string name="ambient_mode_subtitle">Bewegte Coverfarben im Player. Stoppt beim Pausieren und berücksichtigt reduzierte Animationen.</string>
+    <string name="import_local_lyrics">Songtext importieren (LRC / TXT)</string>
+    <string name="local_lyrics_imported">Songtext für diesen Titel gespeichert. Öffne den Songtextbereich zum Lesen.</string>
+    <string name="local_lyrics_import_failed">Import fehlgeschlagen. Wähle eine UTF-8- oder UTF-16-Datei im Format LRC/TXT bis 1 MB.</string>
+</resources>

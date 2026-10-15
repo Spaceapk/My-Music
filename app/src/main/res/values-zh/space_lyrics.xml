@@ -1,0 +1,7 @@
+<resources>
+    <string name="ambient_mode">氛围模式</string>
+    <string name="ambient_mode_subtitle">播放器中流动的封面色彩。暂停时停止，并遵循减少动画设置。</string>
+    <string name="import_local_lyrics">导入歌词（LRC / TXT）</string>
+    <string name="local_lyrics_imported">已为此歌曲保存歌词。请打开歌词面板阅读。</string>
+    <string name="local_lyrics_import_failed">无法导入。请选择不超过 1 MB 的 UTF-8 或 UTF-16 LRC/TXT 文件。</string>
+</resources>
