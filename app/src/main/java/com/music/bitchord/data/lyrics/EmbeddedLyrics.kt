@@ -206,7 +206,12 @@ object EmbeddedLyrics {
                 var at = start + 4
                 while (at + step <= start + size) {
                     if (payload[at] == 0.toByte() && (step == 1 || payload[at + 1] == 0.toByte())) {
-                        return String(payload, at + step, start + size - at - step, charset).trimStart('\uFEFF').trimEnd('\u0000')
+                        val valueAt = at + step
+                        val hasBom = valueAt + 1 < start + size && (
+                            (payload[valueAt] == 0xff.toByte() && payload[valueAt + 1] == 0xfe.toByte()) ||
+                            (payload[valueAt] == 0xfe.toByte() && payload[valueAt + 1] == 0xff.toByte()))
+                        val valueCharset = if (encoding == 1 && hasBom) Charsets.UTF_16 else charset
+                        return String(payload, valueAt, start + size - valueAt, valueCharset).trimStart('\uFEFF').trimEnd('\u0000')
                     }
                     at += step
                 }
