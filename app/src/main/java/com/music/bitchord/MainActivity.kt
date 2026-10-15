@@ -61,6 +61,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.LocalOverscrollFactory
+import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Album
+import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Check
@@ -478,6 +481,8 @@ private fun BitChordApp(
     // and the page is a sibling of the bar rather than a child.
     val navBarScroll = rememberFloatingTabBarScrollConnection()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    // LocalMusicScreen uses 0=songs, 1=artists, 2=albums, 3=playlists.
+    var spaceLibraryTab by rememberSaveable { mutableIntStateOf(0) }
     var spaceQuery by rememberSaveable { mutableStateOf("") }
     /**
      * Whether the player's sheet is up. The player is always a full-screen
@@ -2099,7 +2104,7 @@ private fun BitChordApp(
     // See [topBarContentPadding].
     val listPadding = PaddingValues(
         top = topBarContentPadding(),
-        bottom = if (player.song != null) 110.dp else 16.dp,
+        bottom = (if (player.song != null) 210.dp else 116.dp),
     )
 
     // What colour the page currently under the bars is. The fades either end
@@ -2790,6 +2795,7 @@ private fun BitChordApp(
                             }
                         }
                         LocalMusicScreen(
+                            navigationTab = spaceLibraryTab,
                             songs = localSongs,
                             collections = downloadCollections,
                             isDownloads = page.browseId == "local:downloads",
@@ -2964,6 +2970,7 @@ private fun BitChordApp(
                                 }
                                 LocalMusicScreen(
                                     songs = deviceSongs,
+                                    navigationTab = spaceLibraryTab,
                                     query = spaceQuery, onQueryChange = { spaceQuery = it },
                                     currentSong = player.song, isPlaying = player.isPlaying,
                                     onSongClick = { songs, index -> playFrom(songs, index, QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) },
@@ -3705,7 +3712,6 @@ private fun BitChordApp(
                         .align(Alignment.BottomCenter)
                         .widthIn(max = FLOATING_BAR_MAX_WIDTH)
                         .fillMaxWidth()
-                        .navigationBarsPadding()
                         .padding(horizontal = 10.dp, vertical = 12.dp)
                         .onSizeChanged { floatingBarsHeight.intValue = it.height },
                 ) {
@@ -3728,7 +3734,23 @@ private fun BitChordApp(
                             pull = playerSheetMotion.takeIf { !reducePlayerMotion },
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Spacer(Modifier.height(8.dp))
                     }
+                    FloatingBottomBar(
+                        tabs = listOf(
+                            BottomTab(stringResource(R.string.songs), Icons.Rounded.MusicNote),
+                            BottomTab(stringResource(R.string.albums), Icons.Rounded.Album),
+                            BottomTab(stringResource(R.string.artists), Icons.Rounded.Person),
+                            BottomTab(stringResource(R.string.library_nav_playlists), Icons.AutoMirrored.Rounded.QueueMusic),
+                        ),
+                        selectedIndex = when (spaceLibraryTab) { 2 -> 1; 1 -> 2; else -> spaceLibraryTab },
+                        onTabSelected = { index ->
+                            spaceLibraryTab = when (index) { 1 -> 2; 2 -> 1; else -> index }
+                            onTabSelected(TAB_HOME)
+                        },
+                        hazeState = hazeState,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
 
