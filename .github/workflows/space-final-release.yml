@@ -1,0 +1,159 @@
+name: Publish verified Space Music update
+on:
+  push:
+    branches: [space-publication]
+    paths: ['.github/workflows/space-final-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: space-final-release-1.0.1
+  cancel-in-progress: false
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      VERIFIED_RUN: '38663963928'
+      VERIFIED_SHA: a325b29afea9ffdd9e39614522407e37bd1ac134
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require the verified source and completed build
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .head_sha)" = "$VERIFIED_SHA"
+          git diff --exit-code "$VERIFIED_SHA" HEAD -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties
+          for attempt in $(seq 1 120); do
+            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN/jobs?filter=all" --jq '.jobs[] | select(.name == "build") | .conclusion // "pending"' | tail -1)
+            if [ "$result" = success ]; then exit 0; fi
+            if [ "$result" != pending ]; then exit 1; fi
+            sleep 5
+          done
+          exit 1
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install signature verification tools
+        run: sdkmanager 'build-tools;36.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-android-build
+          path: built
+          github-token: ${{ github.token }}
+          run-id: '38663963928'
+      - name: Create a one-run private receiver and publish only its public key
+        run: |
+          set -euo pipefail
+          umask 077
+          receiver=$(mktemp -d)
+          echo "SPACE_RECEIVER_DIR=$receiver" >> "$GITHUB_ENV"
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out "$receiver/recipient.pem" 2>/dev/null
+          openssl pkey -in "$receiver/recipient.pem" -pubout -out "$receiver/public.pem"
+          content=$(base64 -w0 "$receiver/public.pem")
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.signing/receiver-$GITHUB_RUN_ID.pem" -f message="Publish one-run signing receiver public key" -f branch="$GITHUB_REF_NAME" -f content="$content" >/dev/null
+      - name: Receive encrypted recovery access and sign with the existing identity
+        run: python3 docs/space-private-sign.py
+      - name: Verify package version and retain public signing evidence
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Space-Music-1.0.1-beta.apk | head -1 | tee dist/package-verification.txt
+          grep -q "name='org.nexlibre.spacemusic' versionCode='2'" dist/package-verification.txt
+          (cd dist && sha256sum Space-Music-1.0.1-beta.apk > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: space-final-signed
+          path: dist/
+      - name: Destroy private receiver and temporary recovery material
+        if: always()
+        run: |
+          if [ -n "$SPACE_RECEIVER_DIR" ]; then rm -rf "$SPACE_RECEIVER_DIR"; fi
+  device:
+    needs: sign
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [26, 33, 35]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-final-signed
+          path: dist
+      - name: Download previous published APK for update verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download v1.0.0-beta --repo "$GITHUB_REPOSITORY" --pattern '*.apk' --dir previous
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install over the previous version and verify signed optimized playback
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          cores: 4
+          ram-size: 3072M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: |
+            timeout 180s adb install --no-incremental previous/Space-Music-1.0.0-beta.apk
+            TEST_APP_APK=dist/Space-Music-1.0.1-beta.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
+            adb shell cmd uimode night yes || true
+            adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
+            sleep 3
+            adb exec-out screencap -p > device-dark.png
+            adb shell cmd uimode night no || true
+            adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
+            sleep 3
+            adb exec-out screencap -p > device-light.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: space-final-device-${{ matrix.api }}-${{ github.run_attempt }}
+          path: |
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+            device-*.png
+  publish:
+    needs: device
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-final-signed
+          path: dist
+      - name: Publish only after all signed Android tests succeed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.0.1-beta --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release already exists; refusing to overwrite its APK.'
+            exit 1
+          fi
+          gh release create v1.0.1-beta dist/Space-Music-1.0.1-beta.apk dist/SHA256SUMS.txt dist/Space-Music-1.0.1-beta.apk.signature.txt --repo "$GITHUB_REPOSITORY" --target a325b29afea9ffdd9e39614522407e37bd1ac134 --title 'Space Music 1.0.1 beta · estabilidad y contraste' --notes-file docs/space-1.0.1-notes.md --prerelease --latest
