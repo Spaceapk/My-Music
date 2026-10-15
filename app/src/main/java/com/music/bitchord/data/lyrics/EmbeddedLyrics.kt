@@ -82,12 +82,14 @@ object EmbeddedLyrics {
         LocalLyricsStore.read(context, uri.toString())
             ?: sidecar(uri.path.takeIf { uri.scheme == "file" })
             ?: open(context, uri)?.buffered()?.use { stream ->
-                stream.mark(4)
-                val magic = ByteArray(4)
-                val count = stream.read(magic)
+                stream.mark(16)
+                val magic = stream.readAtMost(12)
                 stream.reset()
-                if (count == 4 && magic.contentEquals(FLAC_MAGIC)) readFlac(stream)
-                else fromBytes(stream.readAtMost(MAX_TAG_BYTES))
+                when {
+                    magic.startsWith(FLAC_MAGIC) -> readFlac(stream)
+                    magic.isMp4() || (magic.size == 12 && String(magic, 4, 4, Charsets.US_ASCII) == "ftyp") -> readMp4(stream)
+                    else -> fromBytes(stream.readAtMost(MAX_TAG_BYTES))
+                }
             }
 
     /**
@@ -191,11 +193,11 @@ object EmbeddedLyrics {
             val start = pos + 10
             if (size <= 0 || size > payload.size - start) return null
             val flags = payload[pos + 9].toInt() and 255
-            if (name == "USLT" && flags == 0 && size > 4) {
+            if (name == "USLT" && flags == 0 && size > 5) {
                 val encoding = payload[start].toInt() and 255
                 val charset = when (encoding) {
                     0 -> Charsets.ISO_8859_1
-                    1 -> Charsets.UTF_16
+                    1 -> if (payload[start + 4] == 0xff.toByte() && payload[start + 5] == 0xfe.toByte()) Charsets.UTF_16LE else Charsets.UTF_16
                     2 -> Charsets.UTF_16BE
                     3 -> Charsets.UTF_8
                     else -> return null
@@ -204,12 +206,41 @@ object EmbeddedLyrics {
                 var at = start + 4
                 while (at + step <= start + size) {
                     if (payload[at] == 0.toByte() && (step == 1 || payload[at + 1] == 0.toByte())) {
-                        return String(payload, at + step, start + size - at - step, charset).trimEnd('\u0000')
+                        return String(payload, at + step, start + size - at - step, charset).trimStart('\uFEFF').trimEnd('\u0000')
                     }
                     at += step
                 }
             }
             pos = start + size
+        }
+        return null
+    }
+
+    /** mdat may be larger than the metadata budget; skip it to reach a trailing moov. */
+    private fun readMp4(stream: InputStream): String? {
+        repeat(256) {
+            var header = stream.readAtMost(8)
+            if (header.size != 8) return null
+            var size = readU32(header, 0)
+            if (size == 1L) {
+                val extended = stream.readAtMost(8)
+                if (extended.size != 8) return null
+                size = readU64(extended, 0)
+                header += extended
+            }
+            if (size < header.size) return null
+            var remaining = size - header.size
+            if (String(header, 4, 4, Charsets.US_ASCII) == "moov") {
+                if (remaining > MAX_TAG_BYTES - header.size) return null
+                val payload = stream.readAtMost(remaining.toInt())
+                if (payload.size.toLong() != remaining) return null
+                return mp4(header + payload)
+            }
+            while (remaining > 0) {
+                val skipped = stream.skip(remaining)
+                if (skipped > 0) remaining -= skipped
+                else if (stream.read() < 0) return null else remaining--
+            }
         }
         return null
     }

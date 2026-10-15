@@ -89,7 +89,7 @@
     <string name="lyrics_provider_not_found">No se encontró la letra</string>
     <string name="lyrics_romanization_unavailable">La romanización no está disponible para esta letra</string>
     <string name="lyrics_romanized">Pronunciación romanizada</string>
-    <string name="lyrics_saved_with_download">Letra guardada con esta descarga</string>
+    <string name="lyrics_saved_with_download">Letra local</string>
     <string name="lyrics_share_pick_limit">La tarjeta está llena</string>
     <string name="lyrics_translated_to">Traducida al %1$s</string>
     <string name="lyrics_translation_unavailable">La traducción no está disponible ahora</string>
@@ -99,7 +99,7 @@
     <string name="next_from">A continuación de: %1$s</string>
     <string name="next_in_queue">Siguiente en la cola</string>
     <string name="no_lyrics_for_track">No hay letra para esta canción</string>
-    <string name="no_lyrics_found">No se encontró la letra</string>
+    <string name="no_lyrics_found">Sin letra local. Importa un LRC o TXT desde el menú de la canción.</string>
     <string name="now_playing">Reproduciendo</string>
     <string name="open_lyrics">Lyrics</string>
     <string name="pause">Pausar</string>

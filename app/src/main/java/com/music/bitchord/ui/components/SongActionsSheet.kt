@@ -210,7 +210,7 @@ fun SongActionsSheet(
         lyricsImportTrack = null
         if (uri != null && track != null) lyricsScope.launch {
             try {
-                LocalLyricsStore.import(lyricsContext, track, uri)
+                LocalLyricsStore.importFile(lyricsContext, track, uri)
                 Toast.makeText(lyricsContext, importSuccess, Toast.LENGTH_LONG).show()
             } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
             catch (_: Exception) { Toast.makeText(lyricsContext, importFailure, Toast.LENGTH_LONG).show() }

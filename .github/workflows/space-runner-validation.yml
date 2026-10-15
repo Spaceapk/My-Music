@@ -1,8 +1,5 @@
 name: Verify corrected Space Music instrumentation
 on:
-  push:
-    branches: [space-runner-validation]
-    paths: ['.github/workflows/space-runner-validation.yml']
   workflow_dispatch:
 permissions:
   contents: read

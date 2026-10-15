@@ -113,3 +113,7 @@
 -keep class okhttp3.OkHttpClient { public *; }
 -keep interface okhttp3.Call { *; }
 -keep class okhttp3.Request { public *; }
+
+# Local lyric persistence is verified from the separate release test APK.
+-keep class com.music.bitchord.data.lyrics.LocalLyricsStore { public *; }
+-keep class com.music.bitchord.data.lyrics.EmbeddedLyrics { public *; }

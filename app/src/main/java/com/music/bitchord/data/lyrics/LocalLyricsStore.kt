@@ -23,7 +23,7 @@ object LocalLyricsStore {
         file(context, track).openRead().use { it.readBytes().toString(Charsets.UTF_8) }
     }.getOrNull()
 
-    suspend fun import(context: Context, track: String, document: Uri) = withContext(Dispatchers.IO) {
+    suspend fun importFile(context: Context, track: String, document: Uri) = withContext(Dispatchers.IO) {
         val bytes = requireNotNull(context.contentResolver.openInputStream(document)).use {
             val output = java.io.ByteArrayOutputStream()
             val buffer = ByteArray(8192)

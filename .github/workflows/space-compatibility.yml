@@ -1,7 +1,5 @@
 name: Space Music optimized compatibility
 on:
-  push:
-    paths: ['.github/workflows/space-compatibility.yml']
   workflow_dispatch:
 permissions:
   contents: read
