@@ -117,3 +117,4 @@
 # Local lyric persistence is verified from the separate release test APK.
 -keep class com.music.bitchord.data.lyrics.LocalLyricsStore { public *; }
 -keep class com.music.bitchord.data.lyrics.EmbeddedLyrics { public *; }
+-keep class com.music.bitchord.data.lyrics.LyricLine { public *; }
