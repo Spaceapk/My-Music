@@ -25,3 +25,13 @@ sleep 12
 timeout 15s adb logcat -d -b crash > device-crash-log.txt
 ! grep -q 'FATAL EXCEPTION' device-crash-log.txt
 timeout 15s adb shell pidof org.nexlibre.spacemusic
+
+# Repeat process creation rather than only recreating an Activity in one process.
+for attempt in $(seq 1 20); do
+  timeout 15s adb shell am force-stop org.nexlibre.spacemusic
+  timeout 60s adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
+  sleep 1
+  timeout 15s adb shell pidof org.nexlibre.spacemusic
+done
+timeout 15s adb logcat -d -b crash > device-crash-log.txt
+! grep -q 'FATAL EXCEPTION' device-crash-log.txt
