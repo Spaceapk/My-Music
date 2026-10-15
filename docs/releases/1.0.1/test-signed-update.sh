@@ -64,11 +64,6 @@ PY_MEDIASTORE
 python3 docs/releases/1.0.1/verify-upgrade-playlist.py seed
 TEST_APP_APK=dist/Space-Music-1.0.1-beta.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
 python3 docs/releases/1.0.1/verify-upgrade-playlist.py verify
-adb shell cmd uimode night yes || true
-adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
-sleep 3
-adb exec-out screencap -p > device-dark.png
-adb shell cmd uimode night no || true
-adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
-sleep 3
-adb exec-out screencap -p > device-light.png
+python3 docs/releases/1.0.1/verify-upgrade-playlist.py capture_dark
+python3 docs/releases/1.0.1/verify-upgrade-playlist.py capture_light
+python3 docs/releases/1.0.1/verify-upgrade-playlist.py capture_glass

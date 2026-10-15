@@ -92,5 +92,38 @@ elif sys.argv[1] == 'verify':
     adb('shell', 'input', 'keyevent', '87')
     session_state(TRACKS[0], 3)
     print('Reordered playlist played in order, survived backgrounding and responded to media pause/play/next')
+elif sys.argv[1] in ('capture_dark', 'capture_light', 'capture_glass'):
+    mode = sys.argv[1].removeprefix('capture_')
+    sdk = int(adb('shell', 'getprop', 'ro.build.version.sdk').strip())
+    if mode == 'glass' and sdk < 31:
+        print('Liquid Glass is unavailable below Android 12; capture skipped')
+        raise SystemExit(0)
+    adb('shell', 'am', 'force-stop', 'org.nexlibre.spacemusic')
+    path = '/data/user/0/org.nexlibre.spacemusic/shared_prefs/bitchord_settings.xml'
+    backup = path + '.bak'
+    source = backup if subprocess.run(['adb', 'shell', 'test', '-f', backup], timeout=30).returncode == 0 else path
+    exists = subprocess.run(['adb', 'shell', 'test', '-f', source], timeout=30).returncode == 0
+    preferences = ET.fromstring(adb('exec-out', 'cat', source)) if exists else ET.Element('map')
+    for tag, name, value in [('string', 'theme_mode', 'LIGHT' if mode == 'light' else 'DARK'),
+                              ('boolean', 'liquid_glass', 'true' if mode == 'glass' else 'false')]:
+        entry = next((e for e in preferences if e.get('name') == name), None)
+        if entry is None: entry = ET.SubElement(preferences, tag, {'name': name})
+        if tag == 'string': entry.text = value
+        else: entry.set('value', value)
+    subprocess.run(['adb', 'shell', 'tee', path], input=ET.tostring(preferences, encoding='utf-8', xml_declaration=True), stdout=subprocess.DEVNULL, check=True, timeout=30)
+    owner = adb('shell', 'stat', '-c', '%u:%g', '/data/user/0/org.nexlibre.spacemusic').strip()
+    assert re.fullmatch(r'\d+:\d+', owner), owner
+    adb('shell', 'chown', owner, path)
+    adb('shell', 'chmod', '600', path)
+    adb('shell', 'rm', '-f', backup)
+    start()
+    tap(LABEL)
+    Path('device-' + mode + '.png').write_bytes(subprocess.check_output(['adb', 'exec-out', 'screencap', '-p'], timeout=30))
+    persisted = ET.fromstring(adb('exec-out', 'cat', path))
+    expected = 'LIGHT' if mode == 'light' else 'DARK'
+    assert next(e.text for e in persisted if e.get('name') == 'theme_mode') == expected
+    tap('Settings')
+    Path('device-settings-' + mode + '.png').write_bytes(subprocess.check_output(['adb', 'exec-out', 'screencap', '-p'], timeout=30))
+    print('Captured configured ' + mode + ' library and settings themes')
 else:
-    raise SystemExit('Use seed or verify')
+    raise SystemExit('Use seed, verify or capture_dark/light/glass')

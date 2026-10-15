@@ -1,4 +1,4 @@
-name: Validate Space Music compact playlist layout before publication
+name: Verify signed Space Music final layout and themes before reviewed publication
 on:
   push:
     branches: [space-reviewed-publication]
@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      VERIFIED_RUN: '38730753578'
-      VERIFIED_SHA: 0f2b90f080fe4ad3f374486a18cc85442576a271
+      VERIFIED_RUN: '38735241735'
+      VERIFIED_SHA: 981b0bb379954dcf5832f4e052ecc7e7581b5789
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
           name: space-android-build
           path: built
           github-token: ${{ github.token }}
-          run-id: '38730753578'
+          run-id: '38735241735'
       - name: Restore locally signed APKs using public ZIP and signature metadata
         run: |
           set -euo pipefail
@@ -71,7 +71,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [26, 33, 35]
+        include:
+          - api: 26
+            screen: 320x640
+          - api: 33
+            screen: 360x800
+          - api: 35
+            screen: 412x892
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -104,7 +110,7 @@ jobs:
           ram-size: 2048M
           heap-size: 512M
           emulator-boot-timeout: 300
-          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan -skin ${{ matrix.screen }} -dpi-device 160
           disable-animations: true
           script: bash docs/releases/1.0.1/test-signed-update.sh
       - uses: actions/upload-artifact@v4
