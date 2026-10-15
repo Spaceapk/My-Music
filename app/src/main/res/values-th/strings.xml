@@ -1279,4 +1279,5 @@
     <string name="star_save_error">ไม่สามารถบันทึกรายการได้</string>
     <string name="chinese_simplified">จีนตัวย่อ</string>
     <string name="chinese_traditional">จีนตัวเต็ม</string>
+    <string name="library_nav_playlists">เพลย์ลิสต์</string>
 </resources>

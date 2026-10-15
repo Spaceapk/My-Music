@@ -1274,4 +1274,5 @@
     <string name="star_save_error">リストを保存できませんでした</string>
     <string name="chinese_simplified">中国語（簡体字）</string>
     <string name="chinese_traditional">中国語（繁体字）</string>
+    <string name="library_nav_playlists">プレイリスト</string>
 </resources>

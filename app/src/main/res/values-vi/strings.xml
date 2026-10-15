@@ -1213,4 +1213,5 @@
     <string name="star_save_error">Không thể lưu danh sách</string>
     <string name="chinese_simplified">Tiếng Trung giản thể</string>
     <string name="chinese_traditional">Tiếng Trung phồn thể</string>
+    <string name="library_nav_playlists">Danh sách phát</string>
 </resources>

@@ -1235,4 +1235,5 @@
     <string name="star_save_error">Impossibile salvare la playlist</string>
     <string name="chinese_simplified">Cinese semplificato</string>
     <string name="chinese_traditional">Cinese tradizionale</string>
+    <string name="library_nav_playlists">Playlist</string>
 </resources>
