@@ -1,4 +1,4 @@
-name: Publish signed and upgrade-verified Space Music update
+name: Validate signed upgrade UI without publishing
 on:
   push:
     branches: [space-reviewed-publication]
@@ -118,8 +118,10 @@ jobs:
             device-crash-log.txt
             device-full-log.txt
             device-upgrade-ui.xml
+            device-media-fixture.txt
             device-*.png
   publish:
+    if: ${{ false }}
     needs: device
     runs-on: ubuntu-latest
     timeout-minutes: 10
