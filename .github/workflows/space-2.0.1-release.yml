@@ -1,4 +1,4 @@
-name: Verify signed Space Music 2.0.1 navigation and compatibility
+name: Verify signed Space Music 2.0.1 navigation, update and compatibility
 on:
   push:
     branches: [space-2.0.1-publication]
