@@ -8,13 +8,19 @@ Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a
 
 ## Descarga e instalación
 
-**[Descargar Space Music Beta 1.0.1 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.1-beta/Space-Music-1.0.1-beta.apk)**
+**[Descargar Space Music Beta 1.0.2 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.2-beta/Space-Music-1.0.2-beta.apk)**
 
 APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
 
-Pruebas aprobadas en Android 8, 13 y 15: reproducción local, listas, arrastre, veinte arranques en frío y actualización desde 1.0.0. Conserva firma y datos: instala sobre la versión oficial anterior sin desinstalar. [Resultados y límites](docs/verification-1.0.1.md). Pendiente validación en teléfonos físicos.
+Pruebas aprobadas en Android 12, 13 y 15: reproducción local, listas, arrastre, veinte arranques en frío y actualización desde 1.0.1. Conserva firma y datos: instala sobre la versión oficial anterior sin desinstalar. [Resultados y límites](docs/verification-1.0.2.md). Pendiente validación en teléfonos físicos.
 
 Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
+
+## Letras locales y ambiente
+
+Lee letras incrustadas compatibles, también texto sin sincronización. En el menú de la canción puedes importar un archivo LRC/TXT sin modificar el audio. El modo ambiente se activa en Ajustes y usa colores de la carátula; respeta pausa, segundo plano y reducción de animaciones. No se consultan servidores para obtener letras.
+
+La matriz de pruebas de esta versión comienza en Android 12; se conserva minSdk 26 para instalación.
 
 ## Firma y actualizaciones
 

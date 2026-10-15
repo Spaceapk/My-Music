@@ -1,0 +1,67 @@
+name: Publish reviewed Space Music 1.0.2 lyrics and ambient mode
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/space-publish-lyrics.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: publish-space-1.0.2
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERIFIED_RUN: '38776684979'
+      VERIFIED_SHA: 48b449ad3423fd01cddc1d0483a3642f4e5f03bb
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require successful signed playback, update, lyrics and visual acceptance
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .head_sha)" = "$VERIFIED_SHA"
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .conclusion)" = success
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN/jobs > signed-jobs.json
+          python3 - <<'PY'
+          import json
+          jobs=[j for j in json.load(open('signed-jobs.json'))['jobs'] if j['name'].startswith('device (')]
+          assert len(jobs)==3 and all(j['conclusion']=='success' for j in jobs), jobs
+          PY
+          git diff --exit-code "$VERIFIED_SHA" HEAD -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-lyrics-signed
+          path: dist
+          github-token: ${{ github.token }}
+          run-id: '38776684979'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: space-lyrics-device-*
+          path: verification
+          github-token: ${{ github.token }}
+          run-id: '38776684979'
+      - name: Verify exact signed bytes and publish once
+        run: |
+          set -euo pipefail
+          echo '93aae3563754f9690fbb0db3c7c212d3515ea0f8877f07073c3e56f5ed3a80d5  dist/Space-Music-1.0.2-beta.apk' | sha256sum -c -
+          (cd dist && sha256sum -c SHA256SUMS.txt)
+          grep -q '5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce' dist/Space-Music-1.0.2-beta.apk.signature.txt
+          grep -q "name='org.nexlibre.spacemusic' versionCode='3'" dist/package-verification.txt
+          python3 - <<'PY_RENAME'
+          from pathlib import Path
+          for p in Path('verification').rglob('device-ambient-paused.png'):
+              p.rename(p.with_name('device-ambient-pause-request.png'))
+          PY_RENAME
+          cp docs/verification-1.0.2.md verification/
+          cp signed-jobs.json verification/
+          (cd verification && zip -qr ../dist/Space-Music-1.0.2-verification.zip .)
+          if gh release view v1.0.2-beta --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Refusing to replace an existing release.'; exit 1
+          fi
+          gh release create v1.0.2-beta dist/Space-Music-1.0.2-beta.apk dist/SHA256SUMS.txt dist/Space-Music-1.0.2-beta.apk.signature.txt dist/Space-Music-1.0.2-verification.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Space Music 1.0.2 beta · letras locales y modo ambiente' --notes-file docs/space-1.0.2-notes.md --prerelease
