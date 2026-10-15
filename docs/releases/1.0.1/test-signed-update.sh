@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
-timeout 30s adb root
-timeout 30s adb wait-for-device
+# adbd can close its transport while restarting as root; verify readiness.
+for attempt in 1 2 3; do
+  timeout 30s adb root || true
+  timeout 30s adb wait-for-device
+  if [ "$(timeout 15s adb shell id -u | tr -d '\r')" = 0 ]; then break; fi
+done
+test "$(timeout 15s adb shell id -u | tr -d '\r')" = 0
 timeout 180s adb install -g --no-incremental previous/Space-Music-1.0.0-beta.apk
 python3 - <<'PY_FIXTURE'
 import wave
 for suffix in ['A', 'B']:
     with wave.open('SpaceUpgradeTone' + suffix + '.wav', 'wb') as audio:
         audio.setnchannels(1); audio.setsampwidth(2); audio.setframerate(44100)
-        audio.writeframes(b'\x00\x00' * 44100)
+        audio.writeframes(b'\x00\x00' * 44100 * 31)
 PY_FIXTURE
 adb shell mkdir -p /sdcard/Music
 for suffix in A B; do

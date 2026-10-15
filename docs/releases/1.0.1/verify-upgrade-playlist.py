@@ -62,6 +62,11 @@ elif sys.argv[1] == 'verify':
     centers = [((b[0]+b[2])//2, (b[1]+b[3])//2) for b in coordinates]
     adb('shell', 'input', 'swipe', str(centers[0][0]), str(centers[0][1]), str(centers[1][0]), str(centers[1][1]+12), '900')
     tap('Save')
+    for attempt in range(12):
+        texts = [n.get('text') for n in snapshot().iter('node') if n.get('text') in TRACKS]
+        if texts == list(reversed(TRACKS)): break
+        time.sleep(1)
+    assert texts == list(reversed(TRACKS)), f'Drag order did not update: {texts}'
     start()
     tap(LABEL)
     texts = [n.get('text') for n in snapshot().iter('node') if n.get('text') in TRACKS]
