@@ -9,11 +9,11 @@ permissions:
   actions: read
 concurrency:
   group: space-final-release-1.0.1
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   sign:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 20
     env:
       VERIFIED_RUN: '38663963928'
       VERIFIED_SHA: a325b29afea9ffdd9e39614522407e37bd1ac134
@@ -22,18 +22,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Require the verified source and completed build
+      - name: Require successful verification of the compiled source
         run: |
           set -euo pipefail
           test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .head_sha)" = "$VERIFIED_SHA"
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN --jq .conclusion)" = success
           git diff --exit-code "$VERIFIED_SHA" HEAD -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties
-          for attempt in $(seq 1 120); do
-            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$VERIFIED_RUN/jobs?filter=all" --jq '.jobs[] | select(.name == "build") | .conclusion // "pending"' | tail -1)
-            if [ "$result" = success ]; then exit 0; fi
-            if [ "$result" != pending ]; then exit 1; fi
-            sleep 5
-          done
-          exit 1
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -49,21 +43,20 @@ jobs:
           path: built
           github-token: ${{ github.token }}
           run-id: '38663963928'
-      - name: Create a one-run private receiver and publish only its public key
+      - name: Restore locally signed APKs using public ZIP and signature metadata
         run: |
           set -euo pipefail
-          umask 077
-          receiver=$(mktemp -d)
-          echo "SPACE_RECEIVER_DIR=$receiver" >> "$GITHUB_ENV"
-          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out "$receiver/recipient.pem" 2>/dev/null
-          openssl pkey -in "$receiver/recipient.pem" -pubout -out "$receiver/public.pem"
-          content=$(base64 -w0 "$receiver/public.pem")
-          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.signing/receiver-$GITHUB_RUN_ID.pem" -f message="Publish one-run signing receiver public key" -f branch="$GITHUB_REF_NAME" -f content="$content" >/dev/null
-      - name: Receive encrypted recovery access and sign with the existing identity
-        run: python3 docs/space-private-sign.py
-      - name: Verify package version and retain public signing evidence
-        run: |
-          set -euo pipefail
+          mkdir -p dist
+          apk=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
+          tests=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          python3 docs/releases/1.0.1/restore-apk-signature.py restore "$apk" docs/releases/1.0.1/app-signature.json dist/Space-Music-1.0.1-beta.apk
+          python3 docs/releases/1.0.1/restore-apk-signature.py restore "$tests" docs/releases/1.0.1/test-signature.json dist/test-runner.apk
+          signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          "$signer" verify --verbose --print-certs dist/Space-Music-1.0.1-beta.apk | tee dist/Space-Music-1.0.1-beta.apk.signature.txt
+          "$signer" verify --print-certs dist/test-runner.apk | tee dist/test-signature.txt
+          grep -q '5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce' dist/Space-Music-1.0.1-beta.apk.signature.txt
+          grep -q '5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce' dist/test-signature.txt
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -P 16 4 dist/Space-Music-1.0.1-beta.apk
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Space-Music-1.0.1-beta.apk | head -1 | tee dist/package-verification.txt
           grep -q "name='org.nexlibre.spacemusic' versionCode='2'" dist/package-verification.txt
           (cd dist && sha256sum Space-Music-1.0.1-beta.apk > SHA256SUMS.txt)
@@ -71,10 +64,6 @@ jobs:
         with:
           name: space-final-signed
           path: dist/
-      - name: Destroy private receiver and temporary recovery material
-        if: always()
-        run: |
-          if [ -n "$SPACE_RECEIVER_DIR" ]; then rm -rf "$SPACE_RECEIVER_DIR"; fi
   device:
     needs: sign
     runs-on: ubuntu-latest
