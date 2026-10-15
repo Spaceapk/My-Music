@@ -72,5 +72,25 @@ elif sys.argv[1] == 'verify':
     texts = [n.get('text') for n in snapshot().iter('node') if n.get('text') in TRACKS]
     assert texts == list(reversed(TRACKS)), f'Dragged order did not persist: {texts}'
     print('Playlist membership survived upgrade and dragged order survived cold restart')
+    tap('Play')
+    def session_state(title, state):
+        for attempt in range(15):
+            dump = adb('shell', 'dumpsys', 'media_session')
+            Path('device-playlist-session.txt').write_text(dump)
+            if title in dump and re.search(r'\bstate=' + str(state) + r'\b', dump): return
+            time.sleep(1)
+        raise AssertionError(f'Media session did not reach {title}, state {state}')
+    session_state(TRACKS[1], 3)
+    Path('device-miniplayer.png').write_bytes(subprocess.check_output(['adb', 'exec-out', 'screencap', '-p'], timeout=30))
+    adb('shell', 'input', 'keyevent', '3')
+    time.sleep(2)
+    session_state(TRACKS[1], 3)
+    adb('shell', 'input', 'keyevent', '127')
+    session_state(TRACKS[1], 2)
+    adb('shell', 'input', 'keyevent', '126')
+    session_state(TRACKS[1], 3)
+    adb('shell', 'input', 'keyevent', '87')
+    session_state(TRACKS[0], 3)
+    print('Reordered playlist played in order, survived backgrounding and responded to media pause/play/next')
 else:
     raise SystemExit('Use seed or verify')
