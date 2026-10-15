@@ -1,0 +1,116 @@
+name: Space Music optimized compatibility
+on:
+  push:
+    paths: ['.github/workflows/space-compatibility.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 95acafb5f92231f4a76add7f0f5155e80d14bd3a
+      - name: Validate compiled source and regression results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/38658832830 --jq .head_sha)" = 95acafb5f92231f4a76add7f0f5155e80d14bd3a
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/38658832830/jobs?filter=all" --jq '[.jobs[] | select(.name == "build" and .conclusion == "success")] | length')" -ge 1
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install signing tools
+        run: sdkmanager 'build-tools;36.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-android-build
+          path: built
+          github-token: ${{ github.token }}
+          run-id: '38658832830'
+      - name: Use an ephemeral certificate exclusively for compatibility tests
+        run: |
+          set -euo pipefail
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          mkdir -p validation
+          keytool -genkeypair -keystore "$keydir/test.p12" -storetype PKCS12 -alias test-only -keyalg RSA -keysize 4096 -validity 1 -dname 'CN=Space Music CI compatibility test' -storepass space-test-only -keypass space-test-only
+          apk=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
+          runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          "$signer" sign --v1-signing-enabled false --v4-signing-enabled false --ks "$keydir/test.p12" --ks-key-alias test-only --ks-pass pass:space-test-only --key-pass pass:space-test-only --out validation/space-ci-test.apk "$apk"
+          "$signer" sign --v1-signing-enabled false --v4-signing-enabled false --ks "$keydir/test.p12" --ks-key-alias test-only --ks-pass pass:space-test-only --key-pass pass:space-test-only --out validation/space-ci-runner.apk "$runner"
+          "$signer" verify validation/space-ci-test.apk
+          "$signer" verify validation/space-ci-runner.apk
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -c -P 16 4 validation/space-ci-test.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: space-ci-validation-input
+          path: validation/
+  device:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [26, 33, 35]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 95acafb5f92231f4a76add7f0f5155e80d14bd3a
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-ci-validation-input
+          path: validation
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify optimized offline playback with the ANGLE software renderer
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          cores: 4
+          ram-size: 3072M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: |
+            TEST_APP_APK=validation/space-ci-test.apk TEST_INSTRUMENTATION_APK=validation/space-ci-runner.apk bash scripts/test-device.sh
+            adb shell cmd uimode night yes || true
+            adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
+            sleep 3
+            adb exec-out screencap -p > device-dark.png
+            adb shell cmd uimode night no || true
+            adb shell am start -W -n org.nexlibre.spacemusic/com.music.bitchord.MainActivity
+            sleep 3
+            adb exec-out screencap -p > device-light.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: space-compatibility-device-${{ matrix.api }}-${{ github.run_attempt }}
+          path: |
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+            device-*.png
