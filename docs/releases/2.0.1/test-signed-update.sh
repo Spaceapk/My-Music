@@ -61,12 +61,12 @@ if sdk >= 29: assert 'is_pending=0' in rows and 'is_podcast=0' in rows, rows
 if sdk >= 30: assert 'is_trashed=0' in rows, rows
 print(rows)
 PY_MEDIASTORE
-python3 docs/releases/1.0.1/verify-upgrade-playlist.py seed
+python3 docs/releases/2.0.1/verify-upgrade-playlist.py seed
 TEST_APP_APK=dist/Space-Music-2.0.1-beta.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk bash scripts/test-device.sh
-python3 docs/releases/1.0.1/verify-upgrade-playlist.py verify
-python3 docs/releases/1.0.1/verify-upgrade-playlist.py capture_dark
-python3 docs/releases/1.0.1/verify-upgrade-playlist.py capture_light
-python3 docs/releases/1.0.1/verify-upgrade-playlist.py capture_glass
+python3 docs/releases/2.0.1/verify-upgrade-playlist.py verify
+python3 docs/releases/2.0.1/verify-upgrade-playlist.py capture_dark
+python3 docs/releases/2.0.1/verify-upgrade-playlist.py capture_light
+python3 docs/releases/2.0.1/verify-upgrade-playlist.py capture_glass
 
 adb shell svc wifi disable
 adb shell svc data disable
