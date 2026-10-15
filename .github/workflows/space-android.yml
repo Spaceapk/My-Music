@@ -109,7 +109,8 @@ jobs:
             device-tests.txt
             device-startup-log.txt
             device-crash-log.txt
-            device-playback.png
+            device-*.png
+            device-navigation.xml
 
   optimized-device-test:
     needs: build

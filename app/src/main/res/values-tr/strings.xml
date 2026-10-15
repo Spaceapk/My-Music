@@ -1253,4 +1253,5 @@
     <string name="star_save_error">Liste kaydedilemedi</string>
     <string name="chinese_simplified">Basitleştirilmiş Çince</string>
     <string name="chinese_traditional">Geleneksel Çince</string>
+    <string name="library_nav_playlists">Çalma listeleri</string>
 </resources>

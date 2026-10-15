@@ -1274,4 +1274,5 @@
     <string name="star_delete_playlist">刪除此清單？音訊檔案會保留。</string>
     <string name="star_playlist_hint">使用此裝置上的音樂建立清單，無需帳號或網路。</string>
     <string name="star_save_error">無法儲存清單</string>
+    <string name="library_nav_playlists">播放列表</string>
 </resources>

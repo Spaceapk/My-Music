@@ -1297,4 +1297,5 @@
     <string name="star_save_error">Impossible de sauvegarder la liste</string>
     <string name="chinese_simplified">Chinois simplifié</string>
     <string name="chinese_traditional">Chinois traditionnel</string>
+    <string name="library_nav_playlists">Playlists</string>
 </resources>

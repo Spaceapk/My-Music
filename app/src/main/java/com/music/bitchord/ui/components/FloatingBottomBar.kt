@@ -9,6 +9,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -256,6 +259,7 @@ fun FloatingBottomBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .selectableGroup()
                 .onSizeChanged { rowSize = it }
                 .pointerInput(Unit) {
                     var totalDrag = 0f
@@ -357,13 +361,16 @@ private fun BottomBarItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .clip(RoundedCornerShape(percent = 50))
-            .clickable(
+            .selectable(
+                selected = selected,
+                role = Role.Tab,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-            ) {
-                if (!selected) haptics.play(Haptic.Select)
-                onClick()
-            }
+                onClick = {
+                    if (!selected) haptics.play(Haptic.Select)
+                    onClick()
+                },
+            )
             .padding(vertical = TAB_VERTICAL_PADDING),
     ) {
         Icon(

@@ -1133,4 +1133,5 @@
     <string name="star_delete_playlist">Delete this playlist? Your audio files will be kept.</string>
     <string name="star_playlist_hint">Create a playlist and add music from this device. No account or connection needed.</string>
     <string name="star_save_error">Could not save playlist</string>
+    <string name="library_nav_playlists">Playlists</string>
 </resources>

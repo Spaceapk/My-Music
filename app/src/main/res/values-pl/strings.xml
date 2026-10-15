@@ -1348,4 +1348,5 @@
     <string name="star_save_error">Nie udało się zapisać listy</string>
     <string name="chinese_simplified">Chiński uproszczony</string>
     <string name="chinese_traditional">Chiński tradycyjny</string>
+    <string name="library_nav_playlists">Playlisty</string>
 </resources>

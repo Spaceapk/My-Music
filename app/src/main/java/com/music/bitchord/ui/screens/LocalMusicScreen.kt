@@ -69,6 +69,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -179,10 +180,12 @@ fun LocalMusicScreen(
     onUploadToWebDav: ((List<Song>) -> Unit)? = null,
     query: String? = null,
     onQueryChange: ((String) -> Unit)? = null,
+    navigationTab: Int? = null,
     modifier: Modifier = Modifier,
 ) {
-    // Which top-level tab is selected.
-    var selectedTab by rememberSaveable(isDownloads) { mutableIntStateOf(LOCAL_TAB_SONGS) }
+    // A supplied tab is owned by the main floating navigation.
+    var internalTab by rememberSaveable(isDownloads) { mutableIntStateOf(LOCAL_TAB_SONGS) }
+    val selectedTab = navigationTab ?: internalTab
 
     // Narrows whichever tab is showing — songs by title/artist/album, artists
     // and albums by name. Not saved across process death: a filter left on a
@@ -239,6 +242,12 @@ fun LocalMusicScreen(
         drillDownLabel = null
         drillDownSongs = emptyList()
         drillDownArt = null
+    }
+
+    LaunchedEffect(navigationTab) {
+        leaveDrillDown()
+        selectedDownloadIds = emptySet()
+        selectedAlbumKeys = emptySet()
     }
 
     BackHandler(enabled = selectingDownloads) {
@@ -337,7 +346,7 @@ fun LocalMusicScreen(
         )
 
         // ── Tab row ──────────────────────────────────────────────────────────
-        TabRow(
+        if (navigationTab == null) TabRow(
             selectedTabIndex = selectedTab,
             containerColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.primary,
@@ -353,7 +362,7 @@ fun LocalMusicScreen(
                 label = stringResource(R.string.songs),
                 selected = selectedTab == LOCAL_TAB_SONGS,
                 onClick = {
-                    selectedTab = LOCAL_TAB_SONGS
+                    internalTab = LOCAL_TAB_SONGS
                     leaveDrillDown()
                 },
             )
@@ -362,7 +371,7 @@ fun LocalMusicScreen(
                 label = stringResource(R.string.artists),
                 selected = selectedTab == LOCAL_TAB_ARTISTS,
                 onClick = {
-                    selectedTab = LOCAL_TAB_ARTISTS
+                    internalTab = LOCAL_TAB_ARTISTS
                     leaveDrillDown()
                 },
             )
@@ -371,7 +380,7 @@ fun LocalMusicScreen(
                 label = stringResource(R.string.albums),
                 selected = selectedTab == LOCAL_TAB_ALBUMS,
                 onClick = {
-                    selectedTab = LOCAL_TAB_ALBUMS
+                    internalTab = LOCAL_TAB_ALBUMS
                     leaveDrillDown()
                 },
             )
@@ -379,7 +388,7 @@ fun LocalMusicScreen(
                 icon = Icons.AutoMirrored.Rounded.QueueMusic,
                 label = stringResource(R.string.playlists),
                 selected = selectedTab == LOCAL_TAB_PLAYLISTS,
-                onClick = { selectedTab = LOCAL_TAB_PLAYLISTS; leaveDrillDown() },
+                onClick = { internalTab = LOCAL_TAB_PLAYLISTS; leaveDrillDown() },
             )
         }
 
@@ -462,7 +471,7 @@ fun LocalMusicScreen(
                         },
                         onSongLongPress = { song ->
                             selectedDownloadIds = selectedDownloadIds + song.videoId
-                            selectedTab = LOCAL_TAB_SONGS
+                            internalTab = LOCAL_TAB_SONGS
                             leaveDrillDown()
                         },
                         // Downloads redefines the hold as "select", so the ⋮ has to

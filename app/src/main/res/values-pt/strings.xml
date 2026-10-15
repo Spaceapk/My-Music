@@ -1301,4 +1301,5 @@
     <string name="star_save_error">Não foi possível salvar a lista</string>
     <string name="chinese_simplified">Chinês simplificado</string>
     <string name="chinese_traditional">Chinês tradicional</string>
+    <string name="library_nav_playlists">Playlists</string>
 </resources>

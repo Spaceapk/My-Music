@@ -1328,4 +1328,5 @@
     <string name="star_save_error">Не удалось сохранить плейлист</string>
     <string name="chinese_simplified">Китайский (упрощённый)</string>
     <string name="chinese_traditional">Китайский (традиционный)</string>
+    <string name="library_nav_playlists">Плейлисты</string>
 </resources>
