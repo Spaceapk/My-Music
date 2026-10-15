@@ -86,3 +86,17 @@
 -keep class androidx.media3.exoplayer.ExoPlayer$Builder { *; }
 -keep class androidx.media3.common.MediaItem { *; }
 -keep class androidx.media3.common.MediaItem$LocalConfiguration { *; }
+
+# The optimized APK is also exercised by its independent instrumentation APK.
+# Preserve only the additional public interfaces used for real service playback.
+-keep class com.music.bitchord.data.Http { public *; }
+-keep class com.music.bitchord.playback.PlayerDeepLink { public *; }
+-keep class com.music.bitchord.playback.PlayerConnectionKt {
+    public static *** playSongs(androidx.media3.session.MediaController, java.util.List, int, kotlin.coroutines.Continuation);
+    public static *** toSong(androidx.media3.common.MediaItem);
+}
+-keep class androidx.media3.session.MediaController { public *; }
+-keep class androidx.media3.session.MediaController$Builder { public *; }
+-keep class androidx.media3.session.SessionToken { public *; }
+-keep class androidx.media3.common.PlaybackException { public *; }
+-keep class okhttp3.Request$Builder { public *; }
