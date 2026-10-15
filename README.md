@@ -8,13 +8,17 @@ Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a
 
 ## Descarga e instalación
 
-**[Descargar Space Music Beta 1.0.2 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v1.0.2-beta/Space-Music-1.0.2-beta.apk)**
+**[Descargar Space Music Beta 2.0.1 — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v2.0.1-beta/Space-Music-2.0.1-beta.apk)**
 
 APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
 
-Pruebas aprobadas en Android 12, 13 y 15: reproducción local, listas, arrastre, veinte arranques en frío y actualización desde 1.0.1. Conserva firma y datos: instala sobre la versión oficial anterior sin desinstalar. [Resultados y límites](docs/verification-1.0.2.md). Pendiente validación en teléfonos físicos.
+Pruebas aprobadas en Android 12, 13 y 15: reproducción local, listas, arrastre, veinte arranques en frío y actualización desde 1.0.2. Conserva firma y datos: instala sobre la versión oficial anterior sin desinstalar. [Resultados y límites](docs/verification-2.0.1.md). Pendiente validación en teléfonos físicos.
 
 Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
+
+## Biblioteca y navegación
+
+Barra inferior flotante Liquid Glass con **Canciones, Álbumes, Artistas y Listas**, sin pestañas superiores duplicadas. El minirreproductor aparece encima de la barra. Mantiene búsqueda, ordenación y vistas de biblioteca. Liquid Glass es el valor predeterminado cuando no hay una preferencia de apariencia guardada.
 
 ## Letras locales y ambiente
 
