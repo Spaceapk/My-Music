@@ -1286,4 +1286,7 @@
     <string name="space_sort_manual">ลำดับที่กำหนดเอง</string>
     <string name="space_sort_artist">ศิลปิน</string>
     <string name="space_sort_recent">เพิ่งเพิ่มลงในรายการนี้</string>
+    <string name="space_about_local">เครื่องเล่นเพลงในเครื่อง · ดูแลโดย nexlibre</string>
+    <string name="space_open_source">ใบอนุญาตและโอเพนซอร์ส</string>
+    <string name="space_open_source_notice">Space Music เป็นเวอร์ชันดัดแปลงจาก Star Music และ BitChord ภายใต้ GPL-3.0 แก้ไขโดย nexlibre ตุลาคม 2026 ผู้เขียนเดิมยังคงมีลิขสิทธิ์ คุณสามารถคัดลอก แก้ไข และเผยแพร่ซอฟต์แวร์ตามใบอนุญาตได้ โดยไม่มีการรับประกัน ซอร์สโค้ดและประกาศเดิมอยู่ในคลังโค้ดที่เชื่อมโยงไว้ มีใบอนุญาต GPL แนบไว้ให้อ่านแบบออฟไลน์</string>
 </resources>

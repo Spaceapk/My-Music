@@ -1281,4 +1281,7 @@
     <string name="space_sort_manual">手動の順序</string>
     <string name="space_sort_artist">アーティスト</string>
     <string name="space_sort_recent">このリストに最近追加した曲</string>
+    <string name="space_about_local">ローカル音楽プレーヤー · 保守: nexlibre</string>
+    <string name="space_open_source">ライセンスとオープンソース</string>
+    <string name="space_open_source_notice">Space MusicはStar MusicとBitChordを基にした改変版で、GPL-3.0で配布されています。改変: nexlibre、2026年10月。原作者の著作権は保持されます。ライセンスに従って複製、改変、再配布できますが、保証はありません。ソースコードと元の告知はリンク先のリポジトリにあります。GPLライセンスはオフラインで閲覧できます。</string>
 </resources>

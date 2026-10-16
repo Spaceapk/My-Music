@@ -1280,4 +1280,7 @@
     <string name="space_sort_manual">Urutan manual</string>
     <string name="space_sort_artist">Artis</string>
     <string name="space_sort_recent">Baru ditambahkan ke playlist ini</string>
+    <string name="space_about_local">Pemutar musik lokal · Dikelola oleh nexlibre</string>
+    <string name="space_open_source">Lisensi dan sumber terbuka</string>
+    <string name="space_open_source_notice">Space Music adalah versi modifikasi dari Star Music dan BitChord dengan lisensi GPL-3.0. Perubahan oleh nexlibre, Oktober 2026. Hak cipta penulis asli tetap berlaku. Anda dapat menyalin, mengubah, dan mendistribusikan perangkat lunak ini sesuai lisensinya, tanpa jaminan. Kode sumber dan pemberitahuan asli tersedia di repositori tertaut. Lisensi GPL disertakan untuk dibaca secara offline.</string>
 </resources>
