@@ -15,7 +15,9 @@ def start():
 
 def tree():
     adb('shell', 'uiautomator', 'dump', '--compressed', '/sdcard/notes.xml')
-    return ET.fromstring(adb('exec-out', 'cat', '/sdcard/notes.xml'))
+    raw = adb('exec-out', 'cat', '/sdcard/notes.xml')
+    Path('device-notes-ui.xml').write_text(raw)
+    return ET.fromstring(raw)
 
 def find(text):
     for _ in range(12):
@@ -28,6 +30,19 @@ def dismiss():
     b = find('Back')
     l,t,r,b = map(int, re.findall(r'\d+', b.get('bounds')))
     adb('shell', 'input', 'tap', str((l+r)//2), str((t+b)//2))
+    # ADB returns before Compose dispatches the input. Wait for the actual UI
+    # dismissal and completed preference write before killing its process.
+    for _ in range(12):
+        visible = any('What is new in Space Music' in n.get('text','') for n in tree().iter('node'))
+        try:
+            raw = adb('exec-out', 'cat', '/data/user/0/'+PACKAGE+'/shared_prefs/space_updates.xml')
+            Path('device-notes-preferences.xml').write_text(raw)
+            saved = any(e.tag == 'int' and e.get('name') == 'seen_version' and e.get('value') == '5' for e in ET.fromstring(raw))
+        except (subprocess.CalledProcessError, ET.ParseError):
+            saved = False
+        if not visible and saved: return
+        time.sleep(0.5)
+    raise AssertionError('Acknowledgement did not close the dialog and persist seen_version')
 
 start()
 find('What is new in Space Music 2.1.0')
