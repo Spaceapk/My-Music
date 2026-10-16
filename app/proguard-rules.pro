@@ -118,3 +118,7 @@
 -keep class com.music.bitchord.data.lyrics.LocalLyricsStore { public *; }
 -keep class com.music.bitchord.data.lyrics.EmbeddedLyrics { public *; }
 -keep class com.music.bitchord.data.lyrics.LyricLine { public *; }
+
+# Persisted playlist sorting modes are also part of the release instrumentation API.
+# Prevent enum unboxing from removing fields used by the separately compiled runner.
+-keep enum com.music.bitchord.data.PlaylistSort { *; }
