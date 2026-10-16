@@ -1,5 +1,15 @@
 # Space Music — cambios
 
+## 2.1.0 estable — listas compactas y avisos de actualización
+
+- Primera entrega estable sin sufijo beta, con versionCode 5 y firma original.
+- Reproducir, añadir y opciones comparten una fila; se eliminan las flechas por canción.
+- Menús para reordenar por arrastre, renombrar, eliminar listas y quitar canciones.
+- Avisos de nuevas versiones estables de Space Music, descarga e instalación mediante Android.
+- Verificación del paquete, versión superior y certificado antes de ofrecer la instalación.
+- Novedades una vez por versión, con notas de actualizaciones descargadas disponibles sin conexión.
+- [Verificación y límites](docs/verification-2.1.0.md): pruebas JVM, lint y actualización firmada desde la beta 2.0.1 en emuladores Android 12, 13 y 15.
+
 ## 1.0.2 beta — letras locales y modo ambiente
 
 - Letras FLAC con campos alternativos, MP3 USLT UTF-8/UTF-16/Latin-1 y texto sin sincronización.
