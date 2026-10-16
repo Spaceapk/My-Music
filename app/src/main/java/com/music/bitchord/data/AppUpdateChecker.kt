@@ -46,6 +46,19 @@ object AppUpdateChecker {
     internal const val LATEST_RELEASE_URL =
         "https://api.github.com/repos/nexlibre/Space-Music/releases/latest"
 
+    // Music's shared client remains disabled. Only release metadata and APKs
+    // use this isolated client, including each HTTPS redirect hop.
+    private val client = okhttp3.OkHttpClient.Builder()
+        .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .addNetworkInterceptor { chain ->
+            val url = chain.request().url
+            check(url.isHttps && url.host in setOf("api.github.com", "github.com", "release-assets.githubusercontent.com", "objects.githubusercontent.com")) {
+                "Untrusted update host"
+            }
+            chain.proceed(chain.request())
+        }.build()
+
     private val json = Json { ignoreUnknownKeys = true }
 
     private val _available = MutableStateFlow<UpdateInfo?>(null)
@@ -69,7 +82,7 @@ object AppUpdateChecker {
     suspend fun check() = withContext(Dispatchers.IO) {
         runCatching {
             val request = Request.Builder().url(LATEST_RELEASE_URL).build()
-            val body = Http.client.newCall(request).execute().use { response ->
+            val body = client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) null else response.body?.string()
             } ?: return@runCatching
             val release = json.parseToJsonElement(body) as? JsonObject ?: return@runCatching
@@ -133,7 +146,7 @@ object AppUpdateChecker {
             val target = File(dir, "space-music-${info.version}.apk")
 
             val request = Request.Builder().url(url).build()
-            Http.client.newCall(request).execute().use { response ->
+            client.newCall(request).execute().use { response ->
                 check(response.isSuccessful) { "Download failed: HTTP ${response.code}" }
                 val body = response.body ?: error("Empty download body")
                 val total = body.contentLength().takeIf { it > 0 }
@@ -159,6 +172,7 @@ object AppUpdateChecker {
                     }
                 }
             }
+            verifyDownloadedApk(context, target)
             // Keep notes for the version actually installed, even when the next
             // launch has no network. Cancelled installations never display them.
             context.getSharedPreferences("space_updates", Context.MODE_PRIVATE).edit()
@@ -173,6 +187,20 @@ object AppUpdateChecker {
                 DownloadState.Failed(error.message ?: "Download failed")
             }
         }
+    }
+
+    @Suppress("DEPRECATION")
+    internal fun verifyDownloadedApk(context: Context, file: File) {
+        val pm = context.packageManager
+        val flags = android.content.pm.PackageManager.GET_SIGNATURES
+        val archive = pm.getPackageArchiveInfo(file.absolutePath, flags) ?: error("Invalid update APK")
+        val installed = pm.getPackageInfo(context.packageName, flags)
+        check(archive.packageName == context.packageName) { "Update belongs to another app" }
+        check(archive.versionCode > installed.versionCode) { "Update is not newer" }
+        fun certificates(info: android.content.pm.PackageInfo) = info.signatures.orEmpty()
+            .map { java.security.MessageDigest.getInstance("SHA-256").digest(it.toByteArray()).toList() }.toSet()
+        val expected = certificates(installed)
+        check(expected.isNotEmpty() && certificates(archive) == expected) { "Update signature does not match Space Music" }
     }
 
     /** Stops an in-flight download; the next read loop sees this and bails. */

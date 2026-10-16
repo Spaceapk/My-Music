@@ -16,12 +16,14 @@ import org.junit.Assert.*
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
     @Test
-    fun localOnlyApplicationCannotAccessNetwork() {
+    fun onlyUpdaterHasNetworkPermissionWhileMusicStaysBlocked() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val permissions = context.packageManager.getPackageInfo(
             context.packageName, android.content.pm.PackageManager.GET_PERMISSIONS,
         ).requestedPermissions.orEmpty()
-        assertFalse(permissions.contains(android.Manifest.permission.INTERNET))
+        assertTrue(permissions.contains(android.Manifest.permission.INTERNET))
+        assertTrue(permissions.contains(android.Manifest.permission.REQUEST_INSTALL_PACKAGES))
+        assertFalse(com.music.bitchord.data.Http.networkRequestsEnabled)
         assertFalse(permissions.contains(android.Manifest.permission.ACCESS_NETWORK_STATE))
     }
 

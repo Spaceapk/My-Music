@@ -22,7 +22,8 @@ class OfflinePlaylistPlaybackTest {
     @Test fun restoredLocalPlaylistDecodesWithoutNetwork() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
-        assertEquals(android.content.pm.PackageManager.PERMISSION_DENIED, context.checkSelfPermission(android.Manifest.permission.INTERNET))
+        // Device runner disables Wi-Fi and mobile data. Music HTTP also remains blocked.
+        assertFalse(com.music.bitchord.data.Http.networkRequestsEnabled)
         val audio = File(context.filesDir, "test-${UUID.randomUUID()}.wav")
         val filename = "test-${UUID.randomUUID()}.json"
         // One second of silent PCM audio: a real local container, no network source.
