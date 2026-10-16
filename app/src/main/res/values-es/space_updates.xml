@@ -1,4 +1,5 @@
-<resources>
+<!-- New stable-release text falls back to English outside Spanish. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="space_playlist_actions">Opciones de la lista</string>
     <string name="space_song_actions">Opciones de la canción</string>
     <string name="space_whats_new">Novedades de Space Music %1$s</string>
