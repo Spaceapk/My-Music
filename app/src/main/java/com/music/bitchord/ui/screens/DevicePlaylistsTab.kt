@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.music.bitchord.R
 import com.music.bitchord.ui.components.ReorderableSongList
+import com.music.bitchord.data.PlaylistSort
 import com.music.bitchord.data.DevicePlaylistStore
 import com.music.bitchord.data.model.Song
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ import kotlinx.coroutines.withContext
 
 /** Local-only management; playback uses the same queue and engine as the device library. */
 @Composable
-fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, padding: PaddingValues) {
+fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, padding: PaddingValues, onOpenSettings: () -> Unit = {}) {
     val context = LocalContext.current.applicationContext
     val loaded = remember(context) { runCatching { DevicePlaylistStore.forDevice(context) } }
     val store = loaded.getOrNull()
@@ -40,6 +41,13 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
     val playlists by store.playlists.collectAsStateWithLifecycle()
     var selectedId by rememberSaveable { mutableStateOf<String?>(null) }
     val selected = playlists.firstOrNull { it.id == selectedId }
+    var searchOpen by rememberSaveable(selectedId) { mutableStateOf(false) }
+    var query by rememberSaveable(selectedId) { mutableStateOf("") }
+    var sortOpen by remember(selectedId) { mutableStateOf(false) }
+    val orderedSongs = remember(selected) { selected?.sortedSongs().orEmpty() }
+    val visibleSongs = remember(orderedSongs, query) {
+        orderedSongs.filter { query.isBlank() || it.title.contains(query, true) || it.artist.contains(query, true) }
+    }
     var editing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     var reordering by remember { mutableStateOf(false) }
@@ -59,15 +67,25 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             finally { busy = false }
         }
     }
-    BackHandler(selected != null) { selectedId = null }
-    Column(Modifier.fillMaxSize().padding(bottom = padding.calculateBottomPadding())) {
-        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+    BackHandler(selected != null || searchOpen) {
+        if (searchOpen) { searchOpen = false; query = "" } else selectedId = null
+    }
+    Column(Modifier.fillMaxSize().statusBarsPadding().padding(bottom = padding.calculateBottomPadding())) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (selected != null) IconButton(onClick = { selectedId = null }) {
                 Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back))
             }
-            Text(selected?.name ?: stringResource(R.string.playlists), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (searchOpen) OutlinedTextField(value = query, onValueChange = { query = it }, singleLine = true,
+                placeholder = { Text(stringResource(R.string.space_playlist_search)) }, modifier = Modifier.weight(1f))
+            else Text(selected?.name ?: stringResource(R.string.playlists), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            IconButton(onClick = { searchOpen = !searchOpen; query = "" }) {
+                Icon(if (searchOpen) Icons.Rounded.Close else Icons.Rounded.Search, stringResource(R.string.space_playlist_search))
+            }
             if (selected == null) IconButton(onClick = { name = ""; editing = true }, enabled = !busy) {
                 Icon(Icons.Rounded.Add, stringResource(R.string.create_playlist))
+            }
+            if (selected == null) IconButton(onClick = onOpenSettings) {
+                Icon(Icons.Rounded.Settings, stringResource(R.string.settings))
             }
         }
         if (selected != null) Row(
@@ -75,13 +93,32 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Button(onClick = { onPlay(selected.songs.map { it.copy(videoId = it.localUri!!) }, 0) }, enabled = selected.songs.isNotEmpty()) {
+            Button(onClick = { onPlay(visibleSongs.map { it.copy(videoId = it.localUri!!) }, 0) }, enabled = visibleSongs.isNotEmpty()) {
                 Icon(Icons.Rounded.PlayArrow, null)
                 Text(stringResource(R.string.play))
             }
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) {
                 Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs))
+            }
+            Box {
+                IconButton(onClick = { sortOpen = true }, enabled = !busy) {
+                    Icon(Icons.Rounded.Sort, stringResource(R.string.space_playlist_sort))
+                }
+                DropdownMenu(expanded = sortOpen, onDismissRequest = { sortOpen = false }) {
+                    Text(stringResource(R.string.space_playlist_sort_hint), Modifier.padding(16.dp), style = MaterialTheme.typography.labelMedium)
+                    PlaylistSort.entries.forEach { option ->
+                        DropdownMenuItem(text = { Text(stringResource(when (option) {
+                            PlaylistSort.MANUAL -> R.string.space_sort_manual
+                            PlaylistSort.TITLE_ASC -> R.string.sort_title_ascending
+                            PlaylistSort.TITLE_DESC -> R.string.sort_title_descending
+                            PlaylistSort.ARTIST -> R.string.space_sort_artist
+                            PlaylistSort.RECENTLY_ADDED -> R.string.space_sort_recent
+                        })) }, trailingIcon = {
+                            if (selected.sort == option) Icon(Icons.Rounded.Check, null)
+                        }, onClick = { sortOpen = false; change { store.setSort(selected.id, option) } })
+                    }
+                }
             }
             Box {
                 IconButton(onClick = { actionsExpanded = true }, enabled = !busy) {
@@ -94,6 +131,9 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
                     DropdownMenuItem(text = { Text(stringResource(R.string.rename)) },
                         leadingIcon = { Icon(Icons.Rounded.Edit, null) },
                         onClick = { actionsExpanded = false; name = selected.name; editing = true })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.settings)) },
+                        leadingIcon = { Icon(Icons.Rounded.Settings, null) },
+                        onClick = { actionsExpanded = false; onOpenSettings() })
                     DropdownMenuItem(text = { Text(stringResource(R.string.delete)) },
                         leadingIcon = { Icon(Icons.Rounded.Delete, null) },
                         onClick = { actionsExpanded = false; deleting = true })
@@ -104,7 +144,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
         if (selected == null) {
             if (playlists.isEmpty()) Text(stringResource(R.string.star_playlist_hint), Modifier.padding(20.dp))
             LazyColumn {
-                items(playlists, key = { it.id }) { p ->
+                items(playlists.filter { query.isBlank() || it.name.contains(query, true) }, key = { it.id }) { p ->
                     ListItem(headlineContent = { Text(p.name) }, supportingContent = { Text("${p.songs.size}") },
                         leadingContent = { Icon(Icons.Rounded.LibraryMusic, null) },
                         modifier = Modifier.clickable { selectedId = p.id })
@@ -113,9 +153,9 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
         } else {
             if (selected.songs.isEmpty()) Text(stringResource(R.string.star_playlist_hint), Modifier.padding(20.dp))
             LazyColumn {
-                itemsIndexed(selected.songs, key = { _, s -> s.localUri ?: s.videoId }) { index, song ->
+                itemsIndexed(visibleSongs, key = { _, s -> s.localUri ?: s.videoId }) { index, song ->
                     ListItem(headlineContent = { Text(song.title, maxLines = 1) }, supportingContent = { Text(song.artist, maxLines = 1) },
-                        modifier = Modifier.clickable { onPlay(selected.songs.map { it.copy(videoId = it.localUri!!) }, index) },
+                        modifier = Modifier.clickable { onPlay(visibleSongs.map { it.copy(videoId = it.localUri!!) }, index) },
                         trailingContent = {
                             var songMenu by remember { mutableStateOf(false) }
                             Box {
@@ -125,7 +165,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
                                 DropdownMenu(expanded = songMenu, onDismissRequest = { songMenu = false }) {
                                     DropdownMenuItem(text = { Text(stringResource(R.string.remove)) },
                                         leadingIcon = { Icon(Icons.Rounded.PlaylistRemove, null) },
-                                        onClick = { songMenu = false; change { store.remove(selected.id, index) } })
+                                        onClick = { songMenu = false; change { store.removeSong(selected.id, requireNotNull(song.localUri)) } })
                                 }
                             }
                         })
@@ -135,7 +175,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
     }
     if (reordering && selected != null) {
         val playlistId = selected.id
-        val order = remember(playlistId) { mutableStateListOf<Song>().apply { addAll(selected.songs) } }
+        val order = remember(playlistId) { mutableStateListOf<Song>().apply { addAll(orderedSongs) } }
         androidx.compose.ui.window.Dialog(onDismissRequest = { reordering = false }) {
             Surface(shape = MaterialTheme.shapes.large) {
                 Column(Modifier.fillMaxWidth().heightIn(max = 560.dp).padding(16.dp)) {

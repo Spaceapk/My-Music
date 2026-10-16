@@ -1297,4 +1297,10 @@
     <string name="chinese_simplified">सरलीकृत चीनी</string>
     <string name="chinese_traditional">पारंपरिक चीनी</string>
     <string name="library_nav_playlists">प्लेलिस्ट</string>
+    <string name="space_playlist_search">प्लेलिस्ट या गाने खोजें</string>
+    <string name="space_playlist_sort">इस प्लेलिस्ट को क्रम में लगाएँ</string>
+    <string name="space_playlist_sort_hint">केवल इस प्लेलिस्ट पर लागू</string>
+    <string name="space_sort_manual">मैन्युअल क्रम</string>
+    <string name="space_sort_artist">कलाकार</string>
+    <string name="space_sort_recent">इस प्लेलिस्ट में हाल ही में जोड़े गए</string>
 </resources>

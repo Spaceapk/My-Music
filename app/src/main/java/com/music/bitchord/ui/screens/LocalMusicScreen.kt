@@ -181,6 +181,7 @@ fun LocalMusicScreen(
     query: String? = null,
     onQueryChange: ((String) -> Unit)? = null,
     navigationTab: Int? = null,
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     // A supplied tab is owned by the main floating navigation.
@@ -270,6 +271,11 @@ fun LocalMusicScreen(
         DevicePlaylistPickerDialog(songs.filter { it.videoId in selectedDownloadIds }) {
             addingSelection = false
         }
+    }
+    // Playlists own their search and sort; library controls must never change playlist order.
+    if (selectedTab == LOCAL_TAB_PLAYLISTS && !isDownloads && navigationTab != null) {
+        DevicePlaylistsTab(songs, onSongClick, bodyContentPadding, onOpenSettings)
+        return
     }
     Column(modifier = modifier.fillMaxSize()) {
         // ── Search ───────────────────────────────────────────────────────────

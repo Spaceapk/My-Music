@@ -2807,6 +2807,7 @@ private fun BitChordApp(
                         }
                         LocalMusicScreen(
                             navigationTab = spaceLibraryTab,
+                            onOpenSettings = { showSettings = true },
                             songs = localSongs,
                             collections = downloadCollections,
                             isDownloads = page.browseId == "local:downloads",
@@ -2982,6 +2983,7 @@ private fun BitChordApp(
                                 LocalMusicScreen(
                                     songs = deviceSongs,
                                     navigationTab = spaceLibraryTab,
+                            onOpenSettings = { showSettings = true },
                                     query = spaceQuery, onQueryChange = { spaceQuery = it },
                                     currentSong = player.song, isPlaying = player.isPlaying,
                                     onSongClick = { songs, index -> playFrom(songs, index, QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) },
@@ -3395,7 +3397,12 @@ private fun BitChordApp(
                         .graphicsLayer { alpha = topFadeAlpha },
                 )
 
-                FrostedTopBar(
+                val playlistOwnsToolbar = spaceLibraryTab == 3 && selectedTab == TAB_HOME &&
+                    (detail == null || isLocalDetail) && libraryShowAll == null &&
+                    !showSettings && !showAccountScrobbling && !showSpotify && !showDiscord &&
+                    !showHistory && !showSources && !showListenTogether && !showEqualizer && !showReplay &&
+                    settingsSubScreen == null
+                if (!playlistOwnsToolbar) FrostedTopBar(
                     title = when {
                         showSpotify && detail == null -> stringResource(R.string.spotify)
                         showDiscord -> "Discord"

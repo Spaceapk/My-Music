@@ -1214,4 +1214,10 @@
     <string name="chinese_simplified">Tiếng Trung giản thể</string>
     <string name="chinese_traditional">Tiếng Trung phồn thể</string>
     <string name="library_nav_playlists">Danh sách phát</string>
+    <string name="space_playlist_search">Tìm danh sách hoặc bài hát</string>
+    <string name="space_playlist_sort">Sắp xếp danh sách này</string>
+    <string name="space_playlist_sort_hint">Chỉ áp dụng cho danh sách này</string>
+    <string name="space_sort_manual">Thứ tự thủ công</string>
+    <string name="space_sort_artist">Nghệ sĩ</string>
+    <string name="space_sort_recent">Mới thêm vào danh sách này</string>
 </resources>

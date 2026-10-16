@@ -1324,4 +1324,10 @@
     <string name="chinese_simplified">סינית מפושטת</string>
     <string name="chinese_traditional">סינית מסורתית</string>
     <string name="library_nav_playlists">פלייליסטים</string>
+    <string name="space_playlist_search">חיפוש רשימות או שירים</string>
+    <string name="space_playlist_sort">מיון הרשימה הזו</string>
+    <string name="space_playlist_sort_hint">חל רק על הרשימה הזו</string>
+    <string name="space_sort_manual">סדר ידני</string>
+    <string name="space_sort_artist">אמן</string>
+    <string name="space_sort_recent">נוספו לאחרונה לרשימה הזו</string>
 </resources>

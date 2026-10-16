@@ -10,7 +10,33 @@ import org.json.JSONObject
 import java.io.File
 import java.util.UUID
 
-data class DevicePlaylist(val id: String, val name: String, val songs: List<Song>)
+enum class PlaylistSort { MANUAL, TITLE_ASC, TITLE_DESC, ARTIST, RECENTLY_ADDED }
+
+data class DevicePlaylist(
+    val id: String,
+    val name: String,
+    val songs: List<Song>,
+    val sort: PlaylistSort = PlaylistSort.MANUAL,
+    // Membership insertion order is independent of the user's manual running order.
+    val addedUris: List<String> = songs.mapNotNull { it.localUri },
+) {
+    fun sortedSongs(): List<Song> {
+        val collator = java.text.Collator.getInstance().apply { strength = java.text.Collator.PRIMARY }
+        val byTitle = Comparator<Song> { a, b -> collator.compare(a.title, b.title) }
+        return when (sort) {
+            PlaylistSort.MANUAL -> songs
+            PlaylistSort.TITLE_ASC -> songs.sortedWith(byTitle)
+            PlaylistSort.TITLE_DESC -> songs.sortedWith(byTitle.reversed())
+            PlaylistSort.ARTIST -> songs.sortedWith(Comparator<Song> { a, b ->
+                collator.compare(a.artist, b.artist).takeIf { it != 0 } ?: byTitle.compare(a, b)
+            })
+            PlaylistSort.RECENTLY_ADDED -> {
+                val positions = addedUris.withIndex().associate { it.value to it.index }
+                songs.sortedByDescending { positions[it.localUri] ?: -1 }
+            }
+        }
+    }
+}
 
 /** Star Music device-only playlists. Atomic writes preserve the previous file on failure. */
 class DevicePlaylistStore(context: Context, filename: String = "star-device-playlists.json") {
@@ -41,7 +67,10 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
                 Song(videoId = s.getString("id"), title = s.getString("title"), artist = s.getString("artist"),
                     thumbnailUrl = optional("art"), durationText = optional("duration"), albumName = optional("album"),
                     localUri = s.getString("uri"), localPath = optional("path"), downloadFormat = optional("format"))
-            })
+            }, sort = runCatching { PlaylistSort.valueOf(p.optString("sort")) }.getOrDefault(PlaylistSort.MANUAL),
+                addedUris = p.optJSONArray("addedUris")?.let { uris ->
+                    (0 until uris.length()).map { uris.getString(it) }
+                } ?: (0 until tracks.length()).map { tracks.getJSONObject(it).getString("uri") })
         }
     }
 
@@ -56,7 +85,8 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
                     .put("art", s.thumbnailUrl).put("duration", s.durationText).put("album", s.albumName)
                     .put("uri", s.localUri).put("path", s.localPath).put("format", s.downloadFormat))
             }
-            array.put(JSONObject().put("id", p.id).put("name", p.name).put("songs", tracks))
+            array.put(JSONObject().put("id", p.id).put("name", p.name).put("songs", tracks)
+                .put("sort", p.sort.name).put("addedUris", JSONArray(p.addedUris)))
         }
         val output = file.startWrite()
         try {
@@ -85,10 +115,20 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
     fun delete(id: String) = update { list -> list.filterNot { it.id == id } }
     fun add(id: String, songs: List<Song>) {
         require(songs.all { it.localUri?.let { uri -> uri.startsWith("content://") || uri.startsWith("file://") } == true })
-        update { list -> list.map { if (it.id == id) it.copy(songs = (it.songs + songs).distinctBy { song -> song.localUri }) else it } }
+        update { list -> list.map { if (it.id == id) it.copy(songs = (it.songs + songs).distinctBy { song -> song.localUri },
+            addedUris = (it.addedUris + songs.mapNotNull { song -> song.localUri }).distinct()) else it } }
     }
     fun remove(id: String, index: Int) = update { list -> list.map { p ->
-        if (p.id == id) p.copy(songs = p.songs.filterIndexed { i, _ -> i != index }) else p
+        if (p.id == id) p.copy(songs = p.songs.filterIndexed { i, _ -> i != index },
+            addedUris = p.addedUris.filterNot { it == p.songs.getOrNull(index)?.localUri }) else p
+    } }
+    fun setSort(id: String, sort: PlaylistSort) = update { list ->
+        list.map { if (it.id == id) it.copy(sort = sort) else it }
+    }
+    /** Resolve identity at write time; sorted/filtered row indexes are not storage indexes. */
+    fun removeSong(id: String, uri: String) = update { list -> list.map { p ->
+        if (p.id == id) p.copy(songs = p.songs.filterNot { it.localUri == uri },
+            addedUris = p.addedUris.filterNot { it == uri }) else p
     } }
     /** Apply a permutation only; reject stale edits rather than losing newer tracks. */
     fun reorder(id: String, uris: List<String>) = update { list -> list.map { p ->
@@ -96,7 +136,7 @@ class DevicePlaylistStore(context: Context, filename: String = "star-device-play
             val existing = p.songs.associateBy { it.localUri }
             require(uris.size == p.songs.size && uris.toSet().size == uris.size &&
                 uris.toSet() == existing.keys) { "Playlist changed; reopen the reorder view" }
-            p.copy(songs = uris.map { existing.getValue(it) })
+            p.copy(songs = uris.map { existing.getValue(it) }, sort = PlaylistSort.MANUAL)
         } else p
     } }
     fun move(id: String, from: Int, to: Int) = update { list -> list.map { p ->

@@ -1302,4 +1302,10 @@
     <string name="chinese_simplified">Chinês simplificado</string>
     <string name="chinese_traditional">Chinês tradicional</string>
     <string name="library_nav_playlists">Playlists</string>
+    <string name="space_playlist_search">Buscar listas ou músicas</string>
+    <string name="space_playlist_sort">Ordenar esta lista</string>
+    <string name="space_playlist_sort_hint">Aplica-se apenas a esta lista</string>
+    <string name="space_sort_manual">Ordem manual</string>
+    <string name="space_sort_artist">Artista</string>
+    <string name="space_sort_recent">Adicionadas recentemente a esta lista</string>
 </resources>

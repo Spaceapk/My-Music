@@ -1254,4 +1254,10 @@
     <string name="chinese_simplified">Basitleştirilmiş Çince</string>
     <string name="chinese_traditional">Geleneksel Çince</string>
     <string name="library_nav_playlists">Çalma listeleri</string>
+    <string name="space_playlist_search">Liste veya şarkı ara</string>
+    <string name="space_playlist_sort">Bu listeyi sırala</string>
+    <string name="space_playlist_sort_hint">Yalnızca bu listeye uygulanır</string>
+    <string name="space_sort_manual">Elle sıralama</string>
+    <string name="space_sort_artist">Sanatçı</string>
+    <string name="space_sort_recent">Bu listeye son eklenenler</string>
 </resources>

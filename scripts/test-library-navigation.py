@@ -53,7 +53,7 @@ def tap(label):
 adb('shell', 'am', 'force-stop', 'org.nexlibre.spacemusic')
 adb('shell', 'am', 'start', '-W', '-n', 'org.nexlibre.spacemusic/com.music.bitchord.MainActivity')
 for node in snapshot().iter('node'):
-    if node.get('text') == 'What is new in Space Music 2.1.0':
+    if node.get('text') == 'What is new in Space Music 2.2.0':
         for button in snapshot().iter('node'):
             if button.get('text') == 'Back':
                 l, t, r, b = bounds(button)

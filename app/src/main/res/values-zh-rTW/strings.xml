@@ -1275,4 +1275,10 @@
     <string name="star_playlist_hint">使用此裝置上的音樂建立清單，無需帳號或網路。</string>
     <string name="star_save_error">無法儲存清單</string>
     <string name="library_nav_playlists">播放列表</string>
+    <string name="space_playlist_search">搜尋清單或歌曲</string>
+    <string name="space_playlist_sort">排序此清單</string>
+    <string name="space_playlist_sort_hint">僅適用於此清單</string>
+    <string name="space_sort_manual">手動排序</string>
+    <string name="space_sort_artist">歌手</string>
+    <string name="space_sort_recent">最近加入此清單</string>
 </resources>

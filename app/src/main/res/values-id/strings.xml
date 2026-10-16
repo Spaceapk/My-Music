@@ -1274,4 +1274,10 @@
     <string name="chinese_simplified">Mandarin sederhana</string>
     <string name="chinese_traditional">Mandarin tradisional</string>
     <string name="library_nav_playlists">Playlist</string>
+    <string name="space_playlist_search">Cari playlist atau lagu</string>
+    <string name="space_playlist_sort">Urutkan playlist ini</string>
+    <string name="space_playlist_sort_hint">Hanya berlaku untuk playlist ini</string>
+    <string name="space_sort_manual">Urutan manual</string>
+    <string name="space_sort_artist">Artis</string>
+    <string name="space_sort_recent">Baru ditambahkan ke playlist ini</string>
 </resources>

@@ -1,3 +1,7 @@
+## 2.2.0 — en verificación
+
+Cabecera compacta de listas, búsqueda propia y orden persistente por lista (manual, título, artista y añadidas recientemente), sin modificar Canciones. Reproducción y eliminación respetan el orden visible. Migración de listas existentes sin pérdida de canciones.
+
 # Space Music — cambios
 
 ## 2.1.0 estable — listas compactas y avisos de actualización

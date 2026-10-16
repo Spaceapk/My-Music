@@ -1274,4 +1274,10 @@
     <string name="star_playlist_hint">使用此设备上的音乐创建列表，无需帐号或网络。</string>
     <string name="star_save_error">无法保存列表</string>
     <string name="library_nav_playlists">播放列表</string>
+    <string name="space_playlist_search">搜索列表或歌曲</string>
+    <string name="space_playlist_sort">排序此列表</string>
+    <string name="space_playlist_sort_hint">仅适用于此列表</string>
+    <string name="space_sort_manual">手动排序</string>
+    <string name="space_sort_artist">歌手</string>
+    <string name="space_sort_recent">最近加入此列表</string>
 </resources>
