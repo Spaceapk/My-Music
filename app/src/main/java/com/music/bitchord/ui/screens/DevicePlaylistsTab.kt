@@ -93,11 +93,11 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Button(onClick = { onPlay(visibleSongs.map { it.copy(videoId = it.localUri!!) }, 0) }, enabled = visibleSongs.isNotEmpty()) {
+            Button(modifier = Modifier.weight(1f), contentPadding = PaddingValues(horizontal = 12.dp),
+                onClick = { onPlay(visibleSongs.map { it.copy(videoId = it.localUri!!) }, 0) }, enabled = visibleSongs.isNotEmpty()) {
                 Icon(Icons.Rounded.PlayArrow, null)
-                Text(stringResource(R.string.play))
+                Text(stringResource(R.string.play), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Spacer(Modifier.weight(1f))
             IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) {
                 Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs))
             }

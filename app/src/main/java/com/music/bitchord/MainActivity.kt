@@ -2983,7 +2983,7 @@ private fun BitChordApp(
                                 LocalMusicScreen(
                                     songs = deviceSongs,
                                     navigationTab = spaceLibraryTab,
-                            onOpenSettings = { showSettings = true },
+                                    onOpenSettings = { showSettings = true },
                                     query = spaceQuery, onQueryChange = { spaceQuery = it },
                                     currentSong = player.song, isPlaying = player.isPlaying,
                                     onSongClick = { songs, index -> playFrom(songs, index, QueueSource(libraryLabel, PlaybackSourceType.BROWSE, "local:all")) },

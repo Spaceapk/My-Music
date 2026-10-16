@@ -79,3 +79,84 @@ tab('Playlists', True)
 adb('shell', 'settings', 'put', 'system', 'user_rotation', '0')
 tap('Songs')
 print('PASS: bottom order, single tabs, routing, selected accessibility state and recreation')
+
+# Seed isolated emulator fixtures through root, for debug and optimized builds.
+# Store tests above use separate filenames; these fixtures exercise the rendered UI.
+import json
+package = 'org.nexlibre.spacemusic'
+base = f'/data/user/0/{package}/files'
+fixture = [dict(id=k, name='Sort ' + k, songs=[
+    dict(id='z', title='ZZZ sort fixture', artist='AAA artist', uri='file:///z.mp3'),
+    dict(id='a', title='AAA sort fixture', artist='ZZZ artist', uri='file:///a.mp3'),
+    dict(id='b', title='BBB sort fixture', artist='BBB artist', uri='file:///b.mp3'),
+]) for k in ['Alpha', 'Beta', 'Gamma']]
+adb('shell', 'am', 'force-stop', package)
+subprocess.run(['adb', 'shell', f'cat > {base}/star-device-playlists.json'],
+               input=json.dumps(fixture).encode(), check=True, timeout=30)
+uid = adb('shell', 'stat', '-c', '%u', base).decode().strip()
+adb('shell', 'chown', f'{uid}:{uid}', f'{base}/star-device-playlists.json')
+adb('shell', 'am', 'start', '-W', '-n', package + '/com.music.bitchord.MainActivity')
+tap('Playlists')
+
+
+def node_named(label):
+    for _ in range(10):
+        found = [n for n in snapshot().iter('node') if label in (n.get('text'), n.get('content-desc'))]
+        if len(found) == 1:
+            return found[0]
+        time.sleep(.4)
+    raise AssertionError(f'Expected one control {label}; found {len(found)}')
+
+
+def click_named(label):
+    l, t, r, b = bounds(node_named(label))
+    adb('shell', 'input', 'tap', str((l+r)//2), str((t+b)//2))
+
+
+def assert_order(expected):
+    for _ in range(10):
+        rows = sorted((bounds(n)[1], n.get('text')) for n in snapshot().iter('node')
+                      if n.get('text', '').endswith('sort fixture'))
+        if [title[:3] for _, title in rows] == expected:
+            return rows
+        time.sleep(.4)
+    raise AssertionError((expected, rows))
+
+
+for name, criterion, expected in [
+    ('Alpha', 'Alphabetical (A to Z)', ['AAA', 'BBB', 'ZZZ']),
+    ('Beta', 'Artist', ['ZZZ', 'BBB', 'AAA']),
+    ('Gamma', 'Recently added to this playlist', ['BBB', 'AAA', 'ZZZ']),
+]:
+    click_named('Sort ' + name)
+    click_named('Sort this playlist')
+    click_named(criterion)
+    rows = assert_order(expected)
+    density = int(re.findall(rb'\d+', adb('shell', 'wm', 'density'))[-1])
+    assert rows[0][0] < 200 * density / 160, ('Excessive header height', rows[0], density)
+    root = snapshot()
+    assert not any(n.get('text') == 'Search this folder' for n in root.iter('node'))
+    Path('device-playlist-sort-' + name.lower() + '.png').write_bytes(adb('exec-out', 'screencap', '-p'))
+    adb('shell', 'input', 'keyevent', '4')
+
+# A full process restart must keep all three independently saved criteria.
+adb('shell', 'am', 'force-stop', package)
+adb('shell', 'am', 'start', '-W', '-n', package + '/com.music.bitchord.MainActivity')
+tap('Playlists')
+click_named('Sort Alpha')
+assert_order(['AAA', 'BBB', 'ZZZ'])
+# Remove the FIRST VISIBLE song; its original storage index is deliberately different.
+menus = sorted([n for n in snapshot().iter('node') if n.get('content-desc') == 'Song options'],
+               key=lambda n: bounds(n)[1])
+assert len(menus) == 3
+l, t, r, b = bounds(menus[0])
+adb('shell', 'input', 'tap', str((l+r)//2), str((t+b)//2))
+click_named('Remove')
+assert_order(['BBB', 'ZZZ'])
+adb('shell', 'input', 'keyevent', '4')
+click_named('Sort Beta')
+assert_order(['ZZZ', 'BBB', 'AAA'])
+adb('shell', 'input', 'keyevent', '4')
+click_named('Sort Gamma')
+assert_order(['BBB', 'AAA', 'ZZZ'])
+print('PASS: compact playlist header, independent sorting, cold-start persistence and sorted deletion')
