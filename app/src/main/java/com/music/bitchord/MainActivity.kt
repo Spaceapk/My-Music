@@ -3389,7 +3389,13 @@ private fun BitChordApp(
                             (header * TOP_FADE_RAMP)).coerceIn(0f, 1f)
                     }
                 }
-                BottomFadeScrim(
+                val playlistOwnsToolbar = spaceLibraryTab == 3 && selectedTab == TAB_HOME &&
+                    (detail == null || isLocalDetail) && libraryShowAll == null &&
+                    !showSettings && !showAccountScrobbling && !showSpotify && !showDiscord &&
+                    !showHistory && !showSources && !showListenTogether && !showEqualizer && !showReplay &&
+                    settingsSubScreen == null
+                // The playlist toolbar is in the content layer; do not paint a fade over its controls.
+                if (!playlistOwnsToolbar) BottomFadeScrim(
                     pageColor = chromePageColor,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
@@ -3397,11 +3403,6 @@ private fun BitChordApp(
                         .graphicsLayer { alpha = topFadeAlpha },
                 )
 
-                val playlistOwnsToolbar = spaceLibraryTab == 3 && selectedTab == TAB_HOME &&
-                    (detail == null || isLocalDetail) && libraryShowAll == null &&
-                    !showSettings && !showAccountScrobbling && !showSpotify && !showDiscord &&
-                    !showHistory && !showSources && !showListenTogether && !showEqualizer && !showReplay &&
-                    settingsSubScreen == null
                 if (!playlistOwnsToolbar) FrostedTopBar(
                     title = when {
                         showSpotify && detail == null -> stringResource(R.string.spotify)

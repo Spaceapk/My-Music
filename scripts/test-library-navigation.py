@@ -95,6 +95,7 @@ subprocess.run(['adb', 'shell', f'cat > {base}/star-device-playlists.json'],
                input=json.dumps(fixture).encode(), check=True, timeout=30)
 uid = adb('shell', 'stat', '-c', '%u', base).decode().strip()
 adb('shell', 'chown', f'{uid}:{uid}', f'{base}/star-device-playlists.json')
+adb('shell', 'restorecon', '-F', f'{base}/star-device-playlists.json')
 adb('shell', 'am', 'start', '-W', '-n', package + '/com.music.bitchord.MainActivity')
 tap('Playlists')
 
