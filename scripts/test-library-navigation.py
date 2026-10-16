@@ -52,6 +52,14 @@ def tap(label):
 # Tests run after local playback regressions, with permissions already granted.
 adb('shell', 'am', 'force-stop', 'org.nexlibre.spacemusic')
 adb('shell', 'am', 'start', '-W', '-n', 'org.nexlibre.spacemusic/com.music.bitchord.MainActivity')
+for node in snapshot().iter('node'):
+    if node.get('text') == 'What is new in Space Music 2.1.0':
+        for button in snapshot().iter('node'):
+            if button.get('text') == 'Back':
+                l, t, r, b = bounds(button)
+                adb('shell', 'input', 'tap', str((l+r)//2), str((t+b)//2))
+                break
+        break
 labels = ['Songs', 'Albums', 'Artists', 'Playlists']
 rects = [bounds(tab(label)) for label in labels]
 assert all(a[2] <= b[0] for a, b in zip(rects, rects[1:])), rects

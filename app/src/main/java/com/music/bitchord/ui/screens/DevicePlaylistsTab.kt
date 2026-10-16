@@ -43,6 +43,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
     var editing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     var reordering by remember { mutableStateOf(false) }
+    var actionsExpanded by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
     var checked by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -70,13 +71,34 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             }
         }
         if (selected != null) Row(
-            Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.End,
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-                IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) { Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs)) }
-                IconButton(onClick = { reordering = true }, enabled = !busy && selected.songs.size > 1) { Icon(Icons.Rounded.DragHandle, stringResource(R.string.reorder_songs)) }
-                IconButton(onClick = { name = selected.name; editing = true }, enabled = !busy) { Icon(Icons.Rounded.Edit, stringResource(R.string.rename)) }
-                IconButton(onClick = { deleting = true }, enabled = !busy) { Icon(Icons.Rounded.Delete, stringResource(R.string.delete)) }
+            Button(onClick = { onPlay(selected.songs.map { it.copy(videoId = it.localUri!!) }, 0) }, enabled = selected.songs.isNotEmpty()) {
+                Icon(Icons.Rounded.PlayArrow, null)
+                Text(stringResource(R.string.play))
+            }
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = { checked = emptySet(); adding = true }, enabled = !busy) {
+                Icon(Icons.Rounded.Add, stringResource(R.string.star_add_songs))
+            }
+            Box {
+                IconButton(onClick = { actionsExpanded = true }, enabled = !busy) {
+                    Icon(Icons.Rounded.MoreVert, stringResource(R.string.space_playlist_actions))
+                }
+                DropdownMenu(expanded = actionsExpanded, onDismissRequest = { actionsExpanded = false }) {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.reorder_songs)) },
+                        leadingIcon = { Icon(Icons.Rounded.DragHandle, null) }, enabled = selected.songs.size > 1,
+                        onClick = { actionsExpanded = false; reordering = true })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.rename)) },
+                        leadingIcon = { Icon(Icons.Rounded.Edit, null) },
+                        onClick = { actionsExpanded = false; name = selected.name; editing = true })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.delete)) },
+                        leadingIcon = { Icon(Icons.Rounded.Delete, null) },
+                        onClick = { actionsExpanded = false; deleting = true })
+                }
+            }
         }
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (selected == null) {
@@ -89,19 +111,22 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
                 }
             }
         } else {
-            Button(onClick = { onPlay(selected.songs.map { it.copy(videoId = it.localUri!!) }, 0) }, enabled = selected.songs.isNotEmpty(), modifier = Modifier.padding(horizontal = 16.dp)) {
-                Icon(Icons.Rounded.PlayArrow, null); Text(stringResource(R.string.play))
-            }
             if (selected.songs.isEmpty()) Text(stringResource(R.string.star_playlist_hint), Modifier.padding(20.dp))
             LazyColumn {
                 itemsIndexed(selected.songs, key = { _, s -> s.localUri ?: s.videoId }) { index, song ->
                     ListItem(headlineContent = { Text(song.title, maxLines = 1) }, supportingContent = { Text(song.artist, maxLines = 1) },
                         modifier = Modifier.clickable { onPlay(selected.songs.map { it.copy(videoId = it.localUri!!) }, index) },
                         trailingContent = {
-                            Row {
-                                IconButton(onClick = { change { store.move(selected.id, index, index - 1) } }, enabled = !busy && index > 0) { Icon(Icons.Rounded.KeyboardArrowUp, stringResource(R.string.star_move_up)) }
-                                IconButton(onClick = { change { store.move(selected.id, index, index + 1) } }, enabled = !busy && index < selected.songs.lastIndex) { Icon(Icons.Rounded.KeyboardArrowDown, stringResource(R.string.star_move_down)) }
-                                IconButton(onClick = { change { store.remove(selected.id, index) } }, enabled = !busy) { Icon(Icons.Rounded.Close, stringResource(R.string.remove)) }
+                            var songMenu by remember { mutableStateOf(false) }
+                            Box {
+                                IconButton(onClick = { songMenu = true }, enabled = !busy) {
+                                    Icon(Icons.Rounded.MoreVert, stringResource(R.string.space_song_actions))
+                                }
+                                DropdownMenu(expanded = songMenu, onDismissRequest = { songMenu = false }) {
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.remove)) },
+                                        leadingIcon = { Icon(Icons.Rounded.PlaylistRemove, null) },
+                                        onClick = { songMenu = false; change { store.remove(selected.id, index) } })
+                                }
                             }
                         })
                 }

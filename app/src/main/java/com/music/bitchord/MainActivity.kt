@@ -25,6 +25,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -694,6 +696,15 @@ private fun BitChordApp(
     // once-per-launch popup version of the same news. `updateDialogShown`
     // rides out configuration changes on rememberSaveable so a rotation
     // doesn't bring it back — only a fresh launch does.
+    val updatePreferences = remember(context) { context.getSharedPreferences("space_updates", android.content.Context.MODE_PRIVATE) }
+    var showWhatsNew by rememberSaveable {
+        mutableStateOf(updatePreferences.getInt("seen_version", 0) < BuildConfig.VERSION_CODE)
+    }
+    val installedNotes = remember {
+        if (updatePreferences.getString("pending_version", null) == BuildConfig.VERSION_NAME)
+            updatePreferences.getString("pending_notes", null)?.takeIf { it.isNotBlank() }
+        else null
+    }
     var updateDialogShown by rememberSaveable { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
     val updateAvailable by viewModel.updateAvailable.collectAsStateWithLifecycle()
@@ -4697,7 +4708,28 @@ private fun BitChordApp(
         }
 
         // ---- Update available (once per launch) ----
-        if (showUpdateDialog) {
+        if (showWhatsNew) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = {
+                    updatePreferences.edit().putInt("seen_version", BuildConfig.VERSION_CODE).apply()
+                    showWhatsNew = false
+                },
+                title = { Text(stringResource(R.string.space_whats_new, BuildConfig.VERSION_NAME)) },
+                text = {
+                    Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                        Text(installedNotes ?: stringResource(R.string.space_whats_new_body))
+                    }
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        updatePreferences.edit().putInt("seen_version", BuildConfig.VERSION_CODE)
+                            .remove("pending_version").remove("pending_notes").apply()
+                        showWhatsNew = false
+                    }) { Text(stringResource(R.string.back)) }
+                },
+            )
+        }
+        if (showUpdateDialog && !showWhatsNew) {
             updateNotice?.let { update ->
                 UpdateAvailableDialog(
                     version = update.version,

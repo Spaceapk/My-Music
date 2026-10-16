@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -42,8 +43,8 @@ object AppUpdateChecker {
 
     private const val CACHE_SUBDIR = "updates"
 
-    private const val LATEST_RELEASE_URL =
-        "https://api.github.com/repos/nexlibre/Star-Music/releases/latest"
+    internal const val LATEST_RELEASE_URL =
+        "https://api.github.com/repos/nexlibre/Space-Music/releases/latest"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -72,6 +73,8 @@ object AppUpdateChecker {
                 if (!response.isSuccessful) null else response.body?.string()
             } ?: return@runCatching
             val release = json.parseToJsonElement(body) as? JsonObject ?: return@runCatching
+            if (release["draft"]?.jsonPrimitive?.booleanOrNull == true ||
+                release["prerelease"]?.jsonPrimitive?.booleanOrNull == true) return@runCatching
             val tag = release["tag_name"]?.jsonPrimitive?.contentOrNull ?: return@runCatching
             val url = release["html_url"]?.jsonPrimitive?.contentOrNull ?: return@runCatching
             val apkUrl = apkAssetUrl(release)
@@ -127,7 +130,7 @@ object AppUpdateChecker {
             val dir = File(context.cacheDir, CACHE_SUBDIR).apply { mkdirs() }
             // Drop anything left over from an earlier attempt.
             dir.listFiles()?.forEach { it.delete() }
-            val target = File(dir, "bitchord-${info.version}.apk")
+            val target = File(dir, "space-music-${info.version}.apk")
 
             val request = Request.Builder().url(url).build()
             Http.client.newCall(request).execute().use { response ->
@@ -156,6 +159,12 @@ object AppUpdateChecker {
                     }
                 }
             }
+            // Keep notes for the version actually installed, even when the next
+            // launch has no network. Cancelled installations never display them.
+            context.getSharedPreferences("space_updates", Context.MODE_PRIVATE).edit()
+                .putString("pending_version", info.version)
+                .putString("pending_notes", info.notes)
+                .apply()
             _download.value = DownloadState.Ready(target)
         }.onFailure { error ->
             _download.value = if (downloadCancelled) {
@@ -224,7 +233,7 @@ object AppUpdateChecker {
      * the tag it was testing toward. Without this, a beta and the release it
      * matches compare equal and testers never get nudged onto the real build.
      */
-    private fun isNewer(latest: String, current: String): Boolean {
+    internal fun isNewer(latest: String, current: String): Boolean {
         val l = parseVersion(latest)
         val c = parseVersion(current)
         for (i in 0 until maxOf(l.parts.size, c.parts.size)) {

@@ -1,0 +1,6 @@
+<resources>
+    <string name="space_playlist_actions">Playlist options</string>
+    <string name="space_song_actions">Song options</string>
+    <string name="space_whats_new">What is new in Space Music %1$s</string>
+    <string name="space_whats_new_body">The stable release is here.\n\n• Compact playlist controls and song menus.\n• Drag to reorder, add songs, rename and remove.\n• Update notices with download and installation.\n• New features shown after installing each update.</string>
+</resources>
