@@ -1280,4 +1280,10 @@
     <string name="chinese_simplified">จีนตัวย่อ</string>
     <string name="chinese_traditional">จีนตัวเต็ม</string>
     <string name="library_nav_playlists">เพลย์ลิสต์</string>
+    <string name="space_playlist_search">ค้นหารายการหรือเพลง</string>
+    <string name="space_playlist_sort">จัดเรียงรายการนี้</string>
+    <string name="space_playlist_sort_hint">ใช้กับรายการนี้เท่านั้น</string>
+    <string name="space_sort_manual">ลำดับที่กำหนดเอง</string>
+    <string name="space_sort_artist">ศิลปิน</string>
+    <string name="space_sort_recent">เพิ่งเพิ่มลงในรายการนี้</string>
 </resources>

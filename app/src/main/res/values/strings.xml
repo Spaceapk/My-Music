@@ -1134,4 +1134,10 @@
     <string name="star_playlist_hint">Create a playlist and add music from this device. No account or connection needed.</string>
     <string name="star_save_error">Could not save playlist</string>
     <string name="library_nav_playlists">Playlists</string>
+    <string name="space_playlist_search">Search playlists or songs</string>
+    <string name="space_playlist_sort">Sort this playlist</string>
+    <string name="space_playlist_sort_hint">Only applies to this playlist</string>
+    <string name="space_sort_manual">Manual order</string>
+    <string name="space_sort_artist">Artist</string>
+    <string name="space_sort_recent">Recently added to this playlist</string>
 </resources>

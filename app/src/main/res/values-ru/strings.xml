@@ -1329,4 +1329,10 @@
     <string name="chinese_simplified">Китайский (упрощённый)</string>
     <string name="chinese_traditional">Китайский (традиционный)</string>
     <string name="library_nav_playlists">Плейлисты</string>
+    <string name="space_playlist_search">Поиск списков или песен</string>
+    <string name="space_playlist_sort">Сортировать этот список</string>
+    <string name="space_playlist_sort_hint">Только для этого списка</string>
+    <string name="space_sort_manual">Ручной порядок</string>
+    <string name="space_sort_artist">Исполнитель</string>
+    <string name="space_sort_recent">Недавно добавленные в этот список</string>
 </resources>

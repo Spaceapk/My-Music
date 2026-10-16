@@ -1349,4 +1349,10 @@
     <string name="chinese_simplified">Chiński uproszczony</string>
     <string name="chinese_traditional">Chiński tradycyjny</string>
     <string name="library_nav_playlists">Playlisty</string>
+    <string name="space_playlist_search">Szukaj list lub utworów</string>
+    <string name="space_playlist_sort">Sortuj tę listę</string>
+    <string name="space_playlist_sort_hint">Dotyczy tylko tej listy</string>
+    <string name="space_sort_manual">Kolejność ręczna</string>
+    <string name="space_sort_artist">Wykonawca</string>
+    <string name="space_sort_recent">Ostatnio dodane do tej listy</string>
 </resources>

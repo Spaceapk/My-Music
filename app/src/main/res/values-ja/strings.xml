@@ -1275,4 +1275,10 @@
     <string name="chinese_simplified">中国語（簡体字）</string>
     <string name="chinese_traditional">中国語（繁体字）</string>
     <string name="library_nav_playlists">プレイリスト</string>
+    <string name="space_playlist_search">リストや曲を検索</string>
+    <string name="space_playlist_sort">このリストを並べ替え</string>
+    <string name="space_playlist_sort_hint">このリストにのみ適用</string>
+    <string name="space_sort_manual">手動の順序</string>
+    <string name="space_sort_artist">アーティスト</string>
+    <string name="space_sort_recent">このリストに最近追加した曲</string>
 </resources>
