@@ -175,8 +175,13 @@ click_named('Settings')
 size = list(map(int, re.findall(rb'(\d+)x(\d+)', adb('shell', 'wm', 'size'))[-1]))
 for _ in range(35):
     root = snapshot()
-    if any(n.get('text') == 'Licenses and open source' for n in root.iter('node')):
-        break
+    buttons = [n for n in root.iter('node') if n.get('text') == 'Licenses and open source']
+    if len(buttons) == 1:
+        # UIAutomator also reports nodes obscured by the floating dock.
+        # Continue scrolling until the button is visibly above its touch guard.
+        safe_bottom = bounds(tab('Songs'))[1] - 24 * density / 160
+        if bounds(buttons[0])[3] < safe_bottom:
+            break
     adb('shell', 'input', 'swipe', str(size[0] // 2), str(int(size[1] * .60)),
         str(size[0] // 2), str(int(size[1] * .25)), '250')
 else:
@@ -196,6 +201,12 @@ try:
             break
         adb('shell', 'input', 'swipe', str(size[0] // 2), str(int(size[1] * .60)),
             str(size[0] // 2), str(int(size[1] * .25)), '250')
+    # Put the expanded notice above the dock for an actual visual review,
+    # rather than capturing only the first lines passing behind the glass.
+    for _ in range(2):
+        adb('shell', 'input', 'swipe', str(size[0] // 2), str(int(size[1] * .60)),
+            str(size[0] // 2), str(int(size[1] * .25)), '250')
+    Path('device-settings-licenses-offline.png').write_bytes(adb('exec-out', 'screencap', '-p'))
     assert 'GNU GENERAL PUBLIC LICENSE' in text, 'Bundled GPL license was not rendered offline'
     assert 'BitChord — kushagrasinghx' in text and 'Star Music — nexlibre' in text, 'Missing source attribution'
     Path('device-settings-licenses-offline.png').write_bytes(adb('exec-out', 'screencap', '-p'))
