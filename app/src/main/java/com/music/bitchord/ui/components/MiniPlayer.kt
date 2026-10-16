@@ -361,6 +361,7 @@ fun MiniPlayer(
 ) {
     val reduceDynamicBlur by AppSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
     val haptics = rememberHaptics()
+    val useGlass = LocalLiquidGlassEnabled.current && isGlassSupported()
     // percent rather than a dp figure, so the corner stays exactly half the
     // height if the row's contents ever change it — which is what keeps a pill
     // a pill instead of a rounded rectangle. Same idiom as [FloatingBottomBar]
@@ -387,6 +388,8 @@ fun MiniPlayer(
             .then(
                 if (reduceDynamicBlur) {
                     Modifier.background(MaterialTheme.colorScheme.surface)
+                } else if (useGlass) {
+                    Modifier.liquidGlass(shape = shape)
                 } else {
                     Modifier.optimizedHazeEffect(
                         state = hazeState,

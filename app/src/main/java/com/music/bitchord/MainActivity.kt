@@ -227,7 +227,6 @@ import com.music.bitchord.playback.rememberPlayerState
 import com.music.bitchord.playback.setQueueDragActive
 import com.music.bitchord.ui.MainViewModel
 import com.music.bitchord.ui.SearchSource
-import com.music.bitchord.ui.components.BottomFadeScrim
 import com.music.bitchord.ui.components.FloatingBarsTapGuard
 import com.music.bitchord.ui.components.BottomTab
 import com.music.bitchord.ui.components.FLOATING_BAR_MAX_WIDTH
@@ -2113,9 +2112,14 @@ private fun BitChordApp(
     // under the status bar inset, and that inset varies by device and by window,
     // so a fixed number only ever lines up on the one device it was picked on.
     // See [topBarContentPadding].
+    val floatingBarsHeight = remember { mutableIntStateOf(0) }
+    val bottomContentPadding = with(LocalDensity.current) {
+        if (floatingBarsHeight.intValue > 0) floatingBarsHeight.intValue.toDp() + 20.dp
+        else if (player.song != null) 164.dp else 100.dp
+    }
     val listPadding = PaddingValues(
         top = topBarContentPadding(),
-        bottom = (if (player.song != null) 210.dp else 116.dp),
+        bottom = bottomContentPadding,
     )
 
     // What colour the page currently under the bars is. The fades either end
@@ -3685,19 +3689,8 @@ private fun BitChordApp(
                     },
                 )
 
-                // Drawn before the bars so their own glass reads on top of it.
-                BottomFadeScrim(
-                    withMiniPlayer = player.song != null,
-                    // Not the wash: by the foot of the screen the page has finished
-                    // easing out of it and into this, so this is what is actually
-                    // under the tab bar.
-                    pageColor = chromePageColor,
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                )
-
-                // Whichever bar is drawing reports its height here, for the
-                // guard to read at layout — never in composition, see the guard.
-                val floatingBarsHeight = remember { mutableIntStateOf(0) }
+                // The playlist extends behind the floating glass. No opaque
+                // footer scrim: the controls supply their own tint and blur.
                 FloatingBarsTapGuard(
                     barsHeight = { floatingBarsHeight.intValue },
                     modifier = Modifier.align(Alignment.BottomCenter),
@@ -3731,7 +3724,7 @@ private fun BitChordApp(
                         .align(Alignment.BottomCenter)
                         .widthIn(max = FLOATING_BAR_MAX_WIDTH)
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 12.dp)
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
                         .onSizeChanged { floatingBarsHeight.intValue = it.height },
                 ) {
                     QueueActionNoticeHost(queueNotice)
