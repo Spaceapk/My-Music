@@ -16,6 +16,14 @@ Pruebas aprobadas en Android 12, 13 y 15: orden independiente por lista, persist
 
 Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
 
+## Próxima actualización: interfaz compacta
+
+Cambios preparados: minirreproductor con el mismo Liquid Glass que la navegación, sin degradado opaco de fondo; listas que se desplazan detrás de las barras y margen final ajustado a su altura real. Se conserva el modo sin desenfoque.
+
+El pie de Ajustes identifica a Space Music y enlaza a este repositorio. Las atribuciones se reúnen en «Licencias y código abierto», con GPL-3.0 disponible sin conexión. Se eliminan los enlaces promocionales heredados a Discord y al sitio de BitChord. La licencia y los avisos del código original se conservan.
+
+Estos cambios no forman parte del APK 2.2.0 enlazado arriba. La compilación y las pruebas de GitHub Actions deben completarse antes de incluirlos en una nueva publicación.
+
 ## Biblioteca y navegación
 
 Barra inferior flotante Liquid Glass con **Canciones, Álbumes, Artistas y Listas**, sin pestañas superiores duplicadas. El minirreproductor aparece encima de la barra. Mantiene búsqueda, ordenación y vistas de biblioteca. Liquid Glass es el valor predeterminado cuando no hay una preferencia de apariencia guardada.

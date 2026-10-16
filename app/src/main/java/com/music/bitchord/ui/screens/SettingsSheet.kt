@@ -270,6 +270,7 @@ fun SettingsScreen(
     // Filters the rows below — see [SettingsSearch]. Blank shows everything,
     // exactly as if the field weren't there.
     var searchQuery by remember { mutableStateOf("") }
+    var showOpenSource by rememberSaveable { mutableStateOf(false) }
     var picking by remember { mutableStateOf<QualityTarget?>(null) }
     var pickingDownloadQuality by remember { mutableStateOf(false) }
     var pickingAutomixPerformance by remember { mutableStateOf(false) }
@@ -1152,42 +1153,58 @@ fun SettingsScreen(
             MessageState(stringResource(R.string.settings_search_empty, searchQuery))
         }
 
-        // The version line is the page's colophon, not a setting: it belongs to
-        // the whole list, so it goes when the list is narrowed to a few rows.
         if (searchQuery.isBlank()) {
-        Text(
-            text = buildAnnotatedString {
-                append("Star Music $version  ")
-                val linkStyles = TextLinkStyles(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline,
-                    ),
+            Text(
+                text = buildAnnotatedString {
+                    append("Space Music $version  ·  ")
+                    withLink(LinkAnnotation.Url(
+                        "https://github.com/nexlibre/Space-Music",
+                        TextLinkStyles(style = SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline,
+                        )),
+                    )) { append("GitHub") }
+                    append("\n")
+                    append(stringResource(R.string.space_about_local))
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 4.dp),
+            )
+            TextButton(
+                onClick = { showOpenSource = !showOpenSource },
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            ) { Text(stringResource(R.string.space_open_source)) }
+            if (showOpenSource) {
+                val license = remember(context) {
+                    context.assets.open("licenses/GPL-3.0.txt").bufferedReader().use { it.readText() }
+                }
+                Text(
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.space_open_source_notice))
+                        append("\n\n")
+                        val links = TextLinkStyles(style = SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline,
+                        ))
+                        listOf(
+                            "Star Music — nexlibre" to "https://github.com/nexlibre/Star-Music",
+                            "BitChord — kushagrasinghx" to "https://github.com/kushagrasinghx/BitChord",
+                            "Echo Music — GPL-3.0" to "https://github.com/EchoMusicApp/Echo-Music",
+                            "Backdrop — Apache-2.0" to "https://github.com/Kyant0/backdrop",
+                        ).forEach { (label, url) ->
+                            withLink(LinkAnnotation.Url(url, links)) { append(label) }
+                            append("\n")
+                        }
+                        append("\n")
+                        append(license)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
                 )
-                withLink(LinkAnnotation.Url("https://github.com/nexlibre/Star-Music", linkStyles)) {
-                    append("GitHub")
-                }
-                append("  ")
-                withLink(LinkAnnotation.Url("https://github.com/kushagrasinghx", linkStyles)) {
-                    append("BitChord: kushagrasinghx")
-                }
-                append("  ")
-                withLink(LinkAnnotation.Url("https://discord.gg/pDdKfrdHY6", linkStyles)) {
-                    append("Discord")
-                }
-                append("  ")
-                withLink(LinkAnnotation.Url("https://bitchord.kushagrasingh.in/", linkStyles)) {
-                    append("Website")
-                }
-                append("\nStar Music by nexlibre · Derived from BitChord · GPL-3.0")
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 8.dp),
-        )
+            }
         }
     }
 

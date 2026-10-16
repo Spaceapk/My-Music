@@ -1281,4 +1281,7 @@
     <string name="space_sort_manual">手動排序</string>
     <string name="space_sort_artist">歌手</string>
     <string name="space_sort_recent">最近加入此清單</string>
+    <string name="space_about_local">本機音樂播放器 · 由 nexlibre 維護</string>
+    <string name="space_open_source">授權條款與開源軟體</string>
+    <string name="space_open_source_notice">Space Music 是基於 Star Music 和 BitChord 修改的版本，採用 GPL-3.0 授權。修改者：nexlibre，2026 年 10 月。原作者保留其著作權。您可依授權條款複製、修改及重新散布本軟體，但不提供任何擔保。原始碼及原始聲明見下方儲存庫連結。隨附的 GPL 授權條款可離線閱讀。</string>
 </resources>

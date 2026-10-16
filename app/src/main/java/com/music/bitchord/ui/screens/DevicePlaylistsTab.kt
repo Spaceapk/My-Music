@@ -70,7 +70,7 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
     BackHandler(selected != null || searchOpen) {
         if (searchOpen) { searchOpen = false; query = "" } else selectedId = null
     }
-    Column(Modifier.fillMaxSize().statusBarsPadding().padding(bottom = padding.calculateBottomPadding())) {
+    Column(Modifier.fillMaxSize().statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (selected != null) IconButton(onClick = { selectedId = null }) {
                 Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back))
@@ -143,7 +143,10 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (selected == null) {
             if (playlists.isEmpty()) Text(stringResource(R.string.star_playlist_hint), Modifier.padding(20.dp))
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
+            ) {
                 items(playlists.filter { query.isBlank() || it.name.contains(query, true) }, key = { it.id }) { p ->
                     ListItem(headlineContent = { Text(p.name) }, supportingContent = { Text("${p.songs.size}") },
                         leadingContent = { Icon(Icons.Rounded.LibraryMusic, null) },
@@ -152,7 +155,10 @@ fun DevicePlaylistsTab(songs: List<Song>, onPlay: (List<Song>, Int) -> Unit, pad
             }
         } else {
             if (selected.songs.isEmpty()) Text(stringResource(R.string.star_playlist_hint), Modifier.padding(20.dp))
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
+            ) {
                 itemsIndexed(visibleSongs, key = { _, s -> s.localUri ?: s.videoId }) { index, song ->
                     ListItem(headlineContent = { Text(song.title, maxLines = 1) }, supportingContent = { Text(song.artist, maxLines = 1) },
                         modifier = Modifier.clickable { onPlay(visibleSongs.map { it.copy(videoId = it.localUri!!) }, index) },

@@ -161,3 +161,56 @@ adb('shell', 'input', 'keyevent', '4')
 click_named('Sort Gamma')
 assert_order(['BBB', 'AAA', 'ZZZ'])
 print('PASS: compact playlist header, independent sorting, cold-start persistence and sorted deletion')
+
+# The compact dock must keep accessible touch targets on every tested density.
+density = int(re.findall(rb'\d+', adb('shell', 'wm', 'density'))[-1])
+for label in labels:
+    l, t, r, b = bounds(tab(label))
+    assert (b - t) * 160 / density >= 48, ('Tab touch target too small', label, [l, t, r, b])
+
+# Settings identifies this application and keeps the inherited legal notices
+# reachable without a network connection, rather than advertising upstream sites.
+adb('shell', 'input', 'keyevent', '4')
+click_named('Settings')
+size = list(map(int, re.findall(rb'(\d+)x(\d+)', adb('shell', 'wm', 'size'))[-1]))
+for _ in range(35):
+    root = snapshot()
+    buttons = [n for n in root.iter('node') if n.get('text') == 'Licenses and open source']
+    if len(buttons) == 1:
+        # UIAutomator also reports nodes obscured by the floating dock.
+        # Continue scrolling until the button is visibly above its touch guard.
+        safe_bottom = bounds(tab('Songs'))[1] - 24 * density / 160
+        if bounds(buttons[0])[3] < safe_bottom:
+            break
+    adb('shell', 'input', 'swipe', str(size[0] // 2), str(int(size[1] * .60)),
+        str(size[0] // 2), str(int(size[1] * .25)), '250')
+else:
+    raise AssertionError('Licenses and open source is not reachable in Settings')
+footer = '\n'.join(n.get('text', '') for n in root.iter('node'))
+assert 'Space Music 2.2.0' in footer, footer
+assert 'Local music player' in footer, footer
+assert 'Discord' not in footer and 'Website' not in footer, footer
+Path('device-settings-identity.png').write_bytes(adb('exec-out', 'screencap', '-p'))
+adb('shell', 'svc', 'wifi', 'disable')
+adb('shell', 'svc', 'data', 'disable')
+try:
+    click_named('Licenses and open source')
+    for _ in range(6):
+        text = '\n'.join(n.get('text', '') for n in snapshot().iter('node'))
+        if 'GNU GENERAL PUBLIC LICENSE' in text:
+            break
+        adb('shell', 'input', 'swipe', str(size[0] // 2), str(int(size[1] * .60)),
+            str(size[0] // 2), str(int(size[1] * .25)), '250')
+    # Put the expanded notice above the dock for an actual visual review,
+    # rather than capturing only the first lines passing behind the glass.
+    for _ in range(2):
+        adb('shell', 'input', 'swipe', str(size[0] // 2), str(int(size[1] * .60)),
+            str(size[0] // 2), str(int(size[1] * .25)), '250')
+    Path('device-settings-licenses-offline.png').write_bytes(adb('exec-out', 'screencap', '-p'))
+    assert 'GNU GENERAL PUBLIC LICENSE' in text, 'Bundled GPL license was not rendered offline'
+    assert 'BitChord — kushagrasinghx' in text and 'Star Music — nexlibre' in text, 'Missing source attribution'
+    Path('device-settings-licenses-offline.png').write_bytes(adb('exec-out', 'screencap', '-p'))
+finally:
+    adb('shell', 'svc', 'wifi', 'enable')
+    adb('shell', 'svc', 'data', 'enable')
+print('PASS: accessible compact dock, Space Music identity and bundled license rendered offline')

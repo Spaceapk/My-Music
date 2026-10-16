@@ -1280,4 +1280,7 @@
     <string name="space_sort_manual">手动排序</string>
     <string name="space_sort_artist">歌手</string>
     <string name="space_sort_recent">最近加入此列表</string>
+    <string name="space_about_local">本地音乐播放器 · 由 nexlibre 维护</string>
+    <string name="space_open_source">许可证与开源软件</string>
+    <string name="space_open_source_notice">Space Music 是基于 Star Music 和 BitChord 修改的版本，采用 GPL-3.0 许可证。修改者：nexlibre，2026 年 10 月。原作者保留其著作权。您可以按照许可证复制、修改和重新分发本软件，但不提供任何担保。源代码和原始声明见下方仓库链接。随附的 GPL 许可证可离线阅读。</string>
 </resources>

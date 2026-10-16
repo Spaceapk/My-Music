@@ -95,17 +95,8 @@ internal val floatingBarInsets: WindowInsets
 /** A gesture bar's inset — 45px at the test phone's 3x density. */
 private val GESTURE_BAR_FLOOR = 15.dp
 
-/**
- * Each tab's own vertical padding, and the counterweight to [PILL_INSET].
- *
- * The pill has no height of its own — it is whatever its contents come to — so
- * taking 2dp off the inset above would have shortened the whole bar by 4. The
- * same 2dp is added back here instead, which leaves the bar's outer height
- * exactly where it was and moves the boundary rather than the bar. The two
- * numbers are a pair: change one and the bar's height moves unless the other
- * moves against it.
- */
-internal val TAB_VERTICAL_PADDING = 9.dp
+/** Compact spacing; glyph, label and pill inset retain a 48dp touch target. */
+internal val TAB_VERTICAL_PADDING = 6.dp
 
 /** The gap between a tab's glyph and its label, in both bars. */
 internal val TAB_ICON_LABEL_GAP = 2.dp

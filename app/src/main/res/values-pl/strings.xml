@@ -1355,4 +1355,7 @@
     <string name="space_sort_manual">Kolejność ręczna</string>
     <string name="space_sort_artist">Wykonawca</string>
     <string name="space_sort_recent">Ostatnio dodane do tej listy</string>
+    <string name="space_about_local">Odtwarzacz muzyki lokalnej · Opieka: nexlibre</string>
+    <string name="space_open_source">Licencje i otwarty kod</string>
+    <string name="space_open_source_notice">Space Music to zmodyfikowana wersja Star Music i BitChord na licencji GPL-3.0. Zmiany: nexlibre, październik 2026. Pierwotni autorzy zachowują prawa autorskie. Możesz kopiować, modyfikować i rozpowszechniać program zgodnie z licencją, bez gwarancji. Kod źródłowy i pierwotne informacje znajdują się w podanych repozytoriach. Licencja GPL jest dostępna offline.</string>
 </resources>
