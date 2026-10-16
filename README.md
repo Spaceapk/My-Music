@@ -8,11 +8,11 @@ Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a
 
 ## Descarga e instalación
 
-**[Descargar Space Music 2.1.0 estable — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v2.1.0/Space-Music-2.1.0.apk)**
+**[Descargar Space Music 2.2.0 estable — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v2.2.0/Space-Music-2.2.0.apk)**
 
 APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
 
-Pruebas aprobadas en Android 12, 13 y 15: reproducción local, listas, arrastre, veinte arranques en frío y actualización desde 2.0.1 beta. Conserva firma y datos: instala sobre la versión oficial anterior sin desinstalar. [Resultados y límites](docs/verification-2.1.0.md). Pendiente validación en teléfonos físicos.
+Pruebas aprobadas en Android 12, 13 y 15: orden independiente por lista, persistencia, reproducción local, arrastre, veinte arranques en frío y actualización desde 2.1.0 estable sin desinstalar. Conserva firma y datos. [Resultados y límites](docs/verification-2.2.0.md). Pendiente validación en teléfonos físicos.
 
 Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
 
@@ -22,7 +22,7 @@ Barra inferior flotante Liquid Glass con **Canciones, Álbumes, Artistas y Lista
 
 ## Listas compactas y actualizaciones
 
-Reproducir, Añadir y Opciones comparten una fila. En Opciones están el orden por arrastre, renombrar y eliminar la lista. El menú de cada canción permite quitarla; se han eliminado las flechas de subir y bajar.
+Cabecera propia de dos filas, búsqueda al tocar la lupa y controles Reproducir, Añadir, Ordenar y Opciones. Cada lista conserva su orden independiente: manual, título A–Z/Z–A, artista o incorporaciones recientes. El orden de Canciones sigue siendo independiente. En Opciones están el orden por arrastre, renombrar y eliminar la lista. El menú de cada canción permite quitarla; se han eliminado las flechas de subir y bajar.
 
 Desde esta versión, un aviso informa de nuevas versiones estables y permite descargar e instalar el APK. Android solicita permiso para instalar desde esta fuente cuando sea necesario. El actualizador comprueba el paquete, una versión superior y la firma antes de ofrecer la instalación. Las novedades de la versión instalada aparecen una vez; las notas de una actualización descargada se conservan para mostrarlas sin conexión.
 

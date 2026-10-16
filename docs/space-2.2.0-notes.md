@@ -1,10 +1,13 @@
-# Space Music 2.2.0
+**[Descargar Space Music 2.2.0 estable — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v2.2.0/Space-Music-2.2.0.apk)**
 
-- Cabecera de listas compacta: búsqueda al tocar la lupa y ajustes dentro de Opciones.
-- Orden independiente por lista: manual, título A–Z, título Z–A, artista y añadidas recientemente a esa lista.
-- El criterio se conserva después de cerrar la aplicación. No cambia el orden de Canciones ni el de las otras listas.
-- La reproducción sigue el orden visible. Quitar una canción actúa sobre la canción seleccionada aunque la lista esté ordenada o filtrada.
-- Guardar un orden por arrastre activa el modo manual. Se conserva el historial de incorporación de canciones.
-- Las listas anteriores mantienen su orden manual. No contenían fechas de incorporación: se utiliza su orden existente como referencia inicial para «recientemente añadidas»; las nuevas incorporaciones sí se registran por separado.
+- Cabecera de listas compacta, con búsqueda al tocar la lupa y ajustes en Opciones.
+- Orden independiente guardado por lista: manual, título A–Z/Z–A, artista o añadidas recientemente a esa lista.
+- Reproducción y eliminación respetan el orden visible. Ordenar una lista no cambia Canciones ni las otras listas.
+- Guardar el orden por arrastre activa el modo manual y conserva el historial de incorporación.
+- Migración de listas existentes sin perder canciones. Como antes no se guardaban fechas de incorporación, se usa su orden existente como referencia inicial; las nuevas incorporaciones se registran por separado.
 
-Validación de esta actualización en curso. No sustituye todavía la descarga estable publicada.
+Instala sobre la versión oficial anterior sin desinstalar para conservar tus listas y preferencias. Mantiene el identificador y la firma oficiales. La matriz de pruebas comienza en Android 12; se conserva la compatibilidad de instalación desde Android 8.
+
+[Compilación, regresiones, lint y pruebas Android 12/13/15 del código verificado](https://github.com/nexlibre/Space-Music/actions/runs/38931532375).
+
+Verificación del APK firmado y actualización desde 2.1.0: https://github.com/nexlibre/Space-Music/actions/runs/38937468797

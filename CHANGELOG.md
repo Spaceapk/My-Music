@@ -1,4 +1,4 @@
-## 2.2.0 — en verificación
+## 2.2.0 — estable
 
 Cabecera compacta de listas, búsqueda propia y orden persistente por lista (manual, título, artista y añadidas recientemente), sin modificar Canciones. Reproducción y eliminación respetan el orden visible. Migración de listas existentes sin pérdida de canciones.
 
