@@ -1,0 +1,80 @@
+name: Verify Android 12 signed update with corrected Search action
+on:
+  push:
+    branches: [space-2.4.0-publication]
+    paths: ['.github/workflows/space-2.4.0-api31.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: space-2.4.0-signed-api31
+  cancel-in-progress: true
+jobs:
+  device:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api: 31
+            screen: 360x800
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require unchanged application source
+        run: git diff --exit-code ee77521288c63cf7654c8952c989acb65afc0a73 HEAD -- app shared sharedUi gradle build.gradle.kts settings.gradle.kts gradle.properties
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-2.4.0-signed
+          path: dist
+          run-id: '39039547497'
+          github-token: ${{ github.token }}
+      - name: Verify exact signed APK under test
+        run: echo '0d02944d9752850d54bb54f48c6fe6d19ed7a6bbd7e4c1b72ae93e16265838d8  dist/Space-Music-2.4.0.apk' | sha256sum -c -
+      - name: Download previous published APK for update verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download v2.3.0 --repo "$GITHUB_REPOSITORY" --pattern '*.apk' --dir previous
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify signed update, playback and restored lyric panels
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan -skin ${{ matrix.screen }} -dpi-device 160
+          disable-animations: true
+          script: bash docs/releases/2.4.0/test-signed-update.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: space-2.4.0-device-${{ matrix.api }}-${{ github.run_id }}
+          path: |
+            device-spatial-benchmark.txt
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+            device-full-log.txt
+            device-*.xml
+            device-media-fixture.txt
+            device-package-fixture.txt
+            device-playlist-session.txt
+            device-*.png
