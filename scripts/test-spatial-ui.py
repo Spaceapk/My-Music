@@ -84,10 +84,11 @@ for theme, font in [('DARK', '1.0'), ('LIGHT', '1.0'), ('DARK', '1.5')]:
     editor = next(n for n in tree().iter('node') if n.get('class') == 'android.widget.EditText')
     l,t,r,b = map(int,re.findall(r'\d+', editor.get('bounds')))
     adb('shell','input','tap',str((l+r)//2),str((t+b)//2))
+    time.sleep(.4)
     adb('shell','input','text','Spatial')
-    ime = adb('shell','dumpsys','input_method').decode(errors='replace')
-    if re.search(r'(?:mInputShown|mIsInputViewShown|isInputViewShown)=true', ime):
-        adb('shell','input','keyevent','4')
+    # SearchField handles IME Search by clearing focus. Back can instead close
+    # Settings if the keyboard visibility report lags behind its real state.
+    adb('shell','input','keyevent','66')
     tap('Spatial audio')
     # Expand through the native handle, without dragging a card or slider.
     expand_sheet()
