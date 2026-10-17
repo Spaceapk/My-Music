@@ -1,5 +1,5 @@
 name: Verify signed Space Music 2.3.0 navigation, update and compatibility
-# Wait for package-replacement broadcasts before launching the upgraded application.
+# Capture settings through the current library navigation, after package replacement settles.
 on:
   push:
     branches: [space-2.3.0-publication]

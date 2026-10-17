@@ -172,6 +172,9 @@ elif sys.argv[1] in ('capture_dark', 'capture_light', 'capture_glass'):
     persisted = ET.fromstring(adb('exec-out', 'cat', path))
     expected = 'LIGHT' if mode == 'light' else 'DARK'
     assert next(e.text for e in persisted if e.get('name') == 'theme_mode') == expected
+    # Settings is reached from the library, outside playlist detail.
+    adb('shell', 'input', 'keyevent', '4')
+    tap('Songs')
     tap('Settings')
     find('Output precision')
     time.sleep(0.5)
