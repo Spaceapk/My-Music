@@ -167,16 +167,16 @@ jobs:
       - name: Require matching main and publish stable APK after all signed-device checks
         run: |
           set -euo pipefail
-          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39037933553 --jq .head_sha)" = 26acd9637423c7f6599414ee98a6315a4b08be9b
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .head_sha)" = 5451724a15339ce80960c67fa823c0c63059f41c
           ready=false
           for attempt in $(seq 1 90); do
-            state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39037933553 --jq .status)
-            conclusion=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39037933553 --jq .conclusion)
+            state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .status)
+            conclusion=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .conclusion)
             if [ "$state" = completed ] && [ "$conclusion" != success ]; then
               echo 'Final verification failed; publication is blocked.'; exit 1
             fi
             git fetch origin main
-            if [ "$conclusion" = success ] && git diff --quiet 26acd9637423c7f6599414ee98a6315a4b08be9b origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
+            if [ "$conclusion" = success ] && git diff --quiet 5451724a15339ce80960c67fa823c0c63059f41c origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
               ready=true; break
             fi
             sleep 10
@@ -192,7 +192,7 @@ jobs:
           if gh release view v2.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Refusing to replace an existing release.'; exit 1
           fi
-          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 26acd9637423c7f6599414ee98a6315a4b08be9b --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
+          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 5451724a15339ce80960c67fa823c0c63059f41c --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
       - uses: actions/upload-artifact@v4
         if: success()
         with:

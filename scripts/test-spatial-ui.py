@@ -29,6 +29,24 @@ def tap(label):
     adb('shell','input','tap',str((l+r)//2),str((t+b)//2))
     time.sleep(.3)
 
+def expand_sheet():
+    handle=find('Drag handle')
+    l,t,r,b=map(int,re.findall(r'\d+',handle.get('bounds')))
+    y=(t+b)//2
+    if y > 80:
+        adb('shell','input','swipe',str((l+r)//2),str(y),str((l+r)//2),'40','450')
+        time.sleep(.4)
+
+def assert_selected(mode):
+    root=tree(); parents={c:p for p in root.iter() for c in p}
+    for n in root.iter('node'):
+        if n.get('text') == mode:
+            while n in parents:
+                if n.get('checked') == 'true' or n.get('selected') == 'true':
+                    return
+                n=parents[n]
+    raise AssertionError('Spatial mode did not become selected: '+mode)
+
 def capture(name):
     Path('device-spatial-' + name + '.png').write_bytes(adb('exec-out','screencap','-p'))
 
@@ -71,11 +89,14 @@ for theme, font in [('DARK', '1.0'), ('LIGHT', '1.0'), ('DARK', '1.5')]:
     if re.search(r'(?:mInputShown|mIsInputViewShown|isInputViewShown)=true', ime):
         adb('shell','input','keyevent','4')
     tap('Spatial audio')
-    # Expand the Material sheet so contextual sliders are reachable.
-    adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.6)),str(size[0]//2),str(int(size[1]*.12)),'350')
+    # Expand through the native handle, without dragging a card or slider.
+    expand_sheet()
     label=theme.lower()+'-'+font
     for mode in ['Espacial original','Audio 8D','Espacial avanzado']:
+        expand_sheet()
         tap(mode)
+        expand_sheet()
+        assert_selected(mode)
         text='\n'.join(n.get('text','') for n in tree().iter('node'))
         assert 'Conserva el sonido espacial actual.' in text
         if mode == 'Espacial original':
