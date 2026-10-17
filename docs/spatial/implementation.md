@@ -1,7 +1,7 @@
 # Audio espacial 3 en 1 — implementación en validación
 
 Esta rama aún no es una versión publicada. Base auditada: Space Music 2.3.0,
-commit 641453da. La siguiente versión propuesta es 2.4.0, pendiente de validación.
+commit 641453da. La versión objetivo es 2.4.0 (versionCode 8), pendiente de validación.
 
 ## Auditoría y arquitectura
 

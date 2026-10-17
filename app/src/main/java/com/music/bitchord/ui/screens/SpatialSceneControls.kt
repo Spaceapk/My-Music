@@ -1,6 +1,8 @@
 package com.music.bitchord.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +55,7 @@ fun SpatialSceneControls() {
             else "Activa el interruptor de audio espacial para escuchar el efecto.", style = MaterialTheme.typography.bodySmall)
         if (settings.mode != SpatialMode.ORIGINAL) {
             val profiles = if (settings.mode == SpatialMode.EIGHT_D) listOf("Suave", "Equilibrado", "Inmersivo") else listOf("Natural", "Envolvente", "Cinemático")
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 profiles.forEachIndexed { i, label ->
                     FilterChip(selected = p.profile == i, onClick = {
                         AppSettings.setSpatialScene(settings.withSelected(SpatialParameters.preset(settings.mode, i)))
@@ -70,7 +72,7 @@ fun SpatialSceneControls() {
             }
             SpatialSlider("Amplitud", p.width, enabled) { update(p.copy(width = it)) }
             Text("Reverberación", style = MaterialTheme.typography.labelLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 listOf("Sin efecto", "Suave", "Moderada").forEachIndexed { i, label ->
                     FilterChip(selected = p.reverb == i, enabled = enabled, onClick = { update(p.copy(reverb = i)) }, label = { Text(label) })
                 }
