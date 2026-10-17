@@ -15,7 +15,7 @@ class SpatialPreferencesTest {
             try {
                 val settings = SpatialSettings(SpatialMode.ADVANCED,
                     SpatialParameters(speed = .18f, reverb = 0, profile = -1),
-                    SpatialParameters(depth = .91f, distance = .72f, profile = 2))
+                    SpatialParameters(depth = .91f, distance = .72f, profile = 2), visualization = true)
                 AppSettings.setSpatialScene(settings)
                 AppSettings.reload()
                 assertEquals(settings, AppSettings.spatialScene.value)

@@ -57,11 +57,11 @@ seleccionado. El servicio conserva la exclusión existente de Atmos.
 
 La fila de audio espacial abre un panel contextual con tres tarjetas,
 perfiles y controles reales. Colores translúcidos del tema, contraste y
-bordes seleccionados, compatible con claro/oscuro/AMOLED. No se añade una
-animación orbital: una animación independiente del reloj de audio podría
-representar una posición falsa. Visualización opcional pospuesta hasta
-contar con telemetría de fase y auditar su consumo. No hay animación nueva
-que ignore reducción de movimiento. No se añade blur pesado por tarjeta.
+bordes seleccionados, compatible con claro/oscuro/AMOLED. La visualización opcional y desactivada por defecto es un esquema estático
+del alcance de la órbita o de las dos fuentes virtuales. Está rotulado como
+estático: no finge análisis musical ni una posición de fase en tiempo real.
+Se puede ocultar y no ejecuta bucles de dibujo al estar oculta. No hay animación
+nueva que ignore reducción de movimiento. No se añade blur pesado por tarjeta.
 
 ## Verificación y límites de publicación
 

@@ -1,6 +1,11 @@
 package com.music.bitchord.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
@@ -53,6 +58,13 @@ fun SpatialSceneControls() {
         }
         Text(if (enabled) "Recomendado con audífonos. No separa instrumentos ni sigue la cabeza."
             else "Activa el interruptor de audio espacial para escuchar el efecto.", style = MaterialTheme.typography.bodySmall)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Mostrar escenario", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
+            Switch(checked = settings.visualization, onCheckedChange = {
+                AppSettings.setSpatialScene(settings.copy(visualization = it))
+            })
+        }
+        if (settings.visualization) SpatialScenario(settings)
         if (settings.mode != SpatialMode.ORIGINAL) {
             val profiles = if (settings.mode == SpatialMode.EIGHT_D) listOf("Suave", "Equilibrado", "Inmersivo") else listOf("Natural", "Envolvente", "Cinemático")
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -89,5 +101,34 @@ private fun SpatialSlider(label: String, value: Float, enabled: Boolean, onChang
     Column {
         Text("$label · ${(value * 100).roundToInt()} %", style = MaterialTheme.typography.labelLarge)
         Slider(value = value, onValueChange = onChange, enabled = enabled, valueRange = 0f..1f)
+    }
+}
+
+/** Static model diagram: extent/virtual speakers, never an invented live audio analysis. */
+@Composable
+private fun SpatialScenario(settings: SpatialSettings) {
+    val color = MaterialTheme.colorScheme.primary
+    val outline = MaterialTheme.colorScheme.outlineVariant
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxWidth().height(130.dp), contentAlignment = Alignment.Center) {
+            Canvas(Modifier.fillMaxSize().semantics {
+                contentDescription = "Esquema estático del escenario espacial seleccionado"
+            }) {
+                val radius = size.height * (.22f + .2f * settings.selected.width)
+                for (scale in listOf(.5f, .75f, 1f)) {
+                    drawCircle(outline.copy(alpha = .6f), radius * scale, style = Stroke(1.dp.toPx()))
+                }
+                if (settings.mode == SpatialMode.ADVANCED) {
+                    drawCircle(color, 5.dp.toPx(), Offset(center.x - radius, center.y))
+                    drawCircle(color, 5.dp.toPx(), Offset(center.x + radius, center.y))
+                }
+            }
+            Icon(Icons.Rounded.Headphones, contentDescription = null, tint = color, modifier = Modifier.size(28.dp))
+        }
+        Text(when (settings.mode) {
+            SpatialMode.ORIGINAL -> "Estéreo con ensanchamiento y crossfeed"
+            SpatialMode.EIGHT_D -> "Alcance de la órbita · esquema estático"
+            SpatialMode.ADVANCED -> "Dos fuentes virtuales · esquema estático"
+        }, style = MaterialTheme.typography.bodySmall)
     }
 }
