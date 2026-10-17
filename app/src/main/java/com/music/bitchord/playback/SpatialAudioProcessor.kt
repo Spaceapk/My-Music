@@ -166,7 +166,7 @@ class SpatialAudioProcessor : BaseAudioProcessor() {
     }
 
     override fun onReset() {
-        scene.reset()
+        scene.release()
         delayLeft = FloatArray(0)
         delayRight = FloatArray(0)
         delayIndex = 0

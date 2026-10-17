@@ -21,6 +21,7 @@ class SpatialSceneEngine {
     private var historyL = FloatArray(1); private var historyR = FloatArray(1)
     private var roomL = FloatArray(1); private var roomR = FloatArray(1)
     private var index = 0; private var roomIndexL = 0; private var roomIndexR = 0
+    private var parked = false
     private var farL = 0f; private var farR = 0f
     val active: Boolean get() = originalWeight + eightWeight + advancedWeight > .000001f
 
@@ -32,10 +33,21 @@ class SpatialSceneEngine {
         reset()
     }
     fun reset() {
-        historyL.fill(0f); historyR.fill(0f); roomL.fill(0f); roomR.fill(0f)
+        clearHistories()
+        parked = false
         index = 0; roomIndexL = 0; roomIndexR = 0; farL = 0f; farR = 0f; phase = 0.0
         originalWeight = 0f; eightWeight = 0f; advancedWeight = 0f
     }
+    private fun clearHistories() {
+        historyL.fill(0f); historyR.fill(0f); roomL.fill(0f); roomR.fill(0f)
+        farL = 0f; farR = 0f
+    }
+    fun release() {
+        historyL = FloatArray(1); historyR = FloatArray(1)
+        roomL = FloatArray(1); roomR = FloatArray(1)
+        reset()
+    }
+    private fun park() { if (!parked) { clearHistories(); parked = true } }
     private fun approach(value: Float, target: Float) = if (abs(target - value) < .001f) target else value + smooth * (target - value)
     private fun delayed(buffer: FloatArray, samples: Float): Float {
         var position = index - samples
@@ -49,10 +61,11 @@ class SpatialSceneEngine {
         eightWeight = approach(eightWeight, if (enabled && settings.mode == SpatialMode.EIGHT_D) 1f else 0f)
         advancedWeight = approach(advancedWeight, if (enabled && settings.mode == SpatialMode.ADVANCED) 1f else 0f)
         // Exact bypass once tails have settled; no residual rounding changes to dry PCM.
-        if (!enabled && !active) { left = l; right = r; return }
+        if (!enabled && !active) { park(); left = l; right = r; return }
         if (originalWeight == 1f && eightWeight == 0f && advancedWeight == 0f) {
-            left = originalL; right = originalR; return
+            park(); left = originalL; right = originalR; return
         }
+        parked = false
         val a = settings.eightD; val b = settings.advanced
         amount8 = approach(amount8, a.intensity); speed = approach(speed, a.speed); width8 = approach(width8, a.width)
         amountA = approach(amountA, b.intensity); widthA = approach(widthA, b.width)

@@ -67,6 +67,17 @@ class SpatialSceneEngineTest {
         }
         assertTrue("Discontinuity $maxStep", maxStep < .01f)
     }
+    @Test fun parkedRoutesDoNotReplayStaleReverb() {
+        val engine = SpatialSceneEngine(); engine.configure(48000)
+        val orbit = SpatialSettings(mode = SpatialMode.EIGHT_D)
+        repeat(48000) { engine.process(.5f, .5f, .5f, .5f, true, orbit) }
+        repeat(48000) { engine.process(0f, 0f, 0f, 0f, false, orbit) }
+        repeat(10000) {
+            engine.process(0f, 0f, 0f, 0f, true, orbit)
+            assertEquals(0f, engine.left, 0f); assertEquals(0f, engine.right, 0f)
+        }
+        engine.release()
+    }
     @Test fun binauralImpulseContainsDelayedFilteredContralateralEnergy() {
         val engine = SpatialSceneEngine(); engine.configure(48000)
         val settings = SpatialSettings(mode = SpatialMode.ADVANCED, advanced = SpatialParameters(intensity = 1f, reverb = 0))

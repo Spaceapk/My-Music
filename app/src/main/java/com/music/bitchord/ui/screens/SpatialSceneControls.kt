@@ -114,7 +114,8 @@ private fun SpatialScenario(settings: SpatialSettings) {
             Canvas(Modifier.fillMaxSize().semantics {
                 contentDescription = "Esquema estático del escenario espacial seleccionado"
             }) {
-                val radius = size.height * (.22f + .2f * settings.selected.width)
+                val width = if (settings.mode == SpatialMode.ORIGINAL) 1f else settings.selected.width
+                val radius = size.height * (.22f + .2f * width)
                 for (scale in listOf(.5f, .75f, 1f)) {
                     drawCircle(outline.copy(alpha = .6f), radius * scale, style = Stroke(1.dp.toPx()))
                 }
