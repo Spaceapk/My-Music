@@ -36,7 +36,7 @@ inventa un escenario estéreo cuando la ruta no tiene dos canales.
   No se incorpora una biblioteca externa ni datos HRTF sin validar su licencia.
 
 Los modos nuevos son combinaciones convexas de señales con ganancia <=1;
-la reverberación tiene realimentación .35 y entrada .65 (estable). Esto
+la reverberación tiene realimentación .35 y entrada .65 (estable), con amortiguación a 1.8 kHz de las reflexiones tempranas. Esto
 previene picos añadidos sobre PCM normalizada en esas rutas. EQ y crossfade
 pueden añadir ganancia posteriormente: se mantiene la protección final
 existente. No hay promesa de reproducción bit-perfect con DSP activo.

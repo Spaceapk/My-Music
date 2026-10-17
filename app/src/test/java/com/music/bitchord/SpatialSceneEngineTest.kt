@@ -57,15 +57,17 @@ class SpatialSceneEngineTest {
     }
     @Test fun smoothControlsAndSwitchesDoNotStepOnConstantInput() {
         val engine = SpatialSceneEngine(); engine.configure(48000)
-        var previous = 0f; var maxStep = 0f
+        var previous = 0f; var maxStep = 0f; var maxStepFrame = -1
         repeat(96000) { i ->
             val mode = SpatialMode.entries[(i / 24000) % 3]
             val p = SpatialParameters(intensity = if (i % 1000 < 500) 0f else 1f, width = 1f, reverb = 2)
             engine.process(.5f, .5f, .41f, .41f, true, SpatialSettings(mode, p, p))
-            if (i > 10000) maxStep = max(maxStep, abs(engine.left - previous))
+            if (i > 10000 && abs(engine.left - previous) > maxStep) {
+                maxStep = abs(engine.left - previous); maxStepFrame = i
+            }
             previous = engine.left
         }
-        assertTrue("Discontinuity $maxStep", maxStep < .01f)
+        assertTrue("Discontinuity $maxStep at frame $maxStepFrame", maxStep < .01f)
     }
     @Test fun parkedRoutesDoNotReplayStaleReverb() {
         val engine = SpatialSceneEngine(); engine.configure(48000)

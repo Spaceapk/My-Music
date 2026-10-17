@@ -21,6 +21,8 @@ class SpatialSceneEngine {
     private var historyL = FloatArray(1); private var historyR = FloatArray(1)
     private var roomL = FloatArray(1); private var roomR = FloatArray(1)
     private var index = 0; private var roomIndexL = 0; private var roomIndexR = 0
+    private var roomFilteredL = 0f; private var roomFilteredR = 0f
+    private var roomCoefficient = .2f
     private var parked = false
     private var farL = 0f; private var farR = 0f
     val active: Boolean get() = originalWeight + eightWeight + advancedWeight > .000001f
@@ -28,6 +30,7 @@ class SpatialSceneEngine {
     fun configure(sampleRate: Int) {
         rate = sampleRate.coerceIn(8000, 384000)
         smooth = (1.0 - exp(-1.0 / (.03 * rate))).toFloat()
+        roomCoefficient = (1.0 - exp(-2.0 * PI * 1800.0 / rate)).toFloat()
         historyL = FloatArray((rate * .001).toInt() + 3); historyR = FloatArray(historyL.size)
         roomL = FloatArray((rate * .037).toInt()); roomR = FloatArray((rate * .043).toInt())
         reset()
@@ -41,6 +44,7 @@ class SpatialSceneEngine {
     private fun clearHistories() {
         historyL.fill(0f); historyR.fill(0f); roomL.fill(0f); roomR.fill(0f)
         farL = 0f; farR = 0f
+        roomFilteredL = 0f; roomFilteredR = 0f
     }
     fun release() {
         historyL = FloatArray(1); historyR = FloatArray(1)
@@ -94,10 +98,13 @@ class SpatialSceneEngine {
         val echoL = roomL[roomIndexL]; val echoR = roomR[roomIndexR]
         roomL[roomIndexL] = dryL * .65f + echoR * .35f
         roomR[roomIndexR] = dryR * .65f + echoL * .35f
-        val eightL = dryL + amount8 * ((orbitL * (1f - rev8) + echoL * rev8) - dryL)
-        val eightR = dryR + amount8 * ((orbitR * (1f - rev8) + echoR * rev8) - dryR)
-        val advancedL = dryL + amountA * ((binauralL * (1f - revA) + echoL * revA) - dryL)
-        val advancedR = dryR + amountA * ((binauralR * (1f - revA) + echoR * revA) - dryR)
+        // Damp the early reflection edges instead of introducing a discrete delayed step.
+        roomFilteredL += roomCoefficient * (echoL - roomFilteredL)
+        roomFilteredR += roomCoefficient * (echoR - roomFilteredR)
+        val eightL = dryL + amount8 * ((orbitL * (1f - rev8) + roomFilteredL * rev8) - dryL)
+        val eightR = dryR + amount8 * ((orbitR * (1f - rev8) + roomFilteredR * rev8) - dryR)
+        val advancedL = dryL + amountA * ((binauralL * (1f - revA) + roomFilteredL * revA) - dryL)
+        val advancedR = dryR + amountA * ((binauralR * (1f - revA) + roomFilteredR * revA) - dryR)
         val dryWeight = (1f - originalWeight - eightWeight - advancedWeight).coerceAtLeast(0f)
         // Original route retains its historical headroom; new routes are convex combinations.
         left = dryL * dryWeight + originalL * originalWeight + eightL * eightWeight + advancedL * advancedWeight
