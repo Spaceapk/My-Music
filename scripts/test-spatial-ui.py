@@ -49,21 +49,28 @@ for theme, font in [('DARK', '1.0'), ('LIGHT', '1.0'), ('DARK', '1.5')]:
     adb('shell','settings','put','system','font_scale',font)
     adb('shell','am','start','-W','-n',PACKAGE+'/com.music.bitchord.MainActivity')
     tap('Settings')
-    # The settings search hint is not exported on every Compose/Android version.
-    # Reach the real row by scrolling, without relying on that placeholder.
-    for _ in range(10):
-        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.3)),str(size[0]//2),str(int(size[1]*.8)),'150')
+    # Use the actual EditText exported by Android, not its unexported hint.
+    # Never start a scroll on the search field: that can open the IME and
+    # turn subsequent swipes into gesture typing.
     for _ in range(20):
-        candidates = [n for n in tree().iter('node') if n.get('text','').split('\n')[0] == 'Spatial audio']
-        visible = [n for n in candidates if 0 < list(map(int,re.findall(r'\d+',n.get('bounds'))))[1]
-            and list(map(int,re.findall(r'\d+',n.get('bounds'))))[3] < size[1]*.87]
-        if visible:
-            tap('Spatial audio')
+        root = tree()
+        editors = [n for n in root.iter('node') if n.get('class') == 'android.widget.EditText']
+        if editors:
             break
-        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.7)),str(size[0]//2),str(int(size[1]*.3)),'200')
+        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.55)),str(size[0]//2),str(int(size[1]*.85)),'180')
     else:
-        capture('missing-settings-row')
-        raise AssertionError('Spatial audio settings row is not reachable')
+        capture('missing-search-editor')
+        raise AssertionError('Settings search editor is not reachable')
+    if any(n.get('content-desc') == 'Clear search' for n in root.iter('node')):
+        tap('Clear search')
+    editor = next(n for n in tree().iter('node') if n.get('class') == 'android.widget.EditText')
+    l,t,r,b = map(int,re.findall(r'\d+', editor.get('bounds')))
+    adb('shell','input','tap',str((l+r)//2),str((t+b)//2))
+    adb('shell','input','text','Spatial')
+    ime = adb('shell','dumpsys','input_method').decode(errors='replace')
+    if re.search(r'(?:mInputShown|mIsInputViewShown|isInputViewShown)=true', ime):
+        adb('shell','input','keyevent','4')
+    tap('Spatial audio')
     # Expand the Material sheet so contextual sliders are reachable.
     adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.6)),str(size[0]//2),str(int(size[1]*.12)),'350')
     label=theme.lower()+'-'+font
