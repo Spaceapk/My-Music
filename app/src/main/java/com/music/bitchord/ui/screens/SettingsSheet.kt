@@ -196,6 +196,14 @@ fun SettingsScreen(
     // which caches the codec-list walk for the life of the process.
     val dolbyAtmosSupported = DeviceCodecs.playsDolbyAtmos
     val spatialAudio by AppSettings.spatialAudio.collectAsStateWithLifecycle()
+    var showSpatialScene by remember { mutableStateOf(false) }
+    if (showSpatialScene) {
+        ModalBottomSheet(onDismissRequest = { showSpatialScene = false }) {
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
+                SpatialSceneControls()
+            }
+        }
+    }
     val nerdStats by AppSettings.showNerdStats.collectAsStateWithLifecycle()
     val reduceAnimation by AppSettings.reduceAnimation.collectAsStateWithLifecycle()
     val reduceDynamicBlur by AppSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
@@ -644,7 +652,7 @@ fun SettingsScreen(
                             ),
                         )
                     },
-                    onClick = { AppSettings.setSpatialAudio(!spatialAudio) },
+                    onClick = { showSpatialScene = true },
                 )
             }
             // The system panel is not listed here as well. A device with a
