@@ -1,5 +1,6 @@
 """Verify first-open notes, acknowledgement and offline downloaded-note persistence."""
 import re
+import sys
 import subprocess
 import time
 import xml.etree.ElementTree as ET
@@ -26,7 +27,7 @@ def find(text):
         time.sleep(1)
     raise AssertionError('Missing new-version text: '+text)
 
-def dismiss():
+def dismiss(expected_code=7):
     b = find('Back')
     l,t,r,b = map(int, re.findall(r'\d+', b.get('bounds')))
     adb('shell', 'input', 'tap', str((l+r)//2), str((t+b)//2))
@@ -37,12 +38,18 @@ def dismiss():
         try:
             raw = adb('exec-out', 'cat', '/data/user/0/'+PACKAGE+'/shared_prefs/space_updates.xml')
             Path('device-notes-preferences.xml').write_text(raw)
-            saved = any(e.tag == 'int' and e.get('name') == 'seen_version' and e.get('value') == '7' for e in ET.fromstring(raw))
+            saved = any(e.tag == 'int' and e.get('name') == 'seen_version' and e.get('value') == str(expected_code) for e in ET.fromstring(raw))
         except (subprocess.CalledProcessError, ET.ParseError):
             saved = False
         if not visible and saved: return
         time.sleep(0.5)
     raise AssertionError('Acknowledgement did not close the dialog and persist seen_version')
+
+if len(sys.argv) > 1 and sys.argv[1] == 'previous':
+    start()
+    find('What is new in Space Music 2.2.0')
+    dismiss(6)
+    raise SystemExit(0)
 
 start()
 find('What is new in Space Music 2.3.0')
