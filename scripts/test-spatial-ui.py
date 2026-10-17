@@ -49,11 +49,21 @@ for theme, font in [('DARK', '1.0'), ('LIGHT', '1.0'), ('DARK', '1.5')]:
     adb('shell','settings','put','system','font_scale',font)
     adb('shell','am','start','-W','-n',PACKAGE+'/com.music.bitchord.MainActivity')
     tap('Settings')
-    field=find('Search settings')
-    tap('Search settings')
-    adb('shell','input','text','Spatial')
-    adb('shell','input','keyevent','4')
-    tap('Spatial audio')
+    # The settings search hint is not exported on every Compose/Android version.
+    # Reach the real row by scrolling, without relying on that placeholder.
+    for _ in range(10):
+        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.3)),str(size[0]//2),str(int(size[1]*.8)),'150')
+    for _ in range(20):
+        candidates = [n for n in tree().iter('node') if n.get('text','').split('\n')[0] == 'Spatial audio']
+        visible = [n for n in candidates if 0 < list(map(int,re.findall(r'\d+',n.get('bounds'))))[1]
+            and list(map(int,re.findall(r'\d+',n.get('bounds'))))[3] < size[1]*.87]
+        if visible:
+            tap('Spatial audio')
+            break
+        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.7)),str(size[0]//2),str(int(size[1]*.3)),'200')
+    else:
+        capture('missing-settings-row')
+        raise AssertionError('Spatial audio settings row is not reachable')
     # Expand the Material sheet so contextual sliders are reachable.
     adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.6)),str(size[0]//2),str(int(size[1]*.12)),'350')
     label=theme.lower()+'-'+font

@@ -110,7 +110,7 @@ jobs:
             device-startup-log.txt
             device-crash-log.txt
             device-*.png
-            device-navigation.xml
+            device-*.xml
 
   optimized-device-test:
     needs: build
@@ -175,4 +175,5 @@ jobs:
             device-startup-log.txt
             device-crash-log.txt
             device-full-log.txt
+            device-*.xml
             device-*.png
