@@ -44,7 +44,7 @@ existente. No hay promesa de reproducción bit-perfect con DSP activo.
 ## Transiciones, preferencias y diseño
 
 Pesos de rutas y controles se suavizan con constante temporal de 30 ms
-(se asientan en aproximadamente 350 ms); no se modifica play/seek ni se
+(se asientan en aproximadamente 210 ms, con ajuste final al 0.1% para evitar estancamiento Float32); no se modifica play/seek ni se
 reconstruye el reproductor. Un bloque usa un snapshot inmutable. Retardos
 preasignados al configurar; no hay asignaciones por frame en el motor.
 En original ya asentado se omiten los cálculos de las rutas nuevas.

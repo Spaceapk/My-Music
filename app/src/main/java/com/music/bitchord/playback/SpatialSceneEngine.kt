@@ -36,7 +36,7 @@ class SpatialSceneEngine {
         index = 0; roomIndexL = 0; roomIndexR = 0; farL = 0f; farR = 0f; phase = 0.0
         originalWeight = 0f; eightWeight = 0f; advancedWeight = 0f
     }
-    private fun approach(value: Float, target: Float) = if (abs(target - value) < .00001f) target else value + smooth * (target - value)
+    private fun approach(value: Float, target: Float) = if (abs(target - value) < .001f) target else value + smooth * (target - value)
     private fun delayed(buffer: FloatArray, samples: Float): Float {
         var position = index - samples
         if (position < 0) position += buffer.size
@@ -85,14 +85,10 @@ class SpatialSceneEngine {
         val eightR = dryR + amount8 * ((orbitR * (1f - rev8) + echoR * rev8) - dryR)
         val advancedL = dryL + amountA * ((binauralL * (1f - revA) + echoL * revA) - dryL)
         val advancedR = dryR + amountA * ((binauralR * (1f - revA) + echoR * revA) - dryR)
-        if (originalWeight == 1f && eightWeight == 0f && advancedWeight == 0f) {
-            left = originalL; right = originalR
-        } else {
         val dryWeight = (1f - originalWeight - eightWeight - advancedWeight).coerceAtLeast(0f)
         // Original route retains its historical headroom; new routes are convex combinations.
         left = dryL * dryWeight + originalL * originalWeight + eightL * eightWeight + advancedL * advancedWeight
         right = dryR * dryWeight + originalR * originalWeight + eightR * eightWeight + advancedR * advancedWeight
-        }
         index = (index + 1) % historyL.size
         roomIndexL = (roomIndexL + 1) % roomL.size; roomIndexR = (roomIndexR + 1) % roomR.size
     }
