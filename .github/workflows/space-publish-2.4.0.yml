@@ -24,12 +24,12 @@ jobs:
         run: |
           set -euo pipefail
           git diff --exit-code ee77521288c63cf7654c8952c989acb65afc0a73 HEAD -- app shared sharedUi gradle build.gradle.kts settings.gradle.kts gradle.properties
-          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .head_sha)" = 5451724a15339ce80960c67fa823c0c63059f41c
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39040923835 --jq .head_sha)" = 2bc9e628289412fbb51b5ad09be09310e07fade3
           test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039547497 --jq .head_sha)" = 372827b1f3a86862b927da833ae8a18e25393689
           ready=false
           for attempt in $(seq 1 150); do
-            final_state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .status)
-            final_result=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .conclusion)
+            final_state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39040923835 --jq .status)
+            final_result=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39040923835 --jq .conclusion)
             if [ "$final_state" = completed ] && [ "$final_result" != success ]; then
               echo 'Final validation failed; release blocked.'; exit 1
             fi
@@ -42,7 +42,7 @@ jobs:
           PY_STATUS
             )
             git fetch origin main
-            if [ "$final_result" = success ] && [ "$signed" = yes ] && git diff --quiet 5451724a15339ce80960c67fa823c0c63059f41c origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
+            if [ "$final_result" = success ] && [ "$signed" = yes ] && git diff --quiet 2bc9e628289412fbb51b5ad09be09310e07fade3 origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
               ready=true; break
             fi
             sleep 10
@@ -74,7 +74,7 @@ jobs:
           if gh release view v2.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Refusing to replace an existing release.'; exit 1
           fi
-          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 5451724a15339ce80960c67fa823c0c63059f41c --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
+          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 2bc9e628289412fbb51b5ad09be09310e07fade3 --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
       - uses: actions/upload-artifact@v4
         if: success()
         with:
