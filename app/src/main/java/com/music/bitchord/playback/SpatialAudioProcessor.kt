@@ -90,6 +90,7 @@ class SpatialAudioProcessor : BaseAudioProcessor() {
 
         val snapshot = settings
         val isEnabled = enabled
+        if (isEnabled && !scene.active) clearOriginalHistory()
         val totalSamples = block.frameCount * 2
         var idx = 0
         var dIdx = delayIndex
@@ -156,6 +157,14 @@ class SpatialAudioProcessor : BaseAudioProcessor() {
         return inputAudioFormat
     }
 
+    private fun clearOriginalHistory() {
+        delayLeft.fill(0f)
+        delayRight.fill(0f)
+        delayIndex = 0
+        lowpassLeft = 0f
+        lowpassRight = 0f
+    }
+
     override fun onFlush() {
         scene.reset()
         delayLeft.fill(0f)
@@ -197,6 +206,7 @@ class SpatialAudioProcessor : BaseAudioProcessor() {
             return
         }
 
+        if (enabled && !scene.active) clearOriginalHistory()
         var dIdx = delayIndex
         var lpL = lowpassLeft
         var lpR = lowpassRight

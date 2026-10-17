@@ -80,6 +80,29 @@ class SpatialSceneEngineTest {
         }
         engine.release()
     }
+    @Test fun reenabledOriginalDoesNotReplayHistoryFromBeforeBypass() {
+        val processor = SpatialAudioProcessor()
+        processor.configure(48000, 2)
+        val block = com.music.bitchord.playback.audio.AudioBlock(2, 512)
+        block.reset(512)
+        fun feed(left: Float) {
+            for (i in 0 until block.samples.size step 2) {
+                block.samples[i] = left; block.samples[i + 1] = 0f
+            }
+            processor.process(block)
+        }
+        processor.enabled = true
+        repeat(100) { feed(1f) }
+        processor.enabled = false
+        repeat(100) { feed(1f) }
+        repeat(100) { feed(0f) }
+        processor.enabled = true
+        repeat(4) {
+            feed(0f)
+            assertTrue("Original replayed dormant crossfeed", block.samples.all { it == 0f })
+        }
+        processor.reset()
+    }
     @Test fun binauralImpulseContainsDelayedFilteredContralateralEnergy() {
         val engine = SpatialSceneEngine(); engine.configure(48000)
         val settings = SpatialSettings(mode = SpatialMode.ADVANCED, advanced = SpatialParameters(intensity = 1f, reverb = 0))
