@@ -89,8 +89,8 @@ for theme, font in [('DARK', '1.0'), ('LIGHT', '1.0'), ('DARK', '1.5')]:
     if re.search(r'(?:mInputShown|mIsInputViewShown|isInputViewShown)=true', ime):
         adb('shell','input','keyevent','4')
     tap('Spatial audio')
-    # Expand the Material sheet so contextual sliders are reachable.
-    adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.6)),str(size[0]//2),str(int(size[1]*.12)),'350')
+    # Expand through the native handle, without dragging a card or slider.
+    expand_sheet()
     label=theme.lower()+'-'+font
     for mode in ['Espacial original','Audio 8D','Espacial avanzado']:
         expand_sheet()

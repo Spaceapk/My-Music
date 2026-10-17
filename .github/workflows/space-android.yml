@@ -27,7 +27,7 @@ jobs:
           set -euo pipefail
           use=false
           changed=$(git diff --name-only ee77521288c63cf7654c8952c989acb65afc0a73 HEAD)
-          if [ -z "$changed" ] || ! printf '%s\n' "$changed" | rg -qv '^(README\.md$|CHANGELOG\.md$|docs/|scripts/|\.github/)'; then
+          if [ -z "$changed" ] || ! printf '%s\n' "$changed" | rg -qv '^(README\.md$|CHANGELOG\.md$|docs/|scripts/(test-spatial-ui\.py|test-library-navigation\.py|test-device\.sh)$|\.github/workflows/space-android\.yml$)'; then
             if [ "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39036566464 --jq .head_sha)" = ee77521288c63cf7654c8952c989acb65afc0a73 ] && [ "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39036566464/jobs --jq '.jobs[] | select(.name == "build") | .conclusion')" = success ] && [ "$(gh api repos/$GITHUB_REPOSITORY/actions/artifacts/12102881120 --jq .expired 2>/dev/null || echo true)" = false ]; then
               use=true
             fi
