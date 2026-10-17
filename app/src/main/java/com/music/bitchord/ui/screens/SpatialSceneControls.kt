@@ -27,7 +27,10 @@ fun SpatialSceneControls() {
     val descriptions = listOf("Conserva el sonido espacial actual.", "Música en movimiento alrededor de ti.", "Profundidad y posicionamiento binaural paramétrico.")
     val icons = listOf(Icons.Rounded.SurroundSound, Icons.Rounded.Waves, Icons.Rounded.Headphones)
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Audio espacial", style = MaterialTheme.typography.titleMedium)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Audio espacial", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+            Switch(checked = enabled, onCheckedChange = AppSettings::setSpatialAudio)
+        }
         Text("Personaliza cómo se mueve y se siente tu música.", style = MaterialTheme.typography.bodySmall)
         SpatialMode.entries.forEachIndexed { index, mode ->
             val selected = settings.mode == mode

@@ -642,16 +642,7 @@ fun SettingsScreen(
                     } else {
                         stringResource(R.string.spatial_audio_subtitle)
                     },
-                    trailing = {
-                        Switch(
-                            checked = spatialAudio,
-                            onCheckedChange = AppSettings::setSpatialAudio,
-                            colors = SwitchDefaults.colors(
-                                checkedTrackColor = MaterialTheme.colorScheme.primary,
-                                checkedBorderColor = MaterialTheme.colorScheme.primary,
-                            ),
-                        )
-                    },
+                    trailing = { Icon(Icons.Rounded.Tune, contentDescription = "Configurar audio espacial") },
                     onClick = { showSpatialScene = true },
                 )
             }
