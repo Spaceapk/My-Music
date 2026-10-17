@@ -3,5 +3,5 @@
     <string name="space_playlist_actions">Opciones de la lista</string>
     <string name="space_song_actions">Opciones de la canción</string>
     <string name="space_whats_new">Novedades de Space Music %1$s</string>
-    <string name="space_whats_new_body">Más espacio para tu música.\n\n• Cabecera compacta con búsqueda al tocar la lupa.\n• Orden independiente guardado por lista: manual, título, artista o añadidas recientemente.\n• La reproducción sigue el orden visible.\n• El orden de Canciones sigue siendo independiente.</string>
+    <string name="space_whats_new_body">Más espacio para tu música.\n\n• Barra inferior compacta, translúcida y con desenfoque Liquid Glass.\n• Las listas se desplazan detrás de los controles, sin el fondo blanco opaco.\n• Ajustes presenta la identidad de Space Music.\n• Atribuciones y licencia disponibles sin conexión en Licencias y código abierto.</string>
 </resources>
