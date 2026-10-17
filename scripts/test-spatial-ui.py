@@ -65,31 +65,42 @@ for theme, font in [('DARK', '1.0'), ('LIGHT', '1.0'), ('DARK', '1.5')]:
     assert re.fullmatch(r'\d+:\d+',owner)
     adb('shell','chown',owner,path); adb('shell','rm','-f',path+'.bak')
     adb('shell','settings','put','system','font_scale',font)
-    adb('shell','am','start','-W','-n',PACKAGE+'/com.music.bitchord.MainActivity')
-    tap('Settings')
-    # Use the actual EditText exported by Android, not its unexported hint.
-    # Never start a scroll on the search field: that can open the IME and
-    # turn subsequent swipes into gesture typing.
-    for _ in range(20):
-        root = tree()
-        editors = [n for n in root.iter('node') if n.get('class') == 'android.widget.EditText']
-        if editors:
+    adb('shell','am','start','-W','-f','0x10008000','-n',PACKAGE+'/com.music.bitchord.MainActivity')
+    # Scope navigation to the actual Settings screen. Outgoing library content
+    # may remain in the accessibility tree during a transition; never type into
+    # an unscoped editor or use Back to dismiss its keyboard.
+    time.sleep(1)
+    for _ in range(12):
+        root=tree()
+        if any(n.get('text') == 'Settings' and n.get('class') == 'android.widget.TextView' for n in root.iter('node')):
             break
-        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.55)),str(size[0]//2),str(int(size[1]*.85)),'180')
+        buttons=[n for n in root.iter('node') if n.get('content-desc') == 'Settings']
+        if buttons:
+            l,t,r,b=map(int,re.findall(r'\d+',buttons[0].get('bounds')))
+            adb('shell','input','tap',str((l+r)//2),str((t+b)//2))
+        time.sleep(.4)
     else:
-        capture('missing-search-editor')
-        raise AssertionError('Settings search editor is not reachable')
-    if any(n.get('content-desc') == 'Clear search' for n in root.iter('node')):
-        tap('Clear search')
-    editor = next(n for n in tree().iter('node') if n.get('class') == 'android.widget.EditText')
-    l,t,r,b = map(int,re.findall(r'\d+', editor.get('bounds')))
-    adb('shell','input','tap',str((l+r)//2),str((t+b)//2))
-    time.sleep(.4)
-    adb('shell','input','text','Spatial')
-    # SearchField handles IME Search by clearing focus. Back can instead close
-    # Settings if the keyboard visibility report lags behind its real state.
-    adb('shell','input','keyevent','66')
-    tap('Spatial audio')
+        capture('settings-not-open')
+        raise AssertionError('Settings screen did not open')
+    for _ in range(24):
+        root=tree()
+        rows=[n for n in root.iter('node') if n.get('text','').split('\n')[0] == 'Spatial audio']
+        reachable=[]
+        for n in rows:
+            l,t,r,b=map(int,re.findall(r'\d+',n.get('bounds')))
+            if t > 80 and b < size[1]*.82 and r > l:
+                reachable.append(n)
+        if reachable:
+            l,t,r,b=map(int,re.findall(r'\d+',reachable[0].get('bounds')))
+            adb('shell','input','tap',str((l+r)//2),str((t+b)//2))
+            time.sleep(.4)
+            break
+        # Pointer-down stays below the search field, so a scroll cannot become
+        # editor focus or gesture typing on the software keyboard.
+        adb('shell','input','swipe',str(size[0]//2),str(int(size[1]*.70)),str(size[0]//2),str(int(size[1]*.32)),'300')
+    else:
+        capture('spatial-row-not-reachable')
+        raise AssertionError('Spatial audio row is not reachable by scrolling')
     # Expand through the native handle, without dragging a card or slider.
     expand_sheet()
     label=theme.lower()+'-'+font
