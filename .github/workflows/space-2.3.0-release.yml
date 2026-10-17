@@ -1,5 +1,5 @@
 name: Verify signed Space Music 2.3.0 navigation, update and compatibility
-# Wait for actual dialog acknowledgement before cold-start persistence assertions.
+# Wait for package-replacement broadcasts before launching the upgraded application.
 on:
   push:
     branches: [space-2.3.0-publication]

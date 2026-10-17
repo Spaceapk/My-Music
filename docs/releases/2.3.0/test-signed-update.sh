@@ -66,6 +66,9 @@ python3 docs/releases/2.3.0/verify-upgrade-playlist.py seed
 adb shell svc wifi disable
 adb shell svc data disable
 adb install -r --no-incremental dist/Space-Music-2.3.0.apk
+# Android 12 delivers package-replacement broadcasts after adb install returns.
+# Let PackageManager finish its own force-stop before starting the upgraded app.
+sleep 3
 python3 docs/releases/2.3.0/verify-whatsnew.py
 python3 docs/releases/2.3.0/verify-upgrade-playlist.py verify
 python3 docs/releases/2.3.0/verify-upgrade-playlist.py capture_dark
