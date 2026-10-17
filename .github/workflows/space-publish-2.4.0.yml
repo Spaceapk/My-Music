@@ -1,0 +1,82 @@
+name: Publish Space Music 2.4.0 from completed signed acceptance
+on:
+  push:
+    branches: [space-2.4.0-publication]
+    paths: ['.github/workflows/space-publish-2.4.0.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: space-2.4.0-immutable-promotion
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require matching compiled application, successful latest validation and signed device checks
+        run: |
+          set -euo pipefail
+          git diff --exit-code ee77521288c63cf7654c8952c989acb65afc0a73 HEAD -- app shared sharedUi gradle build.gradle.kts settings.gradle.kts gradle.properties
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .head_sha)" = 5451724a15339ce80960c67fa823c0c63059f41c
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039547497 --jq .head_sha)" = 372827b1f3a86862b927da833ae8a18e25393689
+          ready=false
+          for attempt in $(seq 1 150); do
+            final_state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .status)
+            final_result=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039510228 --jq .conclusion)
+            if [ "$final_state" = completed ] && [ "$final_result" != success ]; then
+              echo 'Final validation failed; release blocked.'; exit 1
+            fi
+            gh api repos/$GITHUB_REPOSITORY/actions/runs/39039547497/jobs > /tmp/signed-jobs.json
+            signed=$(python3 - <<'PY_STATUS'
+          import json
+          j=json.load(open('/tmp/signed-jobs.json'))['jobs']
+          j=[v for v in j if v['name']=='sign' or v['name'].startswith('device (')]
+          print('yes' if len(j)==6 and all(v['conclusion']=='success' for v in j) else 'no')
+          PY_STATUS
+            )
+            git fetch origin main
+            if [ "$final_result" = success ] && [ "$signed" = yes ] && git diff --quiet 5451724a15339ce80960c67fa823c0c63059f41c origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
+              ready=true; break
+            fi
+            sleep 10
+          done
+          test "$ready" = true
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-2.4.0-signed
+          path: dist
+          run-id: '39039547497'
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: space-2.4.0-device-*
+          path: verification
+          run-id: '39039547497'
+          github-token: ${{ github.token }}
+      - name: Generate report from actual completed evidence and publish the immutable APK
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum -c SHA256SUMS.txt)
+          echo '0d02944d9752850d54bb54f48c6fe6d19ed7a6bbd7e4c1b72ae93e16265838d8  dist/Space-Music-2.4.0.apk' | sha256sum -c -
+          python3 scripts/create-spatial-report.py
+          cp docs/verification-2.4.0.md verification/
+          cp docs/space-2.4.0-notes.md verification/
+          mkdir -p verification/spatial
+          cp docs/spatial/manual-checklist.md verification/spatial/
+          (cd verification && zip -qr ../dist/Space-Music-2.4.0-verification.zip .)
+          if gh release view v2.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Refusing to replace an existing release.'; exit 1
+          fi
+          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 5451724a15339ce80960c67fa823c0c63059f41c --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: space-2.4.0-publication-report
+          path: docs/verification-2.4.0.md
