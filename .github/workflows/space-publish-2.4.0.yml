@@ -24,12 +24,13 @@ jobs:
         run: |
           set -euo pipefail
           git diff --exit-code ee77521288c63cf7654c8952c989acb65afc0a73 HEAD -- app shared sharedUi gradle build.gradle.kts settings.gradle.kts gradle.properties
-          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39040923835 --jq .head_sha)" = 2bc9e628289412fbb51b5ad09be09310e07fade3
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39041920395 --jq .head_sha)" = 2d1147fe50240c2dcc46af4c25cb27d94c5b204e
           test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39039547497 --jq .head_sha)" = 372827b1f3a86862b927da833ae8a18e25393689
+          test "$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39041512989 --jq .head_sha)" = 0bca2ee4b6a9413c290dcb5ddbe70dfd221773c2
           ready=false
           for attempt in $(seq 1 150); do
-            final_state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39040923835 --jq .status)
-            final_result=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39040923835 --jq .conclusion)
+            final_state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39041920395 --jq .status)
+            final_result=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39041920395 --jq .conclusion)
             if [ "$final_state" = completed ] && [ "$final_result" != success ]; then
               echo 'Final validation failed; release blocked.'; exit 1
             fi
@@ -37,12 +38,17 @@ jobs:
             signed=$(python3 - <<'PY_STATUS'
           import json
           j=json.load(open('/tmp/signed-jobs.json'))['jobs']
-          j=[v for v in j if v['name']=='sign' or v['name'].startswith('device (')]
-          print('yes' if len(j)==6 and all(v['conclusion']=='success' for v in j) else 'no')
+          j=[v for v in j if v['name']=='sign' or (v['name'].startswith('device (') and not v['name'].startswith('device (31,'))]
+          print('yes' if len(j)==5 and all(v['conclusion']=='success' for v in j) else 'no')
           PY_STATUS
             )
+            repair_state=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39041512989 --jq .status)
+            repair_result=$(gh api repos/$GITHUB_REPOSITORY/actions/runs/39041512989 --jq .conclusion)
+            if [ "$repair_state" = completed ] && [ "$repair_result" != success ]; then
+              echo 'Signed Android 12 acceptance failed; release blocked.'; exit 1
+            fi
             git fetch origin main
-            if [ "$final_result" = success ] && [ "$signed" = yes ] && git diff --quiet 2bc9e628289412fbb51b5ad09be09310e07fade3 origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
+            if [ "$final_result" = success ] && [ "$signed" = yes ] && [ "$repair_result" = success ] && git diff --quiet 2d1147fe50240c2dcc46af4c25cb27d94c5b204e origin/main -- app shared sharedUi gradle scripts build.gradle.kts settings.gradle.kts gradle.properties; then
               ready=true; break
             fi
             sleep 10
@@ -60,6 +66,12 @@ jobs:
           path: verification
           run-id: '39039547497'
           github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: space-2.4.0-device-31-*
+          path: verification
+          run-id: '39041512989'
+          github-token: ${{ github.token }}
       - name: Generate report from actual completed evidence and publish the immutable APK
         run: |
           set -euo pipefail
@@ -74,7 +86,7 @@ jobs:
           if gh release view v2.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Refusing to replace an existing release.'; exit 1
           fi
-          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 2bc9e628289412fbb51b5ad09be09310e07fade3 --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
+          gh release create v2.4.0 dist/Space-Music-2.4.0.apk dist/SHA256SUMS.txt dist/Space-Music-2.4.0.apk.signature.txt dist/Space-Music-2.4.0-verification.zip --repo "$GITHUB_REPOSITORY" --target 2d1147fe50240c2dcc46af4c25cb27d94c5b204e --title 'Space Music 2.4.0 · versión estable' --notes-file docs/space-2.4.0-notes.md --latest
       - uses: actions/upload-artifact@v4
         if: success()
         with:
