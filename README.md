@@ -8,21 +8,19 @@ Identificador independiente: `org.nexlibre.spacemusic`. Puede instalarse junto a
 
 ## Descarga e instalación
 
-**[Descargar Space Music 2.2.0 estable — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v2.2.0/Space-Music-2.2.0.apk)**
+**[Descargar Space Music 2.3.0 estable — APK completo firmado](https://github.com/nexlibre/Space-Music/releases/download/v2.3.0/Space-Music-2.3.0.apk)**
 
 APK universal optimizado para Android 8.0 o posterior, con firma propia de publicación. Incluye arm64-v8a, armeabi-v7a y x86_64.
 
-Pruebas aprobadas en Android 12, 13 y 15: orden independiente por lista, persistencia, reproducción local, arrastre, veinte arranques en frío y actualización desde 2.1.0 estable sin desinstalar. Conserva firma y datos. [Resultados y límites](docs/verification-2.2.0.md). Pendiente validación en teléfonos físicos.
+Pruebas aprobadas en Android 12, 13 y 15: orden independiente por lista, persistencia, reproducción local, arrastre, veinte arranques en frío y actualización desde 2.2.0 estable sin desinstalar. Conserva firma y datos. [Resultados y límites](docs/verification-2.3.0.md). Pendiente validación en teléfonos físicos.
 
 Si tienes instalada la versión de prueba con firma de desarrollo, debes desinstalarla antes de instalar esta. La desinstalación borra sus datos locales.
 
-## Próxima actualización: interfaz compacta
+## Interfaz compacta
 
-Cambios preparados: minirreproductor con el mismo Liquid Glass que la navegación, sin degradado opaco de fondo; listas que se desplazan detrás de las barras y margen final ajustado a su altura real. Se conserva el modo sin desenfoque.
+Minirreproductor con el mismo Liquid Glass que la navegación, sin degradado opaco de fondo. Las listas se desplazan detrás de las barras y el margen final se ajusta a su altura real. Se conserva el modo sin desenfoque.
 
 El pie de Ajustes identifica a Space Music y enlaza a este repositorio. Las atribuciones se reúnen en «Licencias y código abierto», con GPL-3.0 disponible sin conexión. Se eliminan los enlaces promocionales heredados a Discord y al sitio de BitChord. La licencia y los avisos del código original se conservan.
-
-Estos cambios no forman parte del APK 2.2.0 enlazado arriba. La compilación y las pruebas de GitHub Actions deben completarse antes de incluirlos en una nueva publicación.
 
 ## Biblioteca y navegación
 

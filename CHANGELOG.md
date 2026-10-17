@@ -1,8 +1,15 @@
+# Space Music — cambios
+
+## 2.3.0 · interfaz compacta y Liquid Glass
+
+- Minirreproductor y navegación inferior translúcidos, sin recuadro opaco detrás.
+- Margen de contenido ajustado a la altura de los controles.
+- Ajustes identifica a Space Music; atribuciones y GPL-3.0 accesibles sin conexión.
+- Aviso de novedades actualizado. Mismo paquete y firma para actualizar sobre 2.2.0.
+
 ## 2.2.0 — estable
 
 Cabecera compacta de listas, búsqueda propia y orden persistente por lista (manual, título, artista y añadidas recientemente), sin modificar Canciones. Reproducción y eliminación respetan el orden visible. Migración de listas existentes sin pérdida de canciones.
-
-# Space Music — cambios
 
 ## 2.1.0 estable — listas compactas y avisos de actualización
 
