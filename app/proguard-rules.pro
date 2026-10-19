@@ -141,3 +141,8 @@
 }
 -keep class androidx.media3.common.audio.BaseAudioProcessor { public *; }
 -keep interface androidx.media3.common.audio.AudioProcessor { public *; }
+
+# The spatial continuity runner overrides these public callbacks in a separate APK.
+# Preserve descriptor classes as well as Player.Listener so optimized app and runner agree.
+-keep class androidx.media3.common.Player$Events { public *; }
+-keep class androidx.media3.common.Player$PositionInfo { public *; }
