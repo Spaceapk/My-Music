@@ -1,0 +1,35 @@
+name: Spatial release signing prerequisites
+on:
+  push:
+    branches: [space-spatial-signing-check]
+    paths: ['.github/workflows/space-spatial-signing-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-signing-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - name: Verify original keystore is available and matches published identity
+        env:
+          SPACE_KEYSTORE_B64: ${{ secrets.SPACE_KEYSTORE_B64 }}
+          SPACE_KEYSTORE_PASSWORD: ${{ secrets.SPACE_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SPACE_KEYSTORE_B64" ] || [ -z "$SPACE_KEYSTORE_PASSWORD" ]; then
+            echo '::error::Original signing secrets are unavailable. Do not generate a replacement key or publish an incompatible update.'
+            exit 1
+          fi
+          umask 077
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          printf '%s' "$SPACE_KEYSTORE_B64" | base64 -d > "$keydir/release.p12"
+          keytool -exportcert -keystore "$keydir/release.p12" -alias space-music -storepass:env SPACE_KEYSTORE_PASSWORD -file "$keydir/certificate.der"
+          actual=$(sha256sum "$keydir/certificate.der" | cut -d ' ' -f 1)
+          test "$actual" = 5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce
+          echo 'Original signing identity verified. No APK has been signed or published by this check.'
