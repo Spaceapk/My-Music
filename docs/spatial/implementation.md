@@ -90,3 +90,28 @@ sesiones largas y batería/temperatura en teléfono. Comprobar con música
 propia voces, graves, fatiga y cambios de volumen en los seis perfiles.
 Android 14/16 no se consideran probados por ejecutar pruebas en otras APIs.
 No publicar si faltan los criterios obligatorios del encargo.
+
+
+## Seguimiento de validación del 19 de octubre
+
+Se retiró la reutilización de un APK fijado por SHA del flujo principal de CI: cada
+nuevo commit vuelve a compilar y ejecutar la suite con sus fuentes actuales.
+La comprobación de continuidad del servicio confirma el identificador de la pista,
+espera que su posición supere un segundo y observa discontinuidades explícitas.
+La comparación de posición admite 50 ms de corrección del reloj remoto; no puede
+aceptar un reinicio a cero desde esa línea de base. Los valores anteriores y posteriores
+se registran para diagnosticar cualquier fallo, sin nombres de canciones del usuario.
+Se restauran las preferencias espaciales al terminar la prueba.
+
+La comprobación de firma en Actions
+[39342616316](https://github.com/nexlibre/Space-Music/actions/runs/39342616316)
+confirmó que los secretos `SPACE_KEYSTORE_B64` y/o `SPACE_KEYSTORE_PASSWORD` no están
+disponibles para el trabajo. Esto bloquea la firma oficial y la publicación como
+actualización. No se crea una clave sustituta. Debe restaurarse el almacén original
+en los secretos del repositorio; no enviar contraseñas ni claves por el chat.
+
+Se añadieron pruebas de migración desde preferencias previas, JSON/tipo corrupto y
+combinación de los tres modos con EQ, filtro de transición y normalización activa.
+El panel muestra la suspensión por Atmos y deshabilita sus parámetros mientras esa
+suspensión está activa. Los deslizadores incorporan etiquetas accesibles.
+Pruebas físicas y perceptuales siguen pendientes.

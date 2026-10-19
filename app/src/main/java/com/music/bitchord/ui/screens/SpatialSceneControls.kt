@@ -29,6 +29,9 @@ import kotlin.math.roundToInt
 fun SpatialSceneControls() {
     val settings by AppSettings.spatialScene.collectAsStateWithLifecycle()
     val enabled by AppSettings.spatialAudio.collectAsStateWithLifecycle()
+    val format by com.music.bitchord.data.NerdStats.current.collectAsStateWithLifecycle()
+    val atmos = format?.isDolbyAtmos == true
+    val active = enabled && !atmos
     val p = settings.selected
     val names = listOf("Espacial original", "Audio 8D", "Espacial avanzado")
     val descriptions = listOf("Conserva el sonido espacial actual.", "Música en movimiento alrededor de ti.", "Profundidad y posicionamiento binaural paramétrico.")
@@ -36,7 +39,8 @@ fun SpatialSceneControls() {
     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Audio espacial", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-            Switch(checked = enabled, onCheckedChange = AppSettings::setSpatialAudio)
+            Switch(checked = enabled, onCheckedChange = AppSettings::setSpatialAudio,
+                modifier = Modifier.semantics { contentDescription = "Activar audio espacial" })
         }
         Text("Personaliza cómo se mueve y se siente tu música.", style = MaterialTheme.typography.bodySmall)
         SpatialMode.entries.forEachIndexed { index, mode ->
@@ -56,8 +60,11 @@ fun SpatialSceneControls() {
                 }
             }
         }
-        Text(if (enabled) "Recomendado con audífonos. No separa instrumentos ni sigue la cabeza."
-            else "Activa el interruptor de audio espacial para escuchar el efecto.", style = MaterialTheme.typography.bodySmall)
+        Text(when {
+            atmos -> "Pausado para esta pista: Dolby Atmos ya es espacial."
+            enabled -> "Recomendado con audífonos. No separa instrumentos ni sigue la cabeza."
+            else -> "Activa el interruptor de audio espacial para escuchar el efecto."
+        }, style = MaterialTheme.typography.bodySmall)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Mostrar escenario", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
             Switch(checked = settings.visualization, onCheckedChange = {
@@ -69,24 +76,24 @@ fun SpatialSceneControls() {
             val profiles = if (settings.mode == SpatialMode.EIGHT_D) listOf("Suave", "Equilibrado", "Inmersivo") else listOf("Natural", "Envolvente", "Cinemático")
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 profiles.forEachIndexed { i, label ->
-                    FilterChip(selected = p.profile == i, onClick = {
+                    FilterChip(selected = p.profile == i, enabled = active, onClick = {
                         AppSettings.setSpatialScene(settings.withSelected(SpatialParameters.preset(settings.mode, i)))
                     }, label = { Text(label) })
                 }
             }
             fun update(value: SpatialParameters) = AppSettings.setSpatialScene(settings.withSelected(value.copy(profile = -1)))
-            SpatialSlider("Intensidad", p.intensity, enabled) { update(p.copy(intensity = it)) }
+            SpatialSlider("Intensidad", p.intensity, active) { update(p.copy(intensity = it)) }
             if (settings.mode == SpatialMode.EIGHT_D) {
-                SpatialSlider("Velocidad · %.1f s por vuelta".format(p.periodSeconds), p.speed, enabled) { update(p.copy(speed = it)) }
+                SpatialSlider("Velocidad · %.1f s por vuelta".format(p.periodSeconds), p.speed, active) { update(p.copy(speed = it)) }
             } else {
-                SpatialSlider("Profundidad", p.depth, enabled) { update(p.copy(depth = it)) }
-                SpatialSlider("Distancia virtual", p.distance, enabled) { update(p.copy(distance = it)) }
+                SpatialSlider("Profundidad", p.depth, active) { update(p.copy(depth = it)) }
+                SpatialSlider("Distancia virtual", p.distance, active) { update(p.copy(distance = it)) }
             }
-            SpatialSlider("Amplitud", p.width, enabled) { update(p.copy(width = it)) }
+            SpatialSlider("Amplitud", p.width, active) { update(p.copy(width = it)) }
             Text("Reverberación", style = MaterialTheme.typography.labelLarge)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 listOf("Sin efecto", "Suave", "Moderada").forEachIndexed { i, label ->
-                    FilterChip(selected = p.reverb == i, enabled = enabled, onClick = { update(p.copy(reverb = i)) }, label = { Text(label) })
+                    FilterChip(selected = p.reverb == i, enabled = active, onClick = { update(p.copy(reverb = i)) }, label = { Text(label) })
                 }
             }
             TextButton(onClick = { AppSettings.setSpatialScene(settings.withSelected(SpatialParameters.preset(settings.mode, 1))) }) {
@@ -100,7 +107,8 @@ fun SpatialSceneControls() {
 private fun SpatialSlider(label: String, value: Float, enabled: Boolean, onChange: (Float) -> Unit) {
     Column {
         Text("$label · ${(value * 100).roundToInt()} %", style = MaterialTheme.typography.labelLarge)
-        Slider(value = value, onValueChange = onChange, enabled = enabled, valueRange = 0f..1f)
+        Slider(value = value, onValueChange = onChange, enabled = enabled, valueRange = 0f..1f,
+            modifier = Modifier.semantics { contentDescription = label })
     }
 }
 

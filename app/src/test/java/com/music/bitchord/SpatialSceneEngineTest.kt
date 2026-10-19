@@ -116,4 +116,30 @@ class SpatialSceneEngineTest {
         assertTrue("Missing ITD: $firstOpposite", firstOpposite in 7..32)
         assertTrue(energy > 0f && energy < 1f)
     }
+
+    @Test fun everyModeWorksWithEqTransitionAndActiveNormalization() {
+        val chain = com.music.bitchord.playback.audio.DspChain()
+        chain.configure(48000, 2)
+        chain.spatial.enabled = true
+        chain.equalizer.setTuning(true, EqCurve(FloatArray(EqLayout.SLOTS), FloatArray(EqLayout.SLOTS) { .707f }, preampDb = 3f), 0f)
+        chain.transition.open()
+        chain.loudness.gainFor = { .8f }
+        chain.loudness.track("spatial-integration-test", null)
+        val block = com.music.bitchord.playback.audio.AudioBlock(2, 512)
+        block.reset(512)
+        for (mode in SpatialMode.entries) {
+            chain.spatial.settings = SpatialSettings(mode = mode)
+            repeat(120) { chunk ->
+                for (frame in 0 until block.frameCount) {
+                    val value = (.8 * sin(2 * PI * 440 * (chunk * 512 + frame) / 48000)).toFloat()
+                    block.samples[frame * 2] = value
+                    block.samples[frame * 2 + 1] = -value
+                }
+                chain.process(block)
+                assertTrue("Non-finite or unbounded output with $mode + EQ + normalization",
+                    block.samples.all { it.isFinite() && abs(it) <= 1.00001f })
+            }
+        }
+        chain.reset()
+    }
 }

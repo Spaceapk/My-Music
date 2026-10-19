@@ -23,4 +23,34 @@ class SpatialPreferencesTest {
             } finally { AppSettings.setSpatialScene(old) }
         }
     }
+
+    @Test fun legacyAndCorruptedPreferencesRecoverWithoutLosingTheEnableFlag() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val prefs = instrumentation.targetContext.getSharedPreferences("bitchord_settings", 0)
+        instrumentation.runOnMainSync {
+            val previous = prefs.getString("spatial_scene_v1", null)
+            val enabled = AppSettings.spatialAudio.value
+            try {
+                prefs.edit().remove("spatial_scene_v1").putBoolean("spatial_audio", true).commit()
+                AppSettings.reload()
+                assertEquals(SpatialSettings(), AppSettings.spatialScene.value)
+                assertTrue(AppSettings.spatialAudio.value)
+                for (invalid in listOf("{broken-json", "[]")) {
+                    prefs.edit().putString("spatial_scene_v1", invalid).commit()
+                    AppSettings.reload()
+                    assertEquals(SpatialSettings(), AppSettings.spatialScene.value)
+                    assertTrue(AppSettings.spatialAudio.value)
+                }
+                prefs.edit().putInt("spatial_scene_v1", 7).commit()
+                AppSettings.reload()
+                assertEquals(SpatialSettings(), AppSettings.spatialScene.value)
+                assertTrue(AppSettings.spatialAudio.value)
+            } finally {
+                val edit = prefs.edit().putBoolean("spatial_audio", enabled)
+                if (previous == null) edit.remove("spatial_scene_v1") else edit.putString("spatial_scene_v1", previous)
+                edit.commit()
+                AppSettings.reload()
+            }
+        }
+    }
 }
