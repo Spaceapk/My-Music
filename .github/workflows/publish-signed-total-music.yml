@@ -1,0 +1,129 @@
+name: Publish signed Total Music after verification
+on:
+  workflow_run:
+    workflows: ["Verify Total Music Android edition"]
+    types: [completed]
+    branches: [total-music-continuation-20261020]
+permissions:
+  contents: read
+concurrency:
+  group: total-music-signed-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'total-music-continuation-20261020' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install package verification tools
+        run: sdkmanager 'build-tools;36.0.0'
+      - name: Retrieve the signed APK after source verification completes
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          base=https://github.com/nexlibre/Space-Music/releases/download/total-music-stage-v1.0.1
+          for attempt in $(seq 1 60); do
+            if curl --fail --location --silent --show-error "$base/Total-Music-1.0.1.apk" --output dist/Total-Music-1.0.1.apk; then
+              break
+            fi
+            sleep 30
+          done
+          test -s dist/Total-Music-1.0.1.apk
+          curl --fail --location --silent --show-error "$base/SHA256SUMS.txt" --output dist/SHA256SUMS.txt
+          curl --fail --location --silent --show-error "$base/Total-Music-1.0.1.apk.signature.txt" --output dist/Total-Music-1.0.1.apk.signature.txt
+          curl --fail --location --silent --show-error "$base/package-verification.txt" --output dist/package-verification.txt
+          (cd dist && sha256sum -c SHA256SUMS.txt)
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs dist/Total-Music-1.0.1.apk | tee dist/release-signature-verification.txt
+          cert=$(sed -n 's/.*certificate SHA-256 digest: //Ip' dist/release-signature-verification.txt | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')
+          test "$cert" = "dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0"
+          grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='2' versionName='1.0.1'" dist/package-verification.txt
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Total-Music-1.0.1.apk | grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='2' versionName='1.0.1'"
+      - name: Download and verify the installed Spatial 1.0.0 release
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error \
+            https://github.com/nexlibre/Space-Music/releases/download/spatial-v1.0.0/Space-Music-Spatial-1.0.0.apk \
+            --output spatial-1.0.0.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs spatial-1.0.0.apk > old-signature.txt
+          cert=$(sed -n 's/.*certificate SHA-256 digest: //Ip' old-signature.txt | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')
+          test "$cert" = "dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node,kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Test installation and in-place update on Android 13
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: |
+            adb install spatial-1.0.0.apk
+            test -n "$(find . -name '*test-runner.apk' -type f | head -1)"
+      - name: Download test runner from verified source transfer
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error \
+            https://github.com/nexlibre/Space-Music/releases/download/total-music-stage-v1.0.1/total-music-test-runner.apk \
+            --output dist/total-music-test-runner.apk
+      - name: Run device acceptance tests and verify in-place update
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: |
+            adb install spatial-1.0.0.apk
+            TEST_APP_APK=dist/Total-Music-1.0.1.apk TEST_INSTRUMENTATION_APK=dist/total-music-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
+      - name: Create the verified Total Music release
+        run: |
+          set -euo pipefail
+          tag=v1.0.1
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release tag $tag already exists; refusing to overwrite it."
+            exit 1
+          fi
+          cat > notes.md <<'EOF'
+          Total Music 1.0.1 continues Space Music Spatial 1.0.0. It keeps package `org.nexlibre.spacemusic.spatial` and the original signing certificate, so it can update that installation while remaining separate from the original Space Music app.
+          
+          Includes the local music player, library and playlists, lyrics, artwork, equalizer, background playback, media controls, preferences, accessibility, themes, and the three spatial audio modes.
+          
+          The advanced spatial mode is a parametric binaural approximation. It does not use measured HRTFs, head tracking, instrument separation, or independent object positioning.
+          
+          Verified in GitHub Actions: regression tests, lint, release build, installation, startup, local playback, spatial controls, signature SHA-256, package and version, alignment, and in-place upgrade from the signed Spatial 1.0.0 APK on Android 13. CI emulators also passed API 31–36. Physical phone, headphone, and Bluetooth listening tests remain unperformed.
+          EOF
+          gh release create "$tag" \
+            dist/Total-Music-1.0.1.apk \
+            dist/SHA256SUMS.txt \
+            dist/Total-Music-1.0.1.apk.signature.txt \
+            dist/release-signature-verification.txt \
+            dist/package-verification.txt \
+            --repo "$GITHUB_REPOSITORY" --title "Total Music 1.0.1" --notes-file notes.md \
+            --target "${{ github.event.workflow_run.head_sha }}"
