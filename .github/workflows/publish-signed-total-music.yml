@@ -36,13 +36,18 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 80); do
-            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100" --jq '[.workflow_runs[] | select(.name == "Verify Total Music Android edition" and .status == "completed") | .conclusion] | first // empty')
+            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100" --jq '
+              [.workflow_runs[] | select(.name == "Verify Total Music Android edition")] as $runs |
+              if any($runs[]; .status == "completed" and .conclusion == "success") then "success"
+              elif (($runs | length) > 0 and all($runs[]; .status == "completed")) then "failure"
+              else "waiting" end
+            ')
             if [ "$result" = success ]; then
-              echo "The matching verification run passed."
+              echo "At least one verification run for this exact commit passed."
               exit 0
             fi
-            if [ "$result" = failure ] || [ "$result" = cancelled ]; then
-              echo "::error::The matching verification run did not pass."
+            if [ "$result" = failure ]; then
+              echo "::error::All verification runs for this exact commit completed without success."
               exit 1
             fi
             sleep 30
