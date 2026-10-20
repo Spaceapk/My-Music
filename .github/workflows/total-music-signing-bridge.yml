@@ -155,7 +155,8 @@ jobs:
           disable-animations: true
           script: |
             adb install spatial-1.0.0.apk
-            TEST_APP_APK=dist/Total-Music-1.0.1.apk TEST_INSTRUMENTATION_APK=dist/total-music-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash project/scripts/test-device.sh
+            cd project
+            TEST_APP_APK=../dist/Total-Music-1.0.1.apk TEST_INSTRUMENTATION_APK=../dist/total-music-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
 
   stage:
     needs: emulator
