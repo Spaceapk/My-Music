@@ -1,10 +1,10 @@
 name: Publish signed Total Music after verification
 on:
-  workflow_run:
-    workflows: ["Verify Total Music Android edition"]
-    types: [completed]
+  push:
     branches: [total-music-continuation-20261020]
+    paths: ['.github/workflows/publish-signed-total-music.yml']
 permissions:
+  actions: read
   contents: read
 concurrency:
   group: total-music-signed-publication
@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     permissions:
+      actions: read
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
@@ -31,6 +32,23 @@ jobs:
           packages: platform-tools
       - name: Install package verification tools
         run: sdkmanager 'build-tools;36.0.0'
+      - name: Wait for regression, lint, build, and emulator verification on this commit
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 80); do
+            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100" --jq '[.workflow_runs[] | select(.name == "Verify Total Music Android edition" and .status == "completed") | .conclusion] | first // empty')
+            if [ "$result" = success ]; then
+              echo "The matching verification run passed."
+              exit 0
+            fi
+            if [ "$result" = failure ] || [ "$result" = cancelled ]; then
+              echo "::error::The matching verification run did not pass."
+              exit 1
+            fi
+            sleep 30
+          done
+          echo "::error::Timed out waiting for the matching verification run."
+          exit 1
       - name: Retrieve the signed APK after source verification completes
         run: |
           set -euo pipefail
