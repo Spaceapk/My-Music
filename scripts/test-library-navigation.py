@@ -5,6 +5,8 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+package = os.environ.get('SPACE_APP_ID', package)
+
 
 def adb(*args):
     return subprocess.check_output(['adb', *args], timeout=30)
@@ -51,7 +53,7 @@ def tap(label):
 
 # Tests run after local playback regressions, with permissions already granted.
 adb('shell', 'am', 'force-stop', 'org.nexlibre.spacemusic')
-adb('shell', 'am', 'start', '-W', '-n', 'org.nexlibre.spacemusic/com.music.bitchord.MainActivity')
+adb('shell', 'am', 'start', '-W', '-n', package + '/com.music.bitchord.MainActivity')
 for node in snapshot().iter('node'):
     if node.get('text', '').startswith('What is new in Space Music '):
         for button in snapshot().iter('node'):
@@ -83,6 +85,7 @@ print('PASS: bottom order, single tabs, routing, selected accessibility state an
 # Seed isolated emulator fixtures through root, for debug and optimized builds.
 # Store tests above use separate filenames; these fixtures exercise the rendered UI.
 import json
+import os
 package = 'org.nexlibre.spacemusic'
 base = f'/data/user/0/{package}/files'
 fixture = [dict(id=k, name='Sort ' + k, songs=[
