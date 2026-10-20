@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'total-music-continuation-20261020' }}
+    if: ${{ github.ref == 'refs/heads/total-music-continuation-20261020' }}
     runs-on: ubuntu-latest
     timeout-minutes: 50
     permissions:
