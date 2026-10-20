@@ -5,7 +5,7 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-package = os.environ.get('SPACE_APP_ID', package)
+package = os.environ.get('SPACE_APP_ID', 'org.nexlibre.spacemusic')
 
 
 def adb(*args):
@@ -86,7 +86,6 @@ print('PASS: bottom order, single tabs, routing, selected accessibility state an
 # Store tests above use separate filenames; these fixtures exercise the rendered UI.
 import json
 import os
-package = 'org.nexlibre.spacemusic'
 base = f'/data/user/0/{package}/files'
 fixture = [dict(id=k, name='Sort ' + k, songs=[
     dict(id='z', title='ZZZ sort fixture', artist='AAA artist', uri='file:///z.mp3'),
