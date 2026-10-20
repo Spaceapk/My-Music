@@ -1,7 +1,7 @@
-name: Space Music Spatial parallel edition
+name: Total Music Android release
 on:
   push:
-    branches: [space-spatial-parallel-app]
+    branches: [total-music-branding, main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -116,7 +116,7 @@ jobs:
           signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
           "$signer" sign --ks "$keydir/ci.p12" --ks-key-alias ci-test \
             --ks-pass pass:ci-test-only --key-pass pass:ci-test-only \
-            --out dist/Space-Music-Spatial-CI.apk "$apk"
+            --out dist/Total-Music-CI.apk "$apk"
           "$signer" sign --ks "$keydir/ci.p12" --ks-key-alias ci-test \
             --ks-pass pass:ci-test-only --key-pass pass:ci-test-only \
             --out dist/test-runner.apk "$runner"
@@ -137,7 +137,7 @@ jobs:
           emulator-boot-timeout: 300
           emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
           disable-animations: true
-          script: TEST_APP_APK=dist/Space-Music-Spatial-CI.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
+          script: TEST_APP_APK=dist/Total-Music-CI.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -209,19 +209,21 @@ jobs:
           "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
             --ks-pass "file:$keydir/password.txt" \
             --key-pass "file:$keydir/password.txt" \
-            --out dist/Space-Music-Spatial-1.0.0.apk "$keydir/aligned.apk"
+            --out dist/Total-Music-1.0.1.apk "$keydir/aligned.apk"
           runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
           test -n "$runner"
           "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
             --ks-pass "file:$keydir/password.txt" --key-pass "file:$keydir/password.txt" \
             --out dist/spatial-test-runner.apk "$runner"
-          "$signer" verify --verbose --print-certs dist/Space-Music-Spatial-1.0.0.apk \
-            | tee dist/Space-Music-Spatial-1.0.0.apk.signature.txt
-          "$align" -c -P 16 4 dist/Space-Music-Spatial-1.0.0.apk
-          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Space-Music-Spatial-1.0.0.apk \
+          "$signer" verify --verbose --print-certs dist/Total-Music-1.0.1.apk \
+            | tee dist/Total-Music-1.0.1.apk.signature.txt
+          grep -qi 'certificate SHA-256 digest: dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0' \
+            dist/Total-Music-1.0.1.apk.signature.txt
+          "$align" -c -P 16 4 dist/Total-Music-1.0.1.apk
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Total-Music-1.0.1.apk \
             > dist/package-verification.txt
-          grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='1' versionName='1.0.0'" dist/package-verification.txt
-          (cd dist && sha256sum Space-Music-Spatial-1.0.0.apk > SHA256SUMS.txt)
+          grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='2' versionName='1.0.1'" dist/package-verification.txt
+          (cd dist && sha256sum Total-Music-1.0.1.apk > SHA256SUMS.txt)
       - name: Enable KVM for final signed APK verification
         if: steps.signing.outputs.ready == 'true'
         run: |
@@ -241,7 +243,7 @@ jobs:
           emulator-boot-timeout: 300
           emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
           disable-animations: true
-          script: TEST_APP_APK=dist/Space-Music-Spatial-1.0.0.apk TEST_INSTRUMENTATION_APK=dist/spatial-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
+          script: TEST_APP_APK=dist/Total-Music-1.0.1.apk TEST_INSTRUMENTATION_APK=dist/spatial-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -253,26 +255,26 @@ jobs:
             device-full-log.txt
             device-*.xml
             device-*.png
-      - name: Create non-latest spatial release
+      - name: Create Total Music release
         if: steps.signing.outputs.ready == 'true'
         run: |
           set -euo pipefail
           (cd dist && sha256sum -c SHA256SUMS.txt)
           cat > /tmp/notes.md <<'NOTES'
-          # Space Music Spatial 1.0.0 — edición de prueba
+          # Total Music 1.0.1
 
-          Parallel first-install edition with the three spatial audio modes. It uses a new application ID and a new signing key, so it can be installed alongside the original Space Music. It does not import the original app's settings or library database. Use headphones for the best spatial effect.
+          Total Music update 1.0.1 with the three spatial audio modes. It uses a same application ID and signing key as Space Music Spatial 1.0.0, enabling an in-place update of that app. It remains separate from the original Space Music app, with separate settings and library data. Headphones are recommended for spatial effects.
 
           Automated verification: Android 12, 13, 14, 15 and 16 emulator matrix; JVM regression tests; optimized release build; audio-mode controls and playback integration.
           Final release-signed APK: installation, startup, playback and spatial-control integration are additionally checked on Android 13 before upload.
           
           Modes: Original preserves the previous algorithm; Audio 8D simulates movement (40–6 seconds per turn); Advanced uses a parametric binaural approximation with interaural delay, level and spectral filtering. It does not use measured HRTF, head tracking or instrument separation. Mono/multichannel playback bypasses stereo spatialization; the optional diagram is static.
           
-          Physical-device, headphone listening, Bluetooth route changes and prolonged battery/temperature checks remain pending. This is a prerelease, not a replacement update for the original signed app.
+          Physical-device, headphone listening, Bluetooth route changes and prolonged battery/temperature checks remain pending. This update keeps the existing Spatial package ID and signing certificate.
           NOTES
-          gh release create spatial-v1.0.0 dist/Space-Music-Spatial-1.0.0.apk \
-            dist/SHA256SUMS.txt dist/Space-Music-Spatial-1.0.0.apk.signature.txt \
+          gh release create total-music-v1.0.1 dist/Total-Music-1.0.1.apk \
+            dist/SHA256SUMS.txt dist/Total-Music-1.0.1.apk.signature.txt \
             dist/package-verification.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title 'Space Music Spatial 1.0.0' --notes-file /tmp/notes.md --latest=false --prerelease
-          gh release view spatial-v1.0.0 --repo "$GITHUB_REPOSITORY" --json assets \
-            --jq '.assets[].name' | grep -Fx Space-Music-Spatial-1.0.0.apk
+            --title 'Total Music 1.0.1' --notes-file /tmp/notes.md --latest
+          gh release view total-music-v1.0.1 --repo "$GITHUB_REPOSITORY" --json assets \
+            --jq '.assets[].name' | grep -Fx Total-Music-1.0.1.apk

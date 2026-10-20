@@ -26,7 +26,7 @@ def tab(label, selected=None):
         # Cold launches can still be showing the once-per-version release notes.
         # Close that native dialog before looking for the library tabs.
         if not any(n.get('content-desc') == label for n in root.iter('node')):
-            if any(n.get('text', '').startswith('What is new in Space Music ') for n in root.iter('node')):
+            if any(n.get('text', '').startswith('What is new in Total Music ') for n in root.iter('node')):
                 back = next((n for n in root.iter('node') if n.get('text') == 'Back'), None)
                 if back is not None:
                     l, t, r, b = bounds(back)
@@ -66,7 +66,7 @@ def tap(label):
 adb('shell', 'am', 'force-stop', 'org.nexlibre.spacemusic')
 adb('shell', 'am', 'start', '-W', '-n', package + '/com.music.bitchord.MainActivity')
 for node in snapshot().iter('node'):
-    if node.get('text', '').startswith('What is new in Space Music '):
+    if node.get('text', '').startswith('What is new in Total Music '):
         for button in snapshot().iter('node'):
             if button.get('text') == 'Back':
                 l, t, r, b = bounds(button)
@@ -199,8 +199,8 @@ for _ in range(35):
 else:
     raise AssertionError('Licenses and open source is not reachable in Settings')
 footer = '\n'.join(n.get('text', '') for n in root.iter('node'))
-expected_version = '1.0.0' if package.endswith('.spatial') else '2.4.0'
-assert f'Space Music {expected_version}' in footer, footer
+expected_version = '1.0.1' if package.endswith('.spatial') else '2.4.0'
+assert f'Total Music {expected_version}' in footer, footer
 assert 'Local music player' in footer, footer
 assert 'Discord' not in footer and 'Website' not in footer, footer
 Path('device-settings-identity.png').write_bytes(adb('exec-out', 'screencap', '-p'))
@@ -226,4 +226,4 @@ try:
 finally:
     adb('shell', 'svc', 'wifi', 'enable')
     adb('shell', 'svc', 'data', 'enable')
-print('PASS: accessible compact dock, Space Music identity and bundled license rendered offline')
+print('PASS: accessible compact dock, Total Music identity and bundled license rendered offline')

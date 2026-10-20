@@ -1,4 +1,9 @@
-# Audio espacial 3 en 1 — implementación en validación
+# Total Music — audio espacial 3 en 1
+
+Esta implementación se trasladó desde Space Music, commit de origen `369a1f68e80dae6780d317e82d226bff06d37b01`. La aplicación conserva el paquete Android `org.nexlibre.spacemusic.spatial`; Total Music 1.0.1 usa versionCode 2 y está diseñado como actualización firmada de Space Music Spatial 1.0.0. El informe técnico y los resultados históricos que siguen describen el estado auditado en el repositorio de origen.
+
+Repositorio actual: https://github.com/nexlibre/Total-Music-App. La firma de publicación debe ser la misma que la edición Spatial existente; las pruebas con claves efímeras de CI no verifican compatibilidad de firma.
+
 
 Esta rama aún no es una versión publicada. Base auditada: Space Music 2.3.0,
 commit 641453da. La versión objetivo es 2.4.0 (versionCode 8), pendiente de validación.

@@ -1155,9 +1155,9 @@ fun SettingsScreen(
         if (searchQuery.isBlank()) {
             Text(
                 text = buildAnnotatedString {
-                    append("Space Music $version  ·  ")
+                    append("Total Music $version  ·  ")
                     withLink(LinkAnnotation.Url(
-                        "https://github.com/nexlibre/Space-Music",
+                        "https://github.com/nexlibre/Total-Music-App",
                         TextLinkStyles(style = SpanStyle(
                             color = MaterialTheme.colorScheme.primary,
                             textDecoration = TextDecoration.Underline,

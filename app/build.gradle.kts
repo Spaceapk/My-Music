@@ -91,9 +91,9 @@ android {
         // Haze falls back to a translucent scrim below that.
         minSdk = 26
         targetSdk = 36
-        versionCode = if (spaceSpatialEdition) 1 else 8
-        versionName = if (spaceSpatialEdition) "1.0.0" else "2.4.0"
-        resValue("string", "app_name", if (spaceSpatialEdition) "Space Music Spatial" else "Space Music")
+        versionCode = if (spaceSpatialEdition) 2 else 8
+        versionName = if (spaceSpatialEdition) "1.0.1" else "2.4.0"
+        resValue("string", "app_name", if (spaceSpatialEdition) "Total Music" else "Space Music")
         buildConfigField("Boolean", "SPATIAL_EDITION", spaceSpatialEdition.toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

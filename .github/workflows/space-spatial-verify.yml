@@ -1,7 +1,9 @@
-name: Verify Space Music Spatial parallel edition
+name: Verify Total Music Android edition
 on:
+  push:
+    branches: [total-music-branding, main]
   pull_request:
-    branches: [space-spatial-3-in-1]
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -71,7 +73,7 @@ jobs:
           runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
           test -n "$apk" && test -n "$runner"
           signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
-          "$signer" sign --ks "$keydir/ci.p12" --ks-key-alias ci-test --ks-pass pass:ci-test-only --key-pass pass:ci-test-only --out dist/Space-Music-Spatial-CI.apk "$apk"
+          "$signer" sign --ks "$keydir/ci.p12" --ks-key-alias ci-test --ks-pass pass:ci-test-only --key-pass pass:ci-test-only --out dist/Total-Music-CI.apk "$apk"
           "$signer" sign --ks "$keydir/ci.p12" --ks-key-alias ci-test --ks-pass pass:ci-test-only --key-pass pass:ci-test-only --out dist/test-runner.apk "$runner"
       - name: Enable KVM
         run: |
@@ -90,7 +92,7 @@ jobs:
           emulator-boot-timeout: 300
           emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
           disable-animations: true
-          script: TEST_APP_APK=dist/Space-Music-Spatial-CI.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
+          script: TEST_APP_APK=dist/Total-Music-CI.apk TEST_INSTRUMENTATION_APK=dist/test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:

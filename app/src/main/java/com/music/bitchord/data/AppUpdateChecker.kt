@@ -44,12 +44,12 @@ object AppUpdateChecker {
     private const val CACHE_SUBDIR = "updates"
 
     internal const val LATEST_RELEASE_URL =
-        "https://api.github.com/repos/nexlibre/Space-Music/releases/latest"
+        "https://api.github.com/repos/nexlibre/Total-Music-App/releases/latest"
 
     // Spatial releases share the repository but use a separate version channel;
     // the original app's /latest feed therefore remains untouched.
     internal const val SPATIAL_RELEASES_URL =
-        "https://api.github.com/repos/nexlibre/Space-Music/releases?per_page=100"
+        "https://api.github.com/repos/nexlibre/Total-Music-App/releases?per_page=100"
 
     // Music's shared client remains disabled. Only release metadata and APKs
     // use this isolated client, including each HTTPS redirect hop.
@@ -103,7 +103,7 @@ object AppUpdateChecker {
             val url = release["html_url"]?.jsonPrimitive?.contentOrNull ?: return@runCatching
             val apkUrl = apkAssetUrl(release)
             val notes = release["body"]?.jsonPrimitive?.contentOrNull
-            val latest = tag.removePrefix(if (spatialEdition) "spatial-v" else "v")
+            val latest = tag.removePrefix(if (spatialEdition) "total-music-v" else "v")
             if (isNewer(latest, BuildConfig.VERSION_NAME)) {
                 _available.value = UpdateInfo(latest, url, apkUrl, notes)
             }
@@ -115,7 +115,7 @@ object AppUpdateChecker {
         val releases = json.parseToJsonElement(payload).jsonArray
         releases.mapNotNull { it as? JsonObject }.firstOrNull { release ->
             val tag = release["tag_name"]?.jsonPrimitive?.contentOrNull.orEmpty()
-            tag.startsWith("spatial-v") &&
+            tag.startsWith("total-music-v") &&
                 release["draft"]?.jsonPrimitive?.booleanOrNull != true &&
                 release["prerelease"]?.jsonPrimitive?.booleanOrNull != true
         }
@@ -222,7 +222,7 @@ object AppUpdateChecker {
         fun certificates(info: android.content.pm.PackageInfo) = info.signatures.orEmpty()
             .map { java.security.MessageDigest.getInstance("SHA-256").digest(it.toByteArray()).toList() }.toSet()
         val expected = certificates(installed)
-        check(expected.isNotEmpty() && certificates(archive) == expected) { "Update signature does not match Space Music" }
+        check(expected.isNotEmpty() && certificates(archive) == expected) { "Update signature does not match Total Music" }
     }
 
     /** Stops an in-flight download; the next read loop sees this and bails. */
