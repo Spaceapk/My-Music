@@ -66,28 +66,18 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node,kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Test installation and in-place update on Android 13
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
-          cores: 2
-          ram-size: 2048M
-          heap-size: 512M
-          emulator-boot-timeout: 300
-          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
-          disable-animations: true
-          script: |
-            adb install spatial-1.0.0.apk
-            test -n "$(find . -name '*test-runner.apk' -type f | head -1)"
       - name: Download test runner from verified source transfer
         run: |
           set -euo pipefail
           curl --fail --location --silent --show-error \
             https://github.com/nexlibre/Space-Music/releases/download/total-music-stage-v1.0.1/total-music-test-runner.apk \
             --output dist/total-music-test-runner.apk
-      - name: Run device acceptance tests and verify in-place update
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Test installation and in-place update on Android 13
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
