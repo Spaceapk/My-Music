@@ -189,7 +189,8 @@ for _ in range(35):
 else:
     raise AssertionError('Licenses and open source is not reachable in Settings')
 footer = '\n'.join(n.get('text', '') for n in root.iter('node'))
-assert 'Space Music 2.4.0' in footer, footer
+expected_version = '1.0.0' if package.endswith('.spatial') else '2.4.0'
+assert f'Space Music {expected_version}' in footer, footer
 assert 'Local music player' in footer, footer
 assert 'Discord' not in footer and 'Website' not in footer, footer
 Path('device-settings-identity.png').write_bytes(adb('exec-out', 'screencap', '-p'))
