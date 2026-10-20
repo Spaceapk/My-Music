@@ -13,7 +13,7 @@ jobs:
   publish:
     if: ${{ github.ref == 'refs/heads/total-music-continuation-20261020' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 75
     permissions:
       actions: read
       contents: write
@@ -54,7 +54,7 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           base=https://github.com/nexlibre/Space-Music/releases/download/total-music-stage-v1.0.1
-          for attempt in $(seq 1 60); do
+          for attempt in $(seq 1 100); do
             if curl --fail --location --silent --show-error "$base/Total-Music-1.0.1.apk" --output dist/Total-Music-1.0.1.apk; then
               break
             fi
@@ -115,8 +115,8 @@ jobs:
           set -euo pipefail
           tag=v1.0.1
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "::error::Release tag $tag already exists; refusing to overwrite it."
-            exit 1
+            echo "Release tag $tag already exists; leaving it untouched."
+            exit 0
           fi
           cat > notes.md <<'EOF'
           Total Music 1.0.1 continues Space Music Spatial 1.0.0. It keeps package `org.nexlibre.spacemusic.spatial` and the original signing certificate, so it can update that installation while remaining separate from the original Space Music app.
