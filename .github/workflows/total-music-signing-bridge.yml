@@ -1,0 +1,186 @@
+name: Build and stage Total Music with the original spatial signer
+on:
+  push:
+    branches: [total-music-signing-bridge-20261020]
+    paths: ['.github/workflows/total-music-signing-bridge.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: total-music-signing-bridge
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: nexlibre/Total-Music-App
+          ref: total-music-continuation-20261020
+          path: project
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install Android build tools
+        run: |
+          sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'cmake;3.22.1' 'ndk;27.0.12077973'
+          if [ ! -d "$ANDROID_HOME/platforms/android-37" ]; then ln -s android-37.0 "$ANDROID_HOME/platforms/android-37"; fi
+          echo "ORG_GRADLE_PROJECT_spaceNdkVersion=27.0.12077973" >> "$GITHUB_ENV"
+      - name: Run regression tests and build Total Music spatial edition
+        working-directory: project
+        run: |
+          chmod +x gradlew
+          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 \
+            :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug \
+            :app:assembleProdRelease :app:assembleProdReleaseAndroidTest \
+            -PspaceSpatialEdition=true -PstarTestBuildType=release --build-cache --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: total-music-unsigned-build
+          path: |
+            project/app/build/outputs/apk/
+            project/app/build/reports/
+            project/shared/build/reports/tests/
+          if-no-files-found: error
+
+  sign:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install signing tools
+        run: sdkmanager 'build-tools;36.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: total-music-unsigned-build
+          path: built
+      - name: Sign and verify with the original spatial certificate
+        env:
+          KEY: ${{ secrets.SPACE_SPATIAL_KEYSTORE_B64 }}
+          PASSWORD: ${{ secrets.SPACE_SPATIAL_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          python3 scripts/prepare-spatial-signing.py "$keydir"
+          SPACE_SPATIAL_NORMALIZED_PASSWORD=$(cat "$keydir/password.txt")
+          export SPACE_SPATIAL_NORMALIZED_PASSWORD
+          keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
+            -alias space-spatial -storepass:file "$keydir/password.txt" >/dev/null
+          unsigned=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
+          runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          test -n "$unsigned" && test -n "$runner"
+          mkdir -p dist
+          signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          align="$ANDROID_HOME/build-tools/36.0.0/zipalign"
+          "$align" -f -P 16 4 "$unsigned" "$keydir/aligned.apk"
+          "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
+            --ks-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --key-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --out dist/Total-Music-1.0.1.apk "$keydir/aligned.apk"
+          "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
+            --ks-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --key-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --out dist/total-music-test-runner.apk "$runner"
+          "$signer" verify --verbose --print-certs dist/Total-Music-1.0.1.apk \
+            | tee dist/Total-Music-1.0.1.apk.signature.txt
+          cert=$(sed -n 's/.*certificate SHA-256 digest: //Ip' dist/Total-Music-1.0.1.apk.signature.txt | head -1 | tr -d ':[:space:]' | tr '[:upper:]' '[:lower:]')
+          test "$cert" = "dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0"
+          "$align" -c -P 16 4 dist/Total-Music-1.0.1.apk
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Total-Music-1.0.1.apk > dist/package-verification.txt
+          grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='2' versionName='1.0.1'" dist/package-verification.txt
+          (cd dist && sha256sum Total-Music-1.0.1.apk > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: total-music-original-signed
+          path: dist/
+          if-no-files-found: error
+
+  emulator:
+    needs: sign
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: nexlibre/Total-Music-App
+          ref: total-music-continuation-20261020
+          path: project
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: actions/download-artifact@v4
+        with:
+          name: total-music-original-signed
+          path: dist
+      - name: Download the published Spatial 1.0.0 APK for upgrade testing
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/nexlibre/Space-Music/releases/download/spatial-v1.0.0/Space-Music-Spatial-1.0.0.apk \
+            --output spatial-1.0.0.apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: |
+            adb install spatial-1.0.0.apk
+            TEST_APP_APK=dist/Total-Music-1.0.1.apk TEST_INSTRUMENTATION_APK=dist/total-music-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash project/scripts/test-device.sh
+
+  stage:
+    needs: emulator
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: total-music-original-signed
+          path: dist
+      - name: Publish a temporary transfer prerelease after all signing and emulator gates pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=total-music-stage-v1.0.1
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::The staging tag already exists; refusing to overwrite it."
+            exit 1
+          fi
+          cat > notes.md <<'EOF'
+          Temporary signed transfer artifact for nexlibre/Total-Music-App, built from commit 372c2ebf917857fc549501026877a3b0e88997da.
+          This prerelease is not the Total Music destination release. It exists only so the destination workflow can retrieve the verified APK. It was built and tested in GitHub Actions using the original spatial certificate.
+          EOF
+          gh release create "$tag" dist/Total-Music-1.0.1.apk dist/SHA256SUMS.txt dist/Total-Music-1.0.1.apk.signature.txt dist/package-verification.txt \
+            --repo "$GITHUB_REPOSITORY" --title "Total Music 1.0.1 signing transfer" --notes-file notes.md --prerelease --target "$GITHUB_SHA"
