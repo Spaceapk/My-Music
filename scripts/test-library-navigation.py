@@ -21,8 +21,18 @@ def snapshot():
 
 
 def tab(label, selected=None):
-    for _ in range(10):
+    for _ in range(25):
         root = snapshot()
+        # Cold launches can still be showing the once-per-version release notes.
+        # Close that native dialog before looking for the library tabs.
+        if not any(n.get('content-desc') == label for n in root.iter('node')):
+            if any(n.get('text', '').startswith('What is new in Space Music ') for n in root.iter('node')):
+                back = next((n for n in root.iter('node') if n.get('text') == 'Back'), None)
+                if back is not None:
+                    l, t, r, b = bounds(back)
+                    adb('shell', 'input', 'tap', str((l+r)//2), str((t+b)//2))
+                    time.sleep(.5)
+                    continue
         parents = {child: parent for parent in root.iter() for child in parent}
         nodes = []
         for child in root.iter('node'):
