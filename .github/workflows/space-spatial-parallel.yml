@@ -156,7 +156,7 @@ jobs:
       contents: write
       actions: read
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -210,6 +210,11 @@ jobs:
             --ks-pass "file:$keydir/password.txt" \
             --key-pass "file:$keydir/password.txt" \
             --out dist/Space-Music-Spatial-1.0.0.apk "$keydir/aligned.apk"
+          runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          test -n "$runner"
+          "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
+            --ks-pass "file:$keydir/password.txt" --key-pass "file:$keydir/password.txt" \
+            --out dist/spatial-test-runner.apk "$runner"
           "$signer" verify --verbose --print-certs dist/Space-Music-Spatial-1.0.0.apk \
             | tee dist/Space-Music-Spatial-1.0.0.apk.signature.txt
           "$align" -c -P 16 4 dist/Space-Music-Spatial-1.0.0.apk
@@ -217,22 +222,57 @@ jobs:
             > dist/package-verification.txt
           grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='1' versionName='1.0.0'" dist/package-verification.txt
           (cd dist && sha256sum Space-Music-Spatial-1.0.0.apk > SHA256SUMS.txt)
+      - name: Enable KVM for final signed APK verification
+        if: steps.signing.outputs.ready == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and exercise final signed APK on Android 13
+        if: steps.signing.outputs.ready == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: TEST_APP_APK=dist/Space-Music-Spatial-1.0.0.apk TEST_INSTRUMENTATION_APK=dist/spatial-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: space-spatial-final-signed-device-${{ github.run_attempt }}
+          path: |
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+            device-full-log.txt
+            device-*.xml
+            device-*.png
       - name: Create non-latest spatial release
         if: steps.signing.outputs.ready == 'true'
         run: |
           set -euo pipefail
           (cd dist && sha256sum -c SHA256SUMS.txt)
           cat > /tmp/notes.md <<'NOTES'
-          # Space Music Spatial 1.0.0
+          # Space Music Spatial 1.0.0 — edición de prueba
 
           Parallel first-install edition with the three spatial audio modes. It uses a new application ID and a new signing key, so it can be installed alongside the original Space Music. It does not import the original app's settings or library database. Use headphones for the best spatial effect.
 
           Automated verification: Android 12, 13, 14, 15 and 16 emulator matrix; JVM regression tests; optimized release build; audio-mode controls and playback integration.
-          Physical-device and listening checks are not represented as completed.
+          Final release-signed APK: installation, startup, playback and spatial-control integration are additionally checked on Android 13 before upload.
+          
+          Modes: Original preserves the previous algorithm; Audio 8D simulates movement (40–6 seconds per turn); Advanced uses a parametric binaural approximation with interaural delay, level and spectral filtering. It does not use measured HRTF, head tracking or instrument separation. Mono/multichannel playback bypasses stereo spatialization; the optional diagram is static.
+          
+          Physical-device, headphone listening, Bluetooth route changes and prolonged battery/temperature checks remain pending. This is a prerelease, not a replacement update for the original signed app.
           NOTES
           gh release create spatial-v1.0.0 dist/Space-Music-Spatial-1.0.0.apk \
             dist/SHA256SUMS.txt dist/Space-Music-Spatial-1.0.0.apk.signature.txt \
             dist/package-verification.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title 'Space Music Spatial 1.0.0' --notes-file /tmp/notes.md --latest=false
+            --title 'Space Music Spatial 1.0.0' --notes-file /tmp/notes.md --latest=false --prerelease
           gh release view spatial-v1.0.0 --repo "$GITHUB_REPOSITORY" --json assets \
             --jq '.assets[].name' | grep -Fx Space-Music-Spatial-1.0.0.apk
