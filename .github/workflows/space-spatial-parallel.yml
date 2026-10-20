@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -36,9 +37,12 @@ jobs:
           umask 077
           keydir=$(mktemp -d)
           trap 'rm -rf "$keydir"' EXIT
-          printf '%s' "$KEY" | base64 -d > "$keydir/spatial.p12"
-          keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
-            -alias space-spatial -storepass:env PASSWORD > /dev/null
+          python3 scripts/prepare-spatial-signing.py "$keydir"
+          if ! keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
+            -alias space-spatial -storepass:file "$keydir/password.txt" > /dev/null; then
+            echo "::error::Keystore cannot be opened with the supplied password or expected alias."
+            exit 1
+          fi
           echo "Persistent signing credentials validated."
 
   build:
@@ -186,16 +190,16 @@ jobs:
       - name: Sign APK with the persistent parallel-edition key
         if: steps.signing.outputs.ready == 'true'
         env:
-          SPACE_SPATIAL_KEYSTORE_B64: ${{ secrets.SPACE_SPATIAL_KEYSTORE_B64 }}
-          SPACE_SPATIAL_KEYSTORE_PASSWORD: ${{ secrets.SPACE_SPATIAL_KEYSTORE_PASSWORD }}
+          KEY: ${{ secrets.SPACE_SPATIAL_KEYSTORE_B64 }}
+          PASSWORD: ${{ secrets.SPACE_SPATIAL_KEYSTORE_PASSWORD }}
         run: |
           set -euo pipefail
           umask 077
           keydir=$(mktemp -d)
           trap 'rm -rf "$keydir"' EXIT
-          printf '%s' "$SPACE_SPATIAL_KEYSTORE_B64" | base64 -d > "$keydir/spatial.p12"
+          python3 scripts/prepare-spatial-signing.py "$keydir"
           keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
-            -alias space-spatial -storepass:env SPACE_SPATIAL_KEYSTORE_PASSWORD
+            -alias space-spatial -storepass:file "$keydir/password.txt"
           unsigned=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
           test -n "$unsigned"
           mkdir -p dist
@@ -203,8 +207,8 @@ jobs:
           align="$ANDROID_HOME/build-tools/36.0.0/zipalign"
           "$align" -f -P 16 4 "$unsigned" "$keydir/aligned.apk"
           "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
-            --ks-pass env:SPACE_SPATIAL_KEYSTORE_PASSWORD \
-            --key-pass env:SPACE_SPATIAL_KEYSTORE_PASSWORD \
+            --ks-pass "file:$keydir/password.txt" \
+            --key-pass "file:$keydir/password.txt" \
             --out dist/Space-Music-Spatial-1.0.0.apk "$keydir/aligned.apk"
           "$signer" verify --verbose --print-certs dist/Space-Music-Spatial-1.0.0.apk \
             | tee dist/Space-Music-Spatial-1.0.0.apk.signature.txt
