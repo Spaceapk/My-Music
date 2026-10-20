@@ -115,3 +115,10 @@ combinación de los tres modos con EQ, filtro de transición y normalización ac
 El panel muestra la suspensión por Atmos y deshabilita sus parámetros mientras esa
 suspensión está activa. Los deslizadores incorporan etiquetas accesibles.
 Pruebas físicas y perceptuales siguen pendientes.
+
+
+## Resultado posterior de CI
+
+La revisión `adbf18eed17e7810428862ee36327c4ec56ebe4f` aprobó la compilación,
+regresión, lint y la matriz Android 12–16. La firma oficial sigue bloqueada.
+[Resultados exactos, mediciones, capturas y pendientes](verification-2.4.0.md).
