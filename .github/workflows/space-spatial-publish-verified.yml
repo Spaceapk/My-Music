@@ -1,0 +1,164 @@
+name: Publish verified Space Music Spatial APK
+on:
+  push:
+    branches: [space-spatial-publish-verified]
+    paths: ['.github/workflows/space-spatial-publish-verified.yml', '.github/workflows/space-spatial-parallel.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: space-spatial-verified-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_SHA: 369a1f68e80dae6780d317e82d226bff06d37b01
+      SOURCE_RUN: '39415641427'
+    steps:
+      - name: Verify source, test gates and artifact provenance
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > /tmp/source-run.json
+          jq -e --arg sha "$SOURCE_SHA" '.head_sha == $sha and .status == "completed"' /tmp/source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN/jobs?filter=latest&per_page=100" > /tmp/source-jobs.json
+          python3 - <<'PY'
+          import json
+          jobs = json.load(open("/tmp/source-jobs.json"))["jobs"]
+          required = {"signing-preflight", "build", "device (31)", "device (33)", "device (34)", "device (35)", "device (36)"}
+          passed = {job["name"] for job in jobs if job["conclusion"] == "success"}
+          assert required <= passed, "A mandatory source build/device gate did not pass"
+          PY
+          gh api "repos/$GITHUB_REPOSITORY/compare/$SOURCE_SHA...$GITHUB_SHA" > /tmp/publishing-diff.json
+          jq -e '(.files | length) > 0 and all(.files[]; .filename | startswith(".github/workflows/"))' /tmp/publishing-diff.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/12261373867" > /tmp/source-artifact.json
+          jq -e --arg sha "$SOURCE_SHA" '.expired == false and .workflow_run.head_sha == $sha and .name == "space-spatial-parallel-build" and .digest == "sha256:f79f1bc93d3ff2145668341fee4f5ff89371a742d3f5a35ca82986095b587e84"' /tmp/source-artifact.json
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install signing tools
+        run: sdkmanager 'build-tools;36.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: space-spatial-parallel-build
+          path: built
+          run-id: ${{ env.SOURCE_RUN }}
+          github-token: ${{ github.token }}
+      - name: Check for persistent release signing credentials
+        id: signing
+        env:
+          KEY: ${{ secrets.SPACE_SPATIAL_KEYSTORE_B64 }}
+          PASSWORD: ${{ secrets.SPACE_SPATIAL_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEY" ] && [ -n "$PASSWORD" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Release signing credentials are missing. Set SPACE_SPATIAL_KEYSTORE_B64 and SPACE_SPATIAL_KEYSTORE_PASSWORD before publishing."
+            exit 1
+          fi
+      - name: Sign APK with the persistent parallel-edition key
+        if: steps.signing.outputs.ready == 'true'
+        env:
+          KEY: ${{ secrets.SPACE_SPATIAL_KEYSTORE_B64 }}
+          PASSWORD: ${{ secrets.SPACE_SPATIAL_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          python3 scripts/prepare-spatial-signing.py "$keydir"
+          SPACE_SPATIAL_NORMALIZED_PASSWORD=$(cat "$keydir/password.txt")
+          export SPACE_SPATIAL_NORMALIZED_PASSWORD
+          keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
+            -alias space-spatial -storepass:file "$keydir/password.txt"
+          unsigned=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
+          test -n "$unsigned"
+          mkdir -p dist
+          signer="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          align="$ANDROID_HOME/build-tools/36.0.0/zipalign"
+          "$align" -f -P 16 4 "$unsigned" "$keydir/aligned.apk"
+          "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
+            --ks-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --key-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --out dist/Space-Music-Spatial-1.0.0.apk "$keydir/aligned.apk"
+          runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
+          test -n "$runner"
+          "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
+            --ks-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD --key-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --out dist/spatial-test-runner.apk "$runner"
+          "$signer" verify --verbose --print-certs dist/Space-Music-Spatial-1.0.0.apk \
+            | tee dist/Space-Music-Spatial-1.0.0.apk.signature.txt
+          "$align" -c -P 16 4 dist/Space-Music-Spatial-1.0.0.apk
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/Space-Music-Spatial-1.0.0.apk \
+            > dist/package-verification.txt
+          grep -q "package: name='org.nexlibre.spacemusic.spatial' versionCode='1' versionName='1.0.0'" dist/package-verification.txt
+          (cd dist && sha256sum Space-Music-Spatial-1.0.0.apk > SHA256SUMS.txt)
+      - name: Enable KVM for final signed APK verification
+        if: steps.signing.outputs.ready == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and exercise final signed APK on Android 13
+        if: steps.signing.outputs.ready == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          emulator-boot-timeout: 300
+          emulator-options: -no-window -gpu swangle -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none -feature -Vulkan
+          disable-animations: true
+          script: TEST_APP_APK=dist/Space-Music-Spatial-1.0.0.apk TEST_INSTRUMENTATION_APK=dist/spatial-test-runner.apk SPACE_APP_ID=org.nexlibre.spacemusic.spatial bash scripts/test-device.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: space-spatial-final-signed-device-${{ github.run_attempt }}
+          path: |
+            device-tests.txt
+            device-startup-log.txt
+            device-crash-log.txt
+            device-full-log.txt
+            device-*.xml
+            device-*.png
+      - name: Create non-latest spatial release
+        if: steps.signing.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum -c SHA256SUMS.txt)
+          cat > /tmp/notes.md <<'NOTES'
+          # Space Music Spatial 1.0.0 — edición de prueba
+
+          Application sources and build: commit 369a1f68e80dae6780d317e82d226bff06d37b01, Actions run 39415641427. The publication repair changes workflow commands only; source identity, required passing build/device jobs and artifact digest are verified before signing.
+          Parallel first-install edition with the three spatial audio modes. It uses a new application ID and a new signing key, so it can be installed alongside the original Space Music. It does not import the original app's settings or library database. Use headphones for the best spatial effect.
+
+          Automated verification: Android 12, 13, 14, 15 and 16 emulator matrix; JVM regression tests; optimized release build; audio-mode controls and playback integration.
+          Final release-signed APK: installation, startup, playback and spatial-control integration are additionally checked on Android 13 before upload.
+          
+          Modes: Original preserves the previous algorithm; Audio 8D simulates movement (40–6 seconds per turn); Advanced uses a parametric binaural approximation with interaural delay, level and spectral filtering. It does not use measured HRTF, head tracking or instrument separation. Mono/multichannel playback bypasses stereo spatialization; the optional diagram is static.
+          
+          Physical-device, headphone listening, Bluetooth route changes and prolonged battery/temperature checks remain pending. This is a prerelease, not a replacement update for the original signed app.
+          NOTES
+          gh release create spatial-v1.0.0 dist/Space-Music-Spatial-1.0.0.apk \
+            dist/SHA256SUMS.txt dist/Space-Music-Spatial-1.0.0.apk.signature.txt \
+            dist/package-verification.txt --repo "$GITHUB_REPOSITORY" --target "$SOURCE_SHA" \
+            --title 'Space Music Spatial 1.0.0' --notes-file /tmp/notes.md --latest=false --prerelease
+          gh release view spatial-v1.0.0 --repo "$GITHUB_REPOSITORY" --json assets \
+            --jq '.assets[].name' | grep -Fx Space-Music-Spatial-1.0.0.apk

@@ -198,6 +198,8 @@ jobs:
           keydir=$(mktemp -d)
           trap 'rm -rf "$keydir"' EXIT
           python3 scripts/prepare-spatial-signing.py "$keydir"
+          SPACE_SPATIAL_NORMALIZED_PASSWORD=$(cat "$keydir/password.txt")
+          export SPACE_SPATIAL_NORMALIZED_PASSWORD
           keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
             -alias space-spatial -storepass:file "$keydir/password.txt"
           unsigned=$(find built -path '*/prod/release/*' -name '*universal*unsigned.apk' | head -1)
@@ -207,13 +209,13 @@ jobs:
           align="$ANDROID_HOME/build-tools/36.0.0/zipalign"
           "$align" -f -P 16 4 "$unsigned" "$keydir/aligned.apk"
           "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
-            --ks-pass "file:$keydir/password.txt" \
-            --key-pass "file:$keydir/password.txt" \
+            --ks-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
+            --key-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
             --out dist/Space-Music-Spatial-1.0.0.apk "$keydir/aligned.apk"
           runner=$(find built -path '*/androidTest/prod/release/*' -name '*.apk' | head -1)
           test -n "$runner"
           "$signer" sign --ks "$keydir/spatial.p12" --ks-key-alias space-spatial \
-            --ks-pass "file:$keydir/password.txt" --key-pass "file:$keydir/password.txt" \
+            --ks-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD --key-pass env:SPACE_SPATIAL_NORMALIZED_PASSWORD \
             --out dist/spatial-test-runner.apk "$runner"
           "$signer" verify --verbose --print-certs dist/Space-Music-Spatial-1.0.0.apk \
             | tee dist/Space-Music-Spatial-1.0.0.apk.signature.txt
