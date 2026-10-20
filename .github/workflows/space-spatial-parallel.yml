@@ -149,7 +149,8 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Android and emulator tests passed. Release is not published until the new private signing key is safely stored in SPACE_SPATIAL_KEYSTORE_B64 and SPACE_SPATIAL_KEYSTORE_PASSWORD."
+            echo "::error::Release signing credentials are missing. Set SPACE_SPATIAL_KEYSTORE_B64 and SPACE_SPATIAL_KEYSTORE_PASSWORD before publishing."
+            exit 1
           fi
       - name: Sign APK with the persistent parallel-edition key
         if: steps.signing.outputs.ready == 'true'
