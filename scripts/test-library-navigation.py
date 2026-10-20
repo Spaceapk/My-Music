@@ -1,4 +1,5 @@
 """Check actual rendered bottom tabs, content routing and saved selection."""
+import os
 import re
 import subprocess
 import time
@@ -85,7 +86,6 @@ print('PASS: bottom order, single tabs, routing, selected accessibility state an
 # Seed isolated emulator fixtures through root, for debug and optimized builds.
 # Store tests above use separate filenames; these fixtures exercise the rendered UI.
 import json
-import os
 base = f'/data/user/0/{package}/files'
 fixture = [dict(id=k, name='Sort ' + k, songs=[
     dict(id='z', title='ZZZ sort fixture', artist='AAA artist', uri='file:///z.mp3'),
