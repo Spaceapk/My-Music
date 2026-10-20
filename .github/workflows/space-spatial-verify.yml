@@ -1,7 +1,7 @@
 name: Verify Total Music Android edition
 on:
   push:
-    branches: [total-music-branding, main]
+    branches: [total-music-branding, 'total-music-*', main]
   pull_request:
     branches: [main]
   workflow_dispatch:

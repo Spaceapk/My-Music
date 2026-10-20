@@ -1,12 +1,11 @@
 # Total Music — audio espacial 3 en 1
 
-Esta implementación se trasladó desde Space Music, commit de origen `369a1f68e80dae6780d317e82d226bff06d37b01`. La aplicación conserva el paquete Android `org.nexlibre.spacemusic.spatial`; Total Music 1.0.1 usa versionCode 2 y está diseñado como actualización firmada de Space Music Spatial 1.0.0. El informe técnico y los resultados históricos que siguen describen el estado auditado en el repositorio de origen.
+Esta implementación se trasladó desde Space Music, commit de origen `369a1f68e80dae6780d317e82d226bff06d37b01`, publicado en [Space Music Spatial 1.0.0](https://github.com/nexlibre/Space-Music/releases/tag/spatial-v1.0.0). El destino conserva el historial anterior y añade Total Music sobre la rama de marca. La edición mantiene el paquete Android `org.nexlibre.spacemusic.spatial`, con `versionName 1.0.1` y `versionCode 2`; la huella SHA-256 de firma que debe coincidir es `dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0`. Los apartados técnicos siguientes describen el procesamiento espacial heredado y los resultados históricos de Space Music.
 
 Repositorio actual: https://github.com/nexlibre/Total-Music-App. La firma de publicación debe ser la misma que la edición Spatial existente; las pruebas con claves efímeras de CI no verifican compatibilidad de firma.
 
 
-Esta rama aún no es una versión publicada. Base auditada: Space Music 2.3.0,
-commit 641453da. La versión objetivo es 2.4.0 (versionCode 8), pendiente de validación.
+El texto y los datos de validación que siguen pertenecen a la candidata histórica Space Music 2.4.0 del repositorio de origen. No describen la versión Android de Total Music ni sus resultados actuales; la verificación vigente de Total Music está en GitHub Actions.
 
 ## Auditoría y arquitectura
 
@@ -82,10 +81,11 @@ unreachable). No equivale a un fallo del código ni a pruebas aprobadas.
 CI debe compilar y ejecutar los tests sobre este commit. Las mediciones JVM
 son diagnósticas y no sustituyen CPU/memoria/batería en Android.
 
-Antes de una release estable quedan obligatorios: CI y emuladores, revisión
-visual, benchmarks Android antes/después, firma con certificado original
-5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce,
-instalación como actualización y comprobación de arranque/reproducción.
+Para la candidata histórica Space Music 2.4.0 eran obligatorios: CI y emuladores, revisión
+visual, benchmarks Android antes/después, firma con el certificado de la aplicación
+original `org.nexlibre.spacemusic` (`5436f4210119058a215c0b0660dead0a9b1bed315f13d6f801645c71c942c5ce`),
+instalación como actualización y comprobación de arranque/reproducción. Esa huella
+no corresponde a Space Music Spatial ni a Total Music.
 El respaldo CMS del repositorio está cifrado: no se genera una clave nueva
 ni se reutilizan firmas de APK antiguos para código modificado.
 
