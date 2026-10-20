@@ -11,7 +11,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  signing-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - name: Validate persistent signing credentials before building
+        env:
+          KEY: ${{ secrets.SPACE_SPATIAL_KEYSTORE_B64 }}
+          PASSWORD: ${{ secrets.SPACE_SPATIAL_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEY" ]; then
+            echo "::error::Missing repository secret SPACE_SPATIAL_KEYSTORE_B64"
+            exit 1
+          fi
+          if [ -z "$PASSWORD" ]; then
+            echo "::error::Missing repository secret SPACE_SPATIAL_KEYSTORE_PASSWORD"
+            exit 1
+          fi
+          umask 077
+          keydir=$(mktemp -d)
+          trap 'rm -rf "$keydir"' EXIT
+          printf '%s' "$KEY" | base64 -d > "$keydir/spatial.p12"
+          keytool -list -keystore "$keydir/spatial.p12" -storetype PKCS12 \
+            -alias space-spatial -storepass:env PASSWORD > /dev/null
+          echo "Persistent signing credentials validated."
+
   build:
+    needs: signing-preflight
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
