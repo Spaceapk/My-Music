@@ -6,7 +6,7 @@ Total Music conserva el reproductor local y las funciones existentes: biblioteca
 
 ## Compatibilidad de instalación
 
-Total Music mantiene el identificador Android `org.nexlibre.spacemusic.spatial`, el mismo certificado de firma que Space Music Spatial 1.0.0 y una versión superior (`versionCode 2`, `versionName 1.0.1`). Por ello está preparado para actualizar esa edición sin desinstalarla y conservar sus datos. No actualiza ni reemplaza la aplicación Space Music original, que tiene otro identificador y permanece separada.
+Total Music mantiene el identificador Android `org.nexlibre.spacemusic.spatial`, el mismo certificado de firma que Space Music Spatial 1.0.0 y una versión superior (`versionCode 2`, `versionName 1.0.1`). La huella SHA-256 esperada del certificado es `dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0`. El código está preparado para actualizar esa edición; la publicación requiere validar el APK firmado con esa misma huella. No actualiza ni reemplaza la aplicación original Space Music (`org.nexlibre.spacemusic`), que permanece separada.
 
 La publicación firmada requiere disponer del PKCS#12 original y su contraseña en los secretos de GitHub Actions `SPACE_SPATIAL_KEYSTORE_B64` y `SPACE_SPATIAL_KEYSTORE_PASSWORD`. Estos secretos no se transfieren al importar el repositorio. No se debe crear una clave sustituta: el flujo valida la huella SHA-256 del certificado existente antes de publicar.
 

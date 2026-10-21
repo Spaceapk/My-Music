@@ -1,0 +1,49 @@
+# Verification only: unsigned release APKs cannot update an installed app.
+# Preserve the original spatial signing key for any distributable release.
+workflows:
+  total-music-verify:
+    name: Total Music - tests and unsigned build
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      java: 21
+      vars:
+        ORG_GRADLE_PROJECT_spaceNdkVersion: "27.0.12077973"
+    cache:
+      cache_paths:
+        - ~/.gradle/caches
+        - ~/.gradle/wrapper
+    scripts:
+      - name: Verify source provenance
+        script: |
+          set -eu
+          git fetch origin 369a1f68e80dae6780d317e82d226bff06d37b01
+          git merge-base --is-ancestor 369a1f68e80dae6780d317e82d226bff06d37b01 HEAD
+      - name: Install Android SDK components
+        script: |
+          set -eu
+          sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          test -n "$sdk_root"
+          sdk_manager="$sdk_root/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$sdk_manager" ]; then
+            sdk_manager=$(find "$sdk_root/cmdline-tools" -type f -name sdkmanager | head -n 1)
+          fi
+          test -x "$sdk_manager"
+          "$sdk_manager" --sdk_root="$sdk_root" 'platform-tools' 'platforms;android-37.0' 'build-tools;36.0.0' 'cmake;3.22.1' 'ndk;27.0.12077973'
+          printf 'sdk.dir=%s\n' "$sdk_root" > local.properties
+      - name: Run regression tests and build Total Music
+        script: |
+          set -eu
+          chmod +x gradlew
+          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdRelease :app:assembleProdReleaseAndroidTest -PspaceSpatialEdition=true -PstarTestBuildType=release --build-cache --stacktrace
+      - name: Identify unsigned verification artifacts
+        script: |
+          set -eu
+          mkdir -p verification
+          printf '%s\n' 'Unsigned verification build. Not an installable update. Original signing key and device acceptance are required before distribution.' > verification/README.txt
+          git rev-parse HEAD > verification/source-commit.txt
+    artifacts:
+      - app/build/outputs/apk/**/*.apk
+      - app/build/reports/**/*
+      - shared/build/reports/tests/**/*
+      - verification/*
