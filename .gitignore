@@ -41,6 +41,12 @@ keystore.properties
 .tmp_verify/
 .debug/
 
-# AI agent configuration
-AGENTS.md
+# Local output
 /output/
+
+# Permanent signing files stay outside the checkout
+*.p12
+*.pfx
+*signing-password*
+private-signing/
+
