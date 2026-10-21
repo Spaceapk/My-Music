@@ -77,7 +77,7 @@ def main():
     temporary = output / '.signing-in-progress.apk'
     # All values are paths or public identifiers. Password bytes never enter argv or logs.
     run([apksigner, 'sign', '--ks', key, '--ks-key-alias', config['keyAlias'],
-         '--ks-pass', f'file:{password}', '--key-pass', f'file:{password}',
+         '--ks-pass', f'file:{password}',
          '--v4-signing-enabled', 'false', '--out', temporary, args.unsigned_apk])
     actual = certificate(apksigner, temporary)
     if actual != expected or identity(aapt, temporary) != info:
