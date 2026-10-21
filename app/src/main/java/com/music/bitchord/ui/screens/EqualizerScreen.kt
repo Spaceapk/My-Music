@@ -118,7 +118,7 @@ fun EqualizerScreen(
         ) {
             SettingsRow(
                 icon = Icons.Rounded.Tune,
-                title = stringResource(R.string.equalizer),
+                title = stringResource(R.string.total_eq_name),
                 trailing = {
                     Switch(
                         checked = enabled,
@@ -193,6 +193,7 @@ fun EqualizerScreen(
                     }
                 }
 
+                EqualizerMode.TOTAL -> TotalEqControls(enabled)
                 EqualizerMode.MANUAL -> {
                     SettingsGroup {
                         SettingsRow(
@@ -224,7 +225,7 @@ fun EqualizerScreen(
                 }
             }
 
-            SettingsGroup(
+            if (mode != EqualizerMode.TOTAL) SettingsGroup(
                 header = stringResource(R.string.equalizer_balance),
                 footer = stringResource(R.string.equalizer_balance_footer),
             ) {
@@ -875,6 +876,7 @@ private fun PresetSheet(selected: EqualizerPreset, onSelect: (EqualizerPreset) -
 private fun EqualizerMode.localizedLabel(): String = stringResource(
     when (this) {
         EqualizerMode.DYNAMIC -> R.string.equalizer_dynamic
+        EqualizerMode.TOTAL -> R.string.total_eq_name
         EqualizerMode.MANUAL -> R.string.equalizer_manual
     },
 )

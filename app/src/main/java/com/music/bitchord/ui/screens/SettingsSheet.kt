@@ -650,7 +650,7 @@ fun SettingsScreen(
             // Dolby or Dirac panel has something BitChord cannot reproduce and
             // keeps its row — but one level in, at the foot of the equaliser
             // screen, rather than as a second equaliser entry alongside ours.
-            val equalizerTitle = stringResource(R.string.equalizer)
+            val equalizerTitle = stringResource(R.string.total_eq_name)
             row(equalizerTitle, "eq", "bass", "treble") {
                 SettingsRow(
                     icon = Icons.Rounded.Tune,
@@ -662,6 +662,16 @@ fun SettingsScreen(
         }
 
         SearchableSettingsGroup(search, header = stringResource(R.string.appearance)) {
+            val expressive by com.music.bitchord.data.settings.TotalMusicSettings.expressive.collectAsStateWithLifecycle()
+            row("Google Expressive", "Material You", "Material 3") {
+                SettingsRow(icon = Icons.Rounded.Brightness4, title = stringResource(R.string.total_appearance_style))
+                SegmentedControl(
+                    options = listOf(stringResource(R.string.total_original_theme), "Google Expressive"),
+                    selectedIndex = if (expressive) 1 else 0,
+                    onSelect = { com.music.bitchord.data.settings.TotalMusicSettings.setExpressive(it == 1) },
+                    modifier = Modifier.padding(start = ROW_INSET, end = ROW_INSET, bottom = 14.dp),
+                )
+            }
             val themeTitle = stringResource(R.string.theme)
             row(themeTitle, "dark mode", "light mode") {
                 SettingsRow(icon = Icons.Rounded.Brightness4, title = themeTitle)
@@ -1888,7 +1898,8 @@ private fun DownloadQualitySheet(
 
 // ---- Building blocks --------------------------------------------------------
 
-internal val GroupShape = RoundedCornerShape(14.dp)
+internal val GroupShape: androidx.compose.ui.graphics.Shape
+    @Composable get() = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current) MaterialTheme.shapes.large else RoundedCornerShape(14.dp)
 internal val GROUP_INSET = 16.dp
 internal val ROW_INSET = 16.dp
 internal val ICON_SIZE = 22.dp

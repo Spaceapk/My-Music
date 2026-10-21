@@ -361,12 +361,13 @@ fun MiniPlayer(
 ) {
     val reduceDynamicBlur by AppSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
     val haptics = rememberHaptics()
-    val useGlass = LocalLiquidGlassEnabled.current && isGlassSupported()
+    val expressive = com.music.bitchord.ui.theme.LocalGoogleExpressive.current
+    val useGlass = !expressive && LocalLiquidGlassEnabled.current && isGlassSupported()
     // percent rather than a dp figure, so the corner stays exactly half the
     // height if the row's contents ever change it — which is what keeps a pill
     // a pill instead of a rounded rectangle. Same idiom as [FloatingBottomBar]
     // directly below it, so the two shapes are the same family.
-    val shape = RoundedCornerShape(percent = 50)
+    val shape = if (expressive) RoundedCornerShape(24.dp) else RoundedCornerShape(percent = 50)
     Box(
         modifier = modifier
             .padding(horizontal = BAR_GUTTER)
@@ -386,7 +387,9 @@ fun MiniPlayer(
             )
             .clip(shape)
             .then(
-                if (reduceDynamicBlur) {
+                if (expressive) {
+                    Modifier.background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                } else if (reduceDynamicBlur) {
                     Modifier.background(MaterialTheme.colorScheme.surface)
                 } else if (useGlass) {
                     Modifier.liquidGlass(shape = shape)

@@ -112,6 +112,7 @@ enum class EqualizerMode {
 
     /** Seven sliders and a preset list. */
     MANUAL,
+    TOTAL,
 }
 
 /** Stable persisted ordering for each on-device music library. */
@@ -774,6 +775,7 @@ object AppSettings {
     }
 
     private fun readAll() {
+        TotalMusicSettings.init(prefs)
         migrateSingleQuality()
         audioQualityWifi.value = readQuality(KEY_QUALITY_WIFI)
         audioQualityCellular.value = readQuality(KEY_QUALITY_CELLULAR)

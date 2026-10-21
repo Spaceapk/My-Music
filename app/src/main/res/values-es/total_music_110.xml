@@ -1,0 +1,30 @@
+<resources>
+    <string name="total_eq_name">Total EQ</string>
+    <string name="total_appearance_style">Estilo visual</string>
+    <string name="total_original_theme">Original</string>
+    <string name="total_eq_custom">Personalizado</string>
+    <string name="total_eq_save">Guardar</string>
+    <string name="total_eq_delete_profile">Eliminar perfil guardado</string>
+    <string name="total_eq_response">Respuesta combinada · %1$d Hz · ajuste automático %2$.1f dB. Toca el gráfico para elegir una banda. Las bandas sobre el 45%% de la frecuencia de muestreo están inactivas.</string>
+    <string name="total_eq_31_bands">31 bandas · elige una frecuencia</string>
+    <string name="total_eq_preamp">Preamplificación (dB)</string>
+    <string name="total_eq_headroom">Margen automático de volumen</string>
+    <string name="total_eq_limiter">Limitador de picos</string>
+    <string name="total_eq_parametric">Filtros paramétricos</string>
+    <string name="total_eq_frequency">Frecuencia</string>
+    <string name="total_eq_gain">Ganancia (dB)</string>
+    <string name="total_eq_remove_filter">Eliminar filtro</string>
+    <string name="total_eq_add_filter">Añadir filtro (máximo 8)</string>
+    <string name="total_eq_effects">Tono y estéreo</string>
+    <string name="total_eq_bass">Graves (dB)</string>
+    <string name="total_eq_treble">Agudos (dB)</string>
+    <string name="total_eq_width">Amplitud estéreo · 1 = original</string>
+    <string name="total_eq_effects_note">El balance, la amplitud y el crossfeed se aplican al audio estéreo. Total EQ procesa la música de Total Music; no ecualiza otras aplicaciones. No incluye reverberación.</string>
+    <string name="total_eq_profile_name">Nombre del perfil</string>
+    <string name="total_eq_overwrite">Si usas un nombre existente, se reemplazará ese perfil guardado.</string>
+    <string name="total_eq_peak">Pico</string>
+    <string name="total_eq_low_shelf">Estante de graves</string>
+    <string name="total_eq_high_shelf">Estante de agudos</string>
+    <string name="total_eq_low_pass">Paso bajo</string>
+    <string name="total_eq_high_pass">Paso alto</string>
+</resources>

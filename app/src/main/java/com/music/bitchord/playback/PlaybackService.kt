@@ -5986,6 +5986,7 @@ class PlaybackService : MediaLibraryService() {
                 AppSettings.equalizerFocused,
                 AppSettings.equalizerBalance,
                 AppSettings.equalizerBands,
+                com.music.bitchord.data.settings.TotalMusicSettings.config,
             ) { }.collect { applyEqualizer() }
         }
     }
@@ -6012,10 +6013,15 @@ class PlaybackService : MediaLibraryService() {
                 focused = AppSettings.equalizerFocused.value,
             )
             EqualizerMode.MANUAL -> manualCurve(AppSettings.equalizerBands.value)
+            EqualizerMode.TOTAL -> EqCurve.FLAT
         }
         val balance = AppSettings.equalizerBalance.value
-        equalizerProcessorA.setTuning(enabled, curve, balance)
-        equalizerProcessorB.setTuning(enabled, curve, balance)
+        val total = enabled && AppSettings.equalizerMode.value == EqualizerMode.TOTAL
+        val totalConfig = if (total) com.music.bitchord.data.settings.TotalMusicSettings.config.value else null
+        equalizerProcessorA.setTotalConfig(totalConfig)
+        equalizerProcessorB.setTotalConfig(totalConfig)
+        equalizerProcessorA.setTuning(enabled && !total, curve, if (total) 0f else balance)
+        equalizerProcessorB.setTuning(enabled && !total, curve, if (total) 0f else balance)
     }
 
     /**
