@@ -72,6 +72,10 @@ val betaSuffix = ""
 // Parallel identity for the spatial edition; keeps the existing app untouched.
 val spaceSpatialEdition = providers.gradleProperty("spaceSpatialEdition").orNull == "true"
 
+val totalMusicRelease = Properties().apply {
+    rootProject.file("total-music-release.properties").inputStream().use { load(it) }
+}
+
 val spatialSigning = Properties().apply {
     val file = rootProject.file("space-spatial-keystore.properties")
     if (file.exists()) file.inputStream().use { load(it) }
@@ -87,13 +91,13 @@ android {
     compileSdkMinor = 0
 
     defaultConfig {
-        applicationId = if (spaceSpatialEdition) "org.nexlibre.totalmusic" else "org.nexlibre.spacemusic"
+        applicationId = if (spaceSpatialEdition) totalMusicRelease.getProperty("applicationId") else "org.nexlibre.spacemusic"
         // 26 keeps reach wide; real-time blur (RenderEffect) kicks in on API 31+,
         // Haze falls back to a translucent scrim below that.
         minSdk = 26
         targetSdk = 36
-        versionCode = if (spaceSpatialEdition) 2 else 8
-        versionName = if (spaceSpatialEdition) "1.0.1" else "2.4.0"
+        versionCode = if (spaceSpatialEdition) totalMusicRelease.getProperty("versionCode").toInt() else 8
+        versionName = if (spaceSpatialEdition) totalMusicRelease.getProperty("versionName") else "2.4.0"
         resValue("string", "app_name", if (spaceSpatialEdition) "Total Music" else "Space Music")
         buildConfigField("Boolean", "SPATIAL_EDITION", spaceSpatialEdition.toString())
 
@@ -469,3 +473,4 @@ val verifyDevInstall = tasks.register("verifyDevInstall") {
     }
 }
 tasks.matching { it.name == "installDevDebug" }.configureEach { finalizedBy(verifyDevInstall) }
+

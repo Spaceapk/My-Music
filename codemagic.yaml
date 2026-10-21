@@ -1,6 +1,6 @@
 workflows:
-  total-music-verify:
-    name: Total Music - installable test APK
+  total-music-release:
+    name: Total Music - release for private signing
     instance_type: mac_mini_m2
     max_build_duration: 90
     environment:
@@ -17,6 +17,7 @@ workflows:
           set -eu
           git fetch origin 369a1f68e80dae6780d317e82d226bff06d37b01
           git merge-base --is-ancestor 369a1f68e80dae6780d317e82d226bff06d37b01 HEAD
+          python3 scripts/release/check_release.py
       - name: Install Android SDK components
         script: |
           set -eu
@@ -33,27 +34,20 @@ workflows:
         script: |
           set -eu
           chmod +x gradlew
-          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdDebug -PspaceSpatialEdition=true --build-cache --stacktrace
-      - name: Package and verify signed APK
+          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdRelease -PspaceSpatialEdition=true --build-cache --stacktrace
+      - name: Package unsigned release for private signing
         script: |
           set -eu
-          mkdir -p distribution
-          apk=$(find app/build/outputs/apk -name '*universal*debug.apk' | head -1)
+          mkdir -p release-artifacts
+          apk=$(find app/build/outputs/apk -name '*universal*release-unsigned.apk' | head -1)
           test -n "$apk"
-          sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
-          "$sdk_root/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk" > distribution/signature-verification.txt
-          cp "$apk" distribution/Total-Music-1.0.1-test-universal.apk
-          shasum -a 256 distribution/Total-Music-1.0.1-test-universal.apk > distribution/SHA256.txt
-          zip -j Total-Music-1.0.1-test-install.zip distribution/*
-      - name: Identify source artifacts
-        script: |
-          set -eu
-          mkdir -p verification
-          printf '%s\n' 'Installable standalone test build using Android debug signature. Not a production release or an update for Space Music.' > verification/README.txt
-          git rev-parse HEAD > verification/source-commit.txt
+          version=$(sed -n 's/^versionName=//p' total-music-release.properties)
+          cp "$apk" "release-artifacts/Total-Music-${version}-unsigned.apk"
+          cp total-music-release.properties release-artifacts/
+          git rev-parse HEAD > release-artifacts/source-commit.txt
+          (cd release-artifacts && shasum -a 256 *.apk > SHA256SUMS.txt)
+          (cd release-artifacts && zip -9 "../Total-Music-${version}-unsigned.zip" ./*)
     artifacts:
-      - app/build/outputs/apk/**/*.apk
+      - Total-Music-*-unsigned.zip
       - app/build/reports/**/*
       - shared/build/reports/tests/**/*
-      - verification/*
-      - Total-Music-1.0.1-test-install.zip
