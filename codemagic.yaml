@@ -1,8 +1,6 @@
-# Verification only: unsigned release APKs cannot update an installed app.
-# Preserve the original spatial signing key for any distributable release.
 workflows:
   total-music-verify:
-    name: Total Music - tests and unsigned build
+    name: Total Music - installable test APK
     instance_type: mac_mini_m2
     max_build_duration: 90
     environment:
@@ -35,15 +33,27 @@ workflows:
         script: |
           set -eu
           chmod +x gradlew
-          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdRelease :app:assembleProdReleaseAndroidTest -PspaceSpatialEdition=true -PstarTestBuildType=release --build-cache --stacktrace
-      - name: Identify unsigned verification artifacts
+          ./gradlew '-Dorg.gradle.jvmargs=-Xmx6144m -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true' --max-workers=2 :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdDebug -PspaceSpatialEdition=true --build-cache --stacktrace
+      - name: Package and verify signed APK
+        script: |
+          set -eu
+          mkdir -p distribution
+          apk=$(find app/build/outputs/apk -name '*universal*debug.apk' | head -1)
+          test -n "$apk"
+          sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          "$sdk_root/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$apk" > distribution/signature-verification.txt
+          cp "$apk" distribution/Total-Music-1.0.1-test-universal.apk
+          shasum -a 256 distribution/Total-Music-1.0.1-test-universal.apk > distribution/SHA256.txt
+          zip -j Total-Music-1.0.1-test-install.zip distribution/*
+      - name: Identify source artifacts
         script: |
           set -eu
           mkdir -p verification
-          printf '%s\n' 'Unsigned verification build. Not an installable update. Original signing key and device acceptance are required before distribution.' > verification/README.txt
+          printf '%s\n' 'Installable standalone test build using Android debug signature. Not a production release or an update for Space Music.' > verification/README.txt
           git rev-parse HEAD > verification/source-commit.txt
     artifacts:
       - app/build/outputs/apk/**/*.apk
       - app/build/reports/**/*
       - shared/build/reports/tests/**/*
       - verification/*
+      - Total-Music-1.0.1-test-install.zip
