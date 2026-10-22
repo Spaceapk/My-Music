@@ -585,9 +585,9 @@ internal fun BandFader(
     onChange: (Float) -> Unit,
 ) {
     val haptics = rememberHaptics()
-    val trackColor = MaterialTheme.colorScheme.outline
+    val trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
     val fillColor = MaterialTheme.colorScheme.primary
-    val knobColor = MaterialTheme.colorScheme.background
+    val knobColor = MaterialTheme.colorScheme.primary
     val range = EqLayout.MANUAL_RANGE_DB
     // See [TonePad]: the gesture block outlives the composition that made it.
     val latest by rememberUpdatedState(value)
@@ -650,7 +650,7 @@ internal fun BandFader(
         val inset = KNOB_RADIUS.toPx()
         val usable = size.height - inset * 2
         val centreY = inset + usable / 2
-        val trackWidth = TRACK_WIDTH.toPx()
+        val trackWidth = 18.dp.toPx()
         val centreX = size.width / 2
         val knobY = inset + usable * (1f - (value / range + 1f) / 2f)
 
@@ -680,7 +680,9 @@ internal fun BandFader(
             radius = inset + 1.5f,
             center = Offset(centreX, knobY + 1.5f),
         )
-        drawCircle(color = knobColor, radius = inset, center = Offset(centreX, knobY))
+        drawRoundRect(color = knobColor,
+            topLeft = Offset(centreX - 13.dp.toPx(), knobY - 7.dp.toPx()),
+            size = Size(26.dp.toPx(), 14.dp.toPx()), cornerRadius = CornerRadius(7.dp.toPx()))
     }
 }
 

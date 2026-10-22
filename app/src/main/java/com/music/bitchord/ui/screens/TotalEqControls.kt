@@ -73,7 +73,8 @@ internal fun TotalEqControls(enabled: Boolean) {
         }
         Text(stringResource(if (config.graphicMode == TotalGraphicMode.TEN) R.string.total_eq_10_bands else R.string.total_eq_31_bands), style = MaterialTheme.typography.titleMedium)
         Text(stringResource(R.string.total_eq_drag_bands), style = MaterialTheme.typography.bodySmall)
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.height(198.dp), verticalArrangement = Arrangement.SpaceBetween) {
                 Text("+12", style = MaterialTheme.typography.labelSmall)
                 Text("0 dB", style = MaterialTheme.typography.labelSmall)
@@ -110,6 +111,7 @@ internal fun TotalEqControls(enabled: Boolean) {
                     }
                 }
             }
+        }
         }
         TextButton(onClick = { TotalMusicSettings.update(if (latest.graphicMode == TotalGraphicMode.TEN) latest.copy(tenBands = List(10) { 0f })
                 else latest.copy(bands = List(31) { 0f })) }, enabled = enabled) {
