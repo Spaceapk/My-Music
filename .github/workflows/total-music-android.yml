@@ -1,7 +1,9 @@
 name: Total Music 1.1.0 Android verification
 on:
   push:
-    branches: [integration/total-music-1.1.0]
+    branches: [main, integration/total-music-1.1.0]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read

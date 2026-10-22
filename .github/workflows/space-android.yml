@@ -1,9 +1,8 @@
 name: Space Music Android verification
 on:
   push:
-    branches: [main, space-local]
+    branches: [space-local]
     paths-ignore: ['README.md', 'CHANGELOG.md', 'docs/**', '.signing/**']
-  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,6 +10,9 @@ permissions:
 concurrency:
   group: space-android-${{ github.ref }}
   cancel-in-progress: true
+env:
+  # Preserve manual verification of the old Space Music edition.
+  ORG_GRADLE_PROJECT_spaceSpatialEdition: "false"
 jobs:
   build:
     runs-on: ubuntu-latest

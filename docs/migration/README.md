@@ -34,6 +34,9 @@ certificate is not the pinned permanent Total Music certificate.
   recovered candidates (1.1.0/code 4 and 1.1.1/code 5). The permanent signer
   still enforces a higher code than the actual previous signed APK.
 - GitHub Actions runs tests, lint and builds with `-PspaceSpatialEdition=true`.
+  This workflow owns main/integration pushes and PRs. The legacy Space Music
+  workflow remains available manually and on space-local, explicitly selecting
+  its old identity rather than running wrong-package device tests on Total Music.
   Artifacts record commit, package, version, checksums, test reports and whether
   signing/device testing actually occurred.
 
