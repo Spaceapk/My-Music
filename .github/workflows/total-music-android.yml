@@ -1,7 +1,7 @@
-name: Total Music 1.1.0 Android verification
+name: Total Music 1.2.0 Android verification
 on:
   push:
-    branches: [main, integration/total-music-1.1.0]
+    branches: [main, integration/total-music-1.1.0, design/total-music-1.2.0]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: total-music-1.1.0-verification-${{ github.sha }}
+          name: total-music-1.2.0-verification-${{ github.sha }}
           path: |
             release-artifacts/
             app/build/reports/
