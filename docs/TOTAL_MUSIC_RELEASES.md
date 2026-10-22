@@ -1,6 +1,7 @@
 # Entregas de Total Music
 
-Rama de mantenimiento: `total-music-stable`.
+Rama de mantenimiento en GitHub: `design/total-music-1.2.0` en `Spaceapk/My-Music`.
+GitLab se conserva como respaldo.
 Identidad Android: `org.nexlibre.totalmusic`. Android mínimo: 8 (API 26).
 La primera entrega con firma permanente es 1.0.2, versionCode 3.
 
@@ -23,11 +24,14 @@ sin entregar la autoridad de firma al servicio de compilación.
 1. Partir de la última versión estable y conservar sus cambios.
 2. Ejecutar `python3 scripts/release/prepare_version.py 1.0.3`, sustituyendo
    la versión por la siguiente. Esto aumenta también versionCode.
-3. Confirmar los cambios en GitLab y ejecutar `total-music-release` en Codemagic.
+3. Confirmar los cambios en GitHub y ejecutar `total-music-android.yml` en GitHub Actions.
+   Codemagic `total-music-release` permanece disponible como alternativa.
    El flujo comprueba procedencia, pruebas JVM, pruebas Android locales, lint
    y ensamblado release. Mantiene el baseline de lint preexistente.
-4. Descargar `Total-Music-<version>-unsigned.zip`. Comprobar su SHA256SUMS
-   y que source-commit corresponda al commit construido.
+4. Descargar el artefacto ZIP de verificación de Actions. Extraer de
+   `release-artifacts/` únicamente el APK `unsigned-release-NOT-INSTALLABLE` para
+   firmarlo. Comprobar SHA256SUMS y que source-commit corresponda al commit
+   construido. El APK debug de ese artefacto es solo de pruebas.
 5. Recuperar la clave privada y el archivo de contraseña mediante el flujo de
    archivos privados. Materializarlos fuera del checkout, con permisos 0600.
 6. Definir ANDROID_BUILD_TOOLS, TOTAL_MUSIC_KEYSTORE y
