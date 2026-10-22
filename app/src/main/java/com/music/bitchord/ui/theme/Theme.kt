@@ -108,7 +108,7 @@ private fun Typography.withFamily(family: FontFamily) = Typography(
 /** One palette owns pages, elevated containers, menus and dialogs. Dark is always OLED black. */
 internal fun expressiveColorScheme(dark: Boolean, accent: Color): androidx.compose.material3.ColorScheme {
     // Keep accent text legible even when the user chooses pure white or black.
-    val primary = if (dark) lerp(accent, Color.White, 0.55f)
+    val primary = if (dark) lerp(accent, Color.White, 0.70f)
         else if (accent.luminance() > 0.12f) lerp(accent, Color.Black, 0.60f) else accent
     val onPrimary = if (primary.luminance() > 0.179f) Color.Black else Color.White
     val container = lerp(accent, if (dark) Color.Black else Color.White, if (dark) 0.70f else 0.87f)
