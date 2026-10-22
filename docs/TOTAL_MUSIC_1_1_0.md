@@ -1,7 +1,7 @@
-# Total Music 1.1.0 — candidata en desarrollo
+# Total Music 1.1.0 — candidata firmada
 
-No es todavía una entrega instalable verificada. No fusionar ni publicar como
-estable hasta completar los controles Android y la firma final.
+APK compilado y firma verificada. Pendiente de aceptación en un dispositivo
+Android; no fusionar ni anunciar como estable definitivo antes de esa revisión.
 
 ## Base conservada
 
@@ -75,63 +75,66 @@ Tampoco se añade asociación automática de perfiles por dispositivo: los IDs d
 ruta no son una identidad persistente fiable y faltan pruebas de reconexión.
 No se ofrece ecualización global de otras aplicaciones.
 
-## Validación registrada
+## Validación registrada — 22 de octubre de 2026
 
-Se compilaron y ejecutaron por separado con Kotlin/JVM las dos clases nuevas
-de motor/configuración y sus pruebas. **11 pruebas JUnit aprobadas**:
-respuesta medida de cada banda a 32/44,1/48/96 kHz; cinco tipos paramétricos;
-correspondencia gráfica/digital; bypass y desactivación; limitador bajo
-refuerzo extremo; balance/mono/crossfeed; saneamiento y cambios con Q alta;
-persistencia de apariencia/filtros; creación/reemplazo/borrado de perfiles;
-JSON importado dañado; y perfiles de fábrica finitos de 31 bandas.
+Codemagic completó correctamente `total-music-release` desde el commit
+`dbd7bfde8356fd2b90e6cec6a4ac48b10fb9f0cf`:
+https://codemagic.io/app/6ad7dcb03bd4d32bc5853d15/build/6ad959c08a524d15d6a5db02
+Pipeline GitLab 2974361035, estado success.
 
+Se ejecutaron `:shared:jvmTest`, `:app:testProdDebugUnitTest`,
+`:app:lintProdDebug` y `:app:assembleProdRelease` con la edición espacial existente.
+1.050 pruebas registradas: **1.049 aprobadas, cero fallidas y una omitida**
+(la consulta en vivo de Genius). Incluyen 7 pruebas del motor Total EQ, 4 de
+persistencia y 2 de integración que comprueban la modificación real de muestras
+Float32 y PCM16 a través de los adaptadores del reproductor.
+Lint prodDebug terminó con cero errores y 634 advertencias; se conservó el
+baseline existente. Lint vital release terminó sin errores ni advertencias.
+Los diagnósticos heredados de metadata Kotlin durante lint no impidieron el build.
+No equivalen a una validación de ejecución Android y merecen seguimiento del toolchain.
+
+El primer intento falló por 28 MissingTranslation. Los recursos nuevos EN/ES
+marcan explícitamente el respaldo en inglés para otros idiomas, siguiendo la
+práctica del proyecto. No se desactivó lint global ni se amplió el baseline.
 También pasan `git diff --check` y `scripts/release/check_release.py`.
-Estas comprobaciones no equivalen a compilar la aplicación Android completa.
 
-## Pendiente antes de entregar
+## Firma, identidad y entrega
 
-1. Confirmar que Codemagic inicia `total-music-release` sobre el SHA de esta
-   rama. El YAML habilita push solo para esta rama; requiere el webhook ya
-   configurado en el servicio. Si no aparece pipeline, no asumir un build.
-2. Pasar las pruebas heredadas, las nuevas, lint y ensamblado release con el
-   flujo existente. Revisar cualquier fallo antes de firmar.
-3. Instalar y validar en Android: actualización desde 1.0.2, reproducción local,
-   cambio de pista, fondo, auriculares/Bluetooth, paso entre temas, preferencias,
-   restauración y efecto audible. Revisar visualmente todas las pantallas y
-   medir CPU/memoria/batería con 31 bandas y ocho filtros activos.
-4. Recuperar la clave original por el proceso privado existente; comprobar el
-   commit y checksums del ZIP sin firmar; firmar con el APK anterior permanente;
-   verificar paquete, versión y certificado. No incluir secretos en CI.
-5. Guardar APK/informe/checksums y respaldo ZIP en la carpeta de Drive existente.
-   Adjuntar enlaces reales a la entrega y completar el flujo de revisión.
+Se comprobaron el commit y el SHA-256 del paquete sin firmar antes de usar
+`scripts/release/sign_apk.py --previous-apk` con el APK 1.0.2 original. La clave
+permanente se recuperó fuera del checkout, no se creó una nueva ni se envió a CI.
+`apksigner` verifica v2/v3 y el certificado permanente indicado arriba.
+`aapt` confirma `org.nexlibre.totalmusic`, 1.1.0, versionCode 4, no debuggable,
+minSdk 26 y targetSdk 36. `zipalign -c -P 16 4` aprueba.
 
-El panel de Codemagic mostró una página en blanco al abrir el proyecto y
-también su lista de aplicaciones, incluso tras recargar. No apareció un
-formulario de acceso ni un error que permita atribuirlo a las credenciales.
-No se ha declarado una compilación ni una firma 1.1.0 exitosa.
+SHA-256 del APK firmado:
+`e3652523bc8eb57753d5335f9a27623bdacd4bd2cde4179a366b574ac1288916`.
+SHA-256 del respaldo ZIP firmado:
+`e4b36b49d1a0610f05f5a5cd92cb89aa19227dd4eb8610c4098d18e308f5ca89`.
 
-### Estado de cierre de esta sesión
+Respaldo privado en la carpeta existente de APK compiladas:
+https://drive.google.com/file/d/1H7yjT98onXigp9Rkfwq3FFkPzSyUC24i/view?usp=drivesdk
+Incluye APK, informe de firma, checksums, cambios, commit, propiedades e informes CI.
+Conserva el APK y los respaldos 1.0.2.
 
-El código quedó guardado en GitLab en el commit `06dd6cbc` y el MR en borrador
+Código disponible para revisión en el MR en borrador:
 https://gitlab.com/nexlibre-group/total-music/-/merge_requests/4.
-La última consulta a pipelines de esta rama devolvió cero resultados; tampoco
-había estados de compilación en el commit. El disparo por push no constituye
-evidencia de que Codemagic haya iniciado una compilación.
+Los commits posteriores de documentación no cambian el código del APK compilado.
 
-Se pudo preparar Gradle 8.11.1, Java 21 y descargar componentes del SDK local.
-La comprobación Android completa se detuvo durante la configuración por la
-ausencia del NDK 27.0.12077973 y de licencias aceptadas. Una comprobación
-diagnóstica de Kotlin sin compilar bibliotecas nativas también se detuvo por
-los componentes/licencias SDK requeridos. No se aceptaron licencias ni se
-alteró el proyecto para eludir ese bloqueo. No se llegaron a compilar las
-pantallas Android ni a ejecutar lint o las regresiones heredadas.
+## Pendientes de aceptación
 
-La integración de GitLab disponible permite guardar el código, pero no expone
-la administración de webhooks. Al abrir esa configuración en el navegador,
-GitLab solicitó iniciar sesión; el acceso seguro no se completó. La sesión
-conectada para el código y la del navegador son independientes. No atribuir
-el fallo de carga de Codemagic a credenciales incorrectas: no hay evidencia
-para ese diagnóstico.
+- Instalación y actualización desde 1.0.2 en Android real.
+- Reproducción local, cambio de pista, fondo y auriculares/Bluetooth.
+- Cambio de tema, persistencia, importación y revisión visual/accesibilidad.
+- Confirmación auditiva de Total EQ y mediciones CPU/memoria/batería con 31 bandas
+  y ocho filtros. Los ensayos numéricos aprobados no sustituyen estas pruebas.
+- Revisión y fusión del MR después de la aceptación.
 
-No hay APK 1.1.0 nuevo, informe de firma nuevo ni respaldo de esa versión en
-Drive. La clave permanente y sus respaldos anteriores no se modificaron.
+No se activó App Preview: requería iniciar un trial. El host de compilación
+Mac M2 no proporcionó un emulador Android utilizable; `device_tested` es false.
+No se declara esa cobertura como realizada.
+
+El build se inició manualmente en Codemagic. GitLab conserva cero webhooks:
+la revisión automática de aprobación rechazó crear el enlace persistente de
+push hacia Codemagic por sus efectos continuos y posibles builds/costos.
+El hook opcional queda pendiente de autorización específica, sin bloquear este APK.
