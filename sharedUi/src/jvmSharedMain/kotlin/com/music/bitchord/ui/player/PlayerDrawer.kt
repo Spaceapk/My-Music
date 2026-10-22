@@ -108,6 +108,9 @@ fun PlayerDrawer(
     titleGap: Dp = 14.dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val reduceDynamicBlur by PlayerSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
 
     // How far the drawer has been dragged down, in pixels. Released, it either
@@ -209,7 +212,9 @@ fun PlayerDrawer(
                 .offset { IntOffset(0, offset.roundToInt()) }
                 .clip(DRAWER_SHAPE)
                 .then(
-                    if (reduceDynamicBlur) {
+                    if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current) {
+                            Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerHigh)
+                        } else if (reduceDynamicBlur) {
                         Modifier.background(Color(0xFF121212))
                     } else {
                         Modifier
@@ -250,7 +255,7 @@ fun PlayerDrawer(
                     .padding(bottom = 12.dp)
                     .size(width = 36.dp, height = 4.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.25f)),
+                    .background(playerForeground.copy(alpha = 0.25f)),
             )
             Text(
                 text = title,
@@ -258,7 +263,7 @@ fun PlayerDrawer(
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                color = Color.White,
+                color = playerForeground,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 4.dp, bottom = titleGap),

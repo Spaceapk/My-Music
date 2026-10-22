@@ -111,6 +111,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
@@ -740,6 +741,8 @@ fun NowPlayingScreen(
     windowHeight: Dp,
     modifier: Modifier = Modifier,
 ) {
+    val expressive = com.music.bitchord.ui.theme.LocalGoogleExpressive.current
+    val playerForeground = if (expressive) MaterialTheme.colorScheme.onSurface else Color.White
     val density = LocalDensity.current
     val haptics = rememberHaptics()
 
@@ -756,7 +759,7 @@ fun NowPlayingScreen(
     // Media-player convention: the player always owns light status icons. The
     // top treatment below, rather than a window-flag flip per cover, provides
     // their contrast and stays visually stable through artwork transitions.
-    StatusBarIcons(dark = false)
+    StatusBarIcons(dark = expressive && MaterialTheme.colorScheme.background.luminance() > 0.5f)
 
     // Kept local to the player: a modal player is not in the page's Haze
     // source tree, so it needs its own source for the same frosted material as
@@ -1215,8 +1218,8 @@ fun NowPlayingScreen(
     // Spotify Canvas is the player background on a phone, independent of the
     // still-art full-bleed preference. Other providers and static artwork keep
     // answering to that preference exactly as before.
-    val heroMode = spotifyCanvasOnPhone ||
-        (fullBleedArt && playerFillsWindow(windowWidth))
+    val heroMode = !expressive && (spotifyCanvasOnPhone ||
+        (fullBleedArt && playerFillsWindow(windowWidth)))
 
     // Whether there's a still image to blow out — a placeholder tile is a card
     // or it is nothing, and going full-bleed with one would just tint the top
@@ -1775,7 +1778,8 @@ fun NowPlayingScreen(
                 background = { backgroundModifier ->
                     // The whole screen is the sheets' frost source: there is
                     // no full-bleed banner here to be it instead.
-                    fullArtworkBlurContent(backgroundModifier.hazeSource(playerHaze))
+                    if (expressive) Box(backgroundModifier.background(MaterialTheme.colorScheme.background).hazeSource(playerHaze))
+                    else fullArtworkBlurContent(backgroundModifier.hazeSource(playerHaze))
                 },
                 artwork = { artworkModifier ->
                     LandscapeArtwork(
@@ -2023,7 +2027,7 @@ fun NowPlayingScreen(
             .fillMaxSize()
             .onSizeChanged { playerBounds = it }
             .then(dockHost)
-            .background(Color.Black),
+            .background(if (expressive) MaterialTheme.colorScheme.background else Color.Black),
     ) {
         // Anchored to the sleeve's bottom edge, so the screen carries on in the
         // colours the artwork ended in rather than in a quantiser's idea of what
@@ -2053,7 +2057,7 @@ fun NowPlayingScreen(
             animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
             label = "fullArtworkBackdropCrossfade",
         )
-        if (ambientMode) {
+        if (!expressive && ambientMode) {
             MeshGradientBackground(
                 palette = rememberArtworkColors(remoteArt, canvasFrame),
                 trackKey = song.videoId,
@@ -2063,7 +2067,7 @@ fun NowPlayingScreen(
                 blurRadius = 0.dp,
             )
             Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.35f)))
-        } else if (legacyMeshBackdrop) {
+        } else if (!expressive && legacyMeshBackdrop) {
             // v1.5's backdrop, restored verbatim: no seam, because the blobs
             // are not anchored to anything on screen — they fill the player and
             // the artwork simply sits on top of them. Keyed on the track, so
@@ -2076,14 +2080,14 @@ fun NowPlayingScreen(
                 trackKey = song.videoId,
                 modifier = Modifier.graphicsLayer { alpha = 1f - fullArtworkBackdropAlpha },
             )
-        } else if (!tabletArtworkBackdrop && !spotifyCanvasPresentation) {
+        } else if (!expressive && !tabletArtworkBackdrop && !spotifyCanvasPresentation) {
             ArtworkMeshBackdrop(
                 mesh = artMesh,
                 seam = if (canvasFirstPortrait) renderedCanvasBottom else if (heroMode) heroHeight else 0.dp,
                 modifier = Modifier.graphicsLayer { alpha = 1f - fullArtworkBackdropAlpha },
             )
         }
-        fullArtworkBlurContent(
+        if (!expressive) fullArtworkBlurContent(
             Modifier.graphicsLayer { alpha = fullArtworkBackdropAlpha },
         )
 
@@ -2356,7 +2360,7 @@ fun NowPlayingScreen(
                         .graphicsLayer { alpha = spotifyChromeAlpha }
                         .shadow(2.dp, RoundedCornerShape(3.dp), clip = false)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(Color.White.copy(alpha = 0.70f)),
+                        .background(playerForeground.copy(alpha = 0.70f)),
                 )
                 // [p] is the shared album-to-panel transition. Keeping this in
                 // composition until its final frame gives the caption a real
@@ -2767,7 +2771,7 @@ fun NowPlayingScreen(
                 // it docks.
                 fun sleeveShown(): Float = bannerShown() * dockT()
                 fun sleeveCorner(): Dp {
-                    val corner = 8.dp * (1f - sleeveShown())
+                    val corner = (if (expressive) 32.dp else 8.dp) * (1f - sleeveShown())
                     val t = dockT()
                     return if (dock == null || t >= 1f) corner else lerp(dock.miniArtCorner(), corner, t)
                 }
@@ -2946,7 +2950,7 @@ fun NowPlayingScreen(
                             Icon(
                                 imageVector = BitChordIcons.MusicNote,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.35f),
+                                tint = playerForeground.copy(alpha = 0.35f),
                                 modifier = Modifier
                                     .size(40.dp)
                                     .graphicsLayer {
@@ -3110,7 +3114,7 @@ fun NowPlayingScreen(
                     Icon(
                         imageVector = if (showNext) Icons.Rounded.FastForward else Icons.Rounded.FastRewind,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = playerForeground,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .offset {
@@ -3214,10 +3218,10 @@ fun NowPlayingScreen(
                                     style = MaterialTheme.typography.titleLarge.copy(
                                         fontSize = 20.sp,
                                     ),
-                                    color = Color.White,
+                                    color = playerForeground,
                                     enabled = scrolling,
                                     leading = if (song.isExplicit == true) {
-                                        { ExplicitBadge(color = Color.White) }
+                                        { ExplicitBadge(color = playerForeground) }
                                     } else {
                                         null
                                     },
@@ -3235,7 +3239,7 @@ fun NowPlayingScreen(
                                         fontWeight = FontWeight.W500,
                                         fontSize = 20.sp,
                                     ),
-                                    color = Color.White.copy(alpha = 0.55f),
+                                    color = playerForeground.copy(alpha = 0.55f),
                                     enabled = scrolling,
                                     // A title that's also scrolling gets to go first —
                                     // starting together reads as clutter, so the artist

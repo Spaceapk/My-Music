@@ -147,6 +147,9 @@ internal fun LandscapePlayerLayout(
     queuePane: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     Box(modifier = modifier.fillMaxSize()) {
         background(Modifier.fillMaxSize())
 
@@ -250,7 +253,7 @@ internal fun LandscapePlayerLayout(
                     .height(5.dp)
                     .shadow(2.dp, RoundedCornerShape(3.dp), clip = false)
                     .clip(RoundedCornerShape(3.dp))
-                    .background(Color.White.copy(alpha = 0.70f)),
+                    .background(playerForeground.copy(alpha = 0.70f)),
             )
         }
     }
@@ -289,6 +292,9 @@ internal fun LandscapeArtwork(
     shadowFraction: () -> Float = { 1f },
     overlay: @Composable BoxScope.() -> Unit = {},
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val casts = artLoaded || canvasRendered
     Box(modifier = modifier) {
         Box(
@@ -317,7 +323,7 @@ internal fun LandscapeArtwork(
                 Icon(
                     imageVector = BitChordIcons.MusicNote,
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.35f),
+                    tint = playerForeground.copy(alpha = 0.35f),
                     modifier = Modifier.fillMaxSize(0.36f),
                 )
             }
@@ -418,6 +424,9 @@ internal fun LandscapeCredits(
     onOpenArtist: (browseId: String?, name: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Crossfade(
             targetState = song.title to song.artist,
@@ -430,10 +439,10 @@ internal fun LandscapeCredits(
                 MarqueeText(
                     text = song.title,
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color.White,
+                    color = playerForeground,
                     onOverflowChange = { titleOverflowing = it },
                     leading = if (song.isExplicit == true) {
-                        { ExplicitBadge(Color.White) }
+                        { ExplicitBadge(playerForeground) }
                     } else {
                         null
                     },
@@ -446,7 +455,7 @@ internal fun LandscapeCredits(
                         artistCredits(song.artist, song.artists, song.artistId)
                     },
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.W500),
-                    color = Color.White.copy(alpha = 0.55f),
+                    color = playerForeground.copy(alpha = 0.55f),
                     // A title that's also scrolling gets to go first — starting
                     // together reads as clutter, so the artist waits a beat.
                     startDelayMillis = if (titleOverflowing) MARQUEE_ARTIST_STAGGER_MS else 0L,
@@ -504,6 +513,9 @@ internal fun LandscapeLyricsPane(
     modifier: Modifier = Modifier,
     panel: @Composable (Modifier) -> Unit,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     Column(modifier = modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -520,7 +532,7 @@ internal fun LandscapeLyricsPane(
                 Text(
                     text = placeholder,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White.copy(alpha = 0.6f),
+                    color = playerForeground.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.Center),
                 )

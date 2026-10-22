@@ -465,6 +465,9 @@ internal fun LyricsStatusWithChange(
     onStatusClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val haptics = rememberHaptics()
     Row(
         modifier = modifier,
@@ -473,7 +476,7 @@ internal fun LyricsStatusWithChange(
         Text(
             text = status,
             style = MaterialTheme.typography.titleMedium,
-            color = Color.White.copy(alpha = 0.55f),
+            color = playerForeground.copy(alpha = 0.55f),
             textDecoration = if (onStatusClick != null) TextDecoration.Underline else null,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -698,6 +701,9 @@ private fun SweptLyricLine(
     alignEnd: Boolean = false,
     translationProgress: State<Float>? = null,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     var layout by remember(line) { mutableStateOf<TextLayoutResult?>(null) }
 
     // Filled in and read back a letter at a time inside the draw lambdas, and
@@ -810,7 +816,7 @@ private fun SweptLyricLine(
         Text(
             text = line.text,
             style = style,
-            color = Color.White.copy(alpha = dimAlpha),
+            color = playerForeground.copy(alpha = dimAlpha),
             maxLines = maxLines,
             overflow = overflow,
             onTextLayout = { layout = it },
@@ -820,7 +826,7 @@ private fun SweptLyricLine(
             Text(
                 text = line.text,
                 style = style,
-                color = Color.White,
+                color = playerForeground,
                 maxLines = maxLines,
                 overflow = overflow,
                 modifier = Modifier
@@ -852,7 +858,7 @@ private fun SweptLyricLine(
         Text(
             text = line.text,
             style = style,
-            color = Color.White,
+            color = playerForeground,
             maxLines = maxLines,
             overflow = overflow,
             // The feather erases into this layer, so the layer has to exist —
@@ -1250,11 +1256,14 @@ internal fun TranslationToggleButton(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val active = showingTranslation || state is LyricsTranslationUiState.Loading
     val tint = when {
-        !enabled || state is LyricsTranslationUiState.SameLanguage -> Color.White.copy(alpha = 0.42f)
-        active -> Color.White
-        else -> Color.White.copy(alpha = 0.78f)
+        !enabled || state is LyricsTranslationUiState.SameLanguage -> playerForeground.copy(alpha = 0.42f)
+        active -> playerForeground
+        else -> playerForeground.copy(alpha = 0.78f)
     }
     val discAlpha by animateFloatAsState(
         targetValue = if (active) 0.34f else 0.18f,
@@ -1264,7 +1273,7 @@ internal fun TranslationToggleButton(
         modifier = Modifier
             .size(34.dp)
             .clip(CircleShape)
-            .background(Color.White.copy(alpha = discAlpha))
+            .background(playerForeground.copy(alpha = discAlpha))
             .clickable(
                 enabled = enabled,
                 interactionSource = remember { MutableInteractionSource() },
@@ -1301,11 +1310,14 @@ internal fun RomanizationToggleButton(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val active = showingRomanization || state is LyricsTranslationUiState.Loading
     val tint = when {
-        !enabled || state is LyricsTranslationUiState.SameLanguage -> Color.White.copy(alpha = 0.42f)
-        active -> Color.White
-        else -> Color.White.copy(alpha = 0.78f)
+        !enabled || state is LyricsTranslationUiState.SameLanguage -> playerForeground.copy(alpha = 0.42f)
+        active -> playerForeground
+        else -> playerForeground.copy(alpha = 0.78f)
     }
     val discAlpha by animateFloatAsState(
         targetValue = if (active) 0.34f else 0.18f,
@@ -1315,7 +1327,7 @@ internal fun RomanizationToggleButton(
         modifier = Modifier
             .size(34.dp)
             .clip(CircleShape)
-            .background(Color.White.copy(alpha = discAlpha))
+            .background(playerForeground.copy(alpha = discAlpha))
             .clickable(
                 enabled = enabled,
                 interactionSource = remember { MutableInteractionSource() },
@@ -1440,6 +1452,9 @@ private fun Modifier.lyricParticles(
  */
 @Composable
 private fun LyricsSkeleton(modifier: Modifier = Modifier) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val sweep = rememberInfiniteTransition(label = "lyricsSkeleton").animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -1478,9 +1493,9 @@ private fun LyricsSkeleton(modifier: Modifier = Modifier) {
                                     val startX = -band + sweep.value * (full + band * 2)
                                     val brush = Brush.horizontalGradient(
                                         colors = listOf(
-                                            Color.White.copy(alpha = 0.10f),
-                                            Color.White.copy(alpha = 0.26f),
-                                            Color.White.copy(alpha = 0.10f),
+                                            playerForeground.copy(alpha = 0.10f),
+                                            playerForeground.copy(alpha = 0.26f),
+                                            playerForeground.copy(alpha = 0.10f),
                                         ),
                                         startX = startX,
                                         endX = startX + band,
@@ -1576,6 +1591,9 @@ internal fun LyricsPanel(
     onTogglePick: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val panelPlaying = isPlaying && active
     val clock = rememberLyricClock(trackKey, playhead, panelPlaying)
     val subReveal = rememberSubLyricsReveal(subLines, trackKey)
@@ -1770,7 +1788,7 @@ internal fun LyricsPanel(
                 Text(
                     text = stringResource(Res.string.no_lyrics_for_track),
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White.copy(alpha = 0.6f),
+                    color = playerForeground.copy(alpha = 0.6f),
                 )
             }
         }
@@ -1812,7 +1830,7 @@ internal fun LyricsPanel(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(Color.White.copy(alpha = 0.14f))
+                            .background(playerForeground.copy(alpha = 0.14f))
                             .padding(horizontal = 11.dp, vertical = 4.dp),
                     ) {
                         Text(
@@ -1822,7 +1840,7 @@ internal fun LyricsPanel(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 11.5.sp,
                             ),
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = playerForeground.copy(alpha = 0.9f),
                         )
                     }
                 }
@@ -1941,7 +1959,7 @@ internal fun LyricsPanel(
                                 // fills across it, so they light left to right.
                                 val lit = (through * GAP_DOTS - dot).coerceIn(0f, 1f)
                                 drawCircle(
-                                    color = Color.White.copy(
+                                    color = playerForeground.copy(
                                         alpha = GAP_DOT_REST + (1f - GAP_DOT_REST) * lit,
                                     ),
                                     radius = radius,
@@ -2059,8 +2077,8 @@ internal fun LyricsPanel(
                     // is picked is read against what isn't.
                     .background(
                         when {
-                            index in picked -> Color.White.copy(alpha = 0.16f)
-                            picking -> Color.White.copy(alpha = 0.05f)
+                            index in picked -> playerForeground.copy(alpha = 0.16f)
+                            picking -> playerForeground.copy(alpha = 0.05f)
                             else -> Color.Transparent
                         },
                     )
@@ -2295,6 +2313,9 @@ private fun PanelVoice(
     rise: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     if (line.isWordSynced && !browsing) {
         // Every word-synced line goes through the sweep, not just the playing
         // one — a line that has already been sung is fully revealed and one
@@ -2361,7 +2382,7 @@ private fun PanelVoice(
         Text(
             text = line.text,
             style = style,
-            color = Color.White.copy(alpha = lit),
+            color = playerForeground.copy(alpha = lit),
             onTextLayout = { layout = it },
             modifier = modifier.lyricParticles(layout, translationProgress, room).padding(room),
         )
@@ -2499,6 +2520,9 @@ private fun CurrentLyricLine(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val isSynced = remember(lines) { lines.any { it.timeMs > 0L } }
     if (!isSynced) {
         Row(
@@ -2511,14 +2535,14 @@ private fun CurrentLyricLine(
             Icon(
                 imageVector = BitChordIcons.MusicNote,
                 contentDescription = null,
-                tint = Color.White,
+                tint = playerForeground,
                 modifier = Modifier.size(16.dp),
             )
             Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(Res.string.open_lyrics),
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
+                color = playerForeground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f, fill = false),
@@ -2527,7 +2551,7 @@ private fun CurrentLyricLine(
             Icon(
                 imageVector = BitChordIcons.ChevronRight,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.5f),
+                tint = playerForeground.copy(alpha = 0.5f),
                 modifier = Modifier.size(14.dp),
             )
         }
@@ -2577,7 +2601,7 @@ private fun CurrentLyricLine(
             Icon(
                 imageVector = BitChordIcons.MusicNote,
                 contentDescription = null,
-                tint = Color.White,
+                tint = playerForeground,
                 modifier = Modifier.size(16.dp),
             )
             Spacer(Modifier.width(6.dp))
@@ -2620,7 +2644,7 @@ private fun CurrentLyricLine(
                 Text(
                     text = lineText,
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (itemInstrumental) Color.White.copy(alpha = 0.5f) else Color.White,
+                    color = if (itemInstrumental) playerForeground.copy(alpha = 0.5f) else playerForeground,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -2631,7 +2655,7 @@ private fun CurrentLyricLine(
         Icon(
             imageVector = BitChordIcons.ChevronRight,
             contentDescription = null,
-            tint = Color.White.copy(alpha = 0.5f),
+            tint = playerForeground.copy(alpha = 0.5f),
             modifier = Modifier.size(14.dp),
         )
     }
@@ -2644,6 +2668,9 @@ private fun CurrentLyricLine(
  */
 @Composable
 private fun LyricsUnavailableLine(trackKey: Any, modifier: Modifier = Modifier) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     var visible by remember(trackKey) { mutableStateOf(true) }
     LaunchedEffect(trackKey) {
         delay(LYRICS_UNAVAILABLE_HOLD_MS)
@@ -2657,7 +2684,7 @@ private fun LyricsUnavailableLine(trackKey: Any, modifier: Modifier = Modifier) 
     Text(
         text = stringResource(Res.string.lyrics_not_available),
         style = MaterialTheme.typography.titleMedium,
-        color = Color.White,
+        color = playerForeground,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
@@ -2669,10 +2696,13 @@ private fun LyricsUnavailableLine(trackKey: Any, modifier: Modifier = Modifier) 
 /** Stands in for [CurrentLyricLine] while a lookup is still in flight. */
 @Composable
 private fun LyricsLoadingLine(text: String, modifier: Modifier = Modifier) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        color = Color.White.copy(alpha = 0.55f),
+        color = playerForeground.copy(alpha = 0.55f),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier.padding(vertical = 4.dp),

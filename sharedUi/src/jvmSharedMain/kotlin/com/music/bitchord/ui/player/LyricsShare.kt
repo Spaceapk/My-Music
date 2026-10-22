@@ -344,17 +344,20 @@ private fun RowScope.PickAction(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val playerForeground = if (com.music.bitchord.ui.theme.LocalGoogleExpressive.current)
+        androidx.compose.material3.MaterialTheme.colorScheme.onSurface else Color.White
+
     val background = if (accent) {
-        Color.White.copy(alpha = if (enabled) 1f else 0.3f)
+        playerForeground.copy(alpha = if (enabled) 1f else 0.3f)
     } else {
-        Color.White.copy(alpha = if (enabled) 0.10f else 0.05f)
+        playerForeground.copy(alpha = if (enabled) 0.10f else 0.05f)
     }
     // The drawer's own base colour, so the label on the solid button reads as
     // cut out of it rather than as black paint laid over white.
     val foreground = if (accent) {
         Color(0xFF121212).copy(alpha = if (enabled) 1f else 0.4f)
     } else {
-        Color.White.copy(alpha = if (enabled) 0.85f else 0.4f)
+        playerForeground.copy(alpha = if (enabled) 0.85f else 0.4f)
     }
     Row(
         modifier = modifier
