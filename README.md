@@ -1,5 +1,9 @@
 # Total Music
 
+[Descargar Total Music 1.2.0 — APK universal firmado](https://github.com/Spaceapk/My-Music/releases/download/v1.2.0/Total-Music-1.2.0-universal.apk)
+
+[Release y verificaciones](https://github.com/Spaceapk/My-Music/releases/tag/v1.2.0). Compilación aprobada: `2637fce548a1a07722f534ef06e5493e7963f628`. Firma permanente y alineación verificadas frente a 1.1.0. Sin pruebas en teléfono físico ni emulador en esta actualización.
+
 Reproductor Android de música local derivado de [Star Music](https://github.com/nexlibre/Star-Music), basado en [BitChord](https://github.com/kushagrasinghx/BitChord). Este repositorio continúa la edición de Audio espacial 3 en 1 publicada en Space Music, basada en el commit `369a1f68e80dae6780d317e82d226bff06d37b01`.
 
 Total Music conserva el reproductor local y las funciones existentes: biblioteca por canciones, artistas y álbumes; listas persistentes; búsqueda y orden; letras locales; carátulas; ecualizador; reproducción en segundo plano; controles multimedia; temas, accesibilidad y preferencias guardadas. El cliente de música no consulta servicios para letras; el cliente de actualizaciones se limita a GitHub Releases.
@@ -7,13 +11,13 @@ Total Music conserva el reproductor local y las funciones existentes: biblioteca
 ## Compatibilidad de instalación
 
 Esta integración continúa Total Music con `org.nexlibre.totalmusic`, versión
-`1.1.0` y `versionCode 6`. Conserva el certificado permanente de Total Music
+`1.2.0` y `versionCode 7`. Conserva el certificado permanente de Total Music
 1.0.2, cuya huella SHA-256 es
 `9ae145a703a85902fe6d6ab3d886f6801873d717929deaa3e3d0b0a81de829fa`.
 No debe confundirse con la antigua edición `org.nexlibre.spacemusic.spatial`,
 que usa otro identificador y otro certificado. Las ramas antiguas se conservan.
 
-El código 6 supera los candidatos recuperados de GitLab (códigos 4 y 5).
+El código 7 supera la entrega permanente 1.1.0 (código 6).
 La actualización definitiva requiere recuperar la clave privada original y
 verificar el APK anterior con `scripts/release/sign_apk.py`. No crear otra clave.
 Los APK de pruebas usan firma debug y **no** pueden actualizar la instalación
