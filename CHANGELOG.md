@@ -1,3 +1,16 @@
+# Total Music 1.1.0 — candidata, pendiente de validación Android
+
+- Nueva identidad: nota musical y ondas; iconos adaptativo y monocromático.
+- Google Expressive seleccionable en Apariencia, con paleta dinámica compatible.
+- Total EQ: 31 bandas, ocho filtros paramétricos, preamplificación y curva digital.
+- Graves, agudos, balance, amplitud estéreo, crossfeed y limitador de picos.
+- Perfiles de fábrica y perfiles propios persistentes.
+- Conserva tema Original, controles de ecualización anteriores y audio espacial.
+
+Estado y pruebas: `docs/TOTAL_MUSIC_1_1_0.md`. Todavía no es una release verificada.
+
+---
+
 # Space Music — cambios
 
 ## 2.3.0 · interfaz compacta y Liquid Glass

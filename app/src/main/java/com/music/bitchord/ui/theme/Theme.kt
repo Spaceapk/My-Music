@@ -1,6 +1,13 @@
 package com.music.bitchord.ui.theme
 
 import android.app.Activity
+import android.os.Build
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.Shapes
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -99,13 +106,33 @@ private fun Typography.withFamily(family: FontFamily) = Typography(
 @Composable
 fun BitChordTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    expressive: Boolean = false,
     content: @Composable () -> Unit,
 ) {
+    val context = LocalContext.current
+    val colors = if (!expressive) {
+        if (darkTheme) DarkColors else LightColors
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else if (darkTheme) {
+        darkColorScheme(primary = Color(0xFFA8C7FA), onPrimary = Color(0xFF062E6F),
+            primaryContainer = Color(0xFF284777), onPrimaryContainer = Color(0xFFD3E3FD),
+            secondary = Color(0xFFB8C7DE), background = Color(0xFF101318), surface = Color(0xFF191C20))
+    } else {
+        lightColorScheme(primary = Color(0xFF0B57D0), onPrimary = Color.White,
+            primaryContainer = Color(0xFFD3E3FD), onPrimaryContainer = Color(0xFF062E6F),
+            secondary = Color(0xFF526078), background = Color(0xFFF8F9FF), surface = Color(0xFFF0F4F9))
+    }
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        typography = BitChordTypography,
+        colorScheme = colors,
+        typography = if (expressive) Typography() else BitChordTypography,
+        shapes = if (expressive) Shapes(
+            extraSmall = RoundedCornerShape(12.dp), small = RoundedCornerShape(16.dp),
+            medium = RoundedCornerShape(24.dp), large = RoundedCornerShape(28.dp), extraLarge = RoundedCornerShape(36.dp),
+        ) else Shapes(),
         content = {
             androidx.compose.runtime.CompositionLocalProvider(
+                LocalGoogleExpressive provides expressive,
                 androidx.compose.material3.LocalContentColor provides MaterialTheme.colorScheme.onBackground,
             ) { content() }
         },

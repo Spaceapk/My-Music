@@ -3,5 +3,5 @@
     <string name="space_playlist_actions">Opciones de la lista</string>
     <string name="space_song_actions">Opciones de la canción</string>
     <string name="space_whats_new">Novedades de Total Music %1$s</string>
-    <string name="space_whats_new_body">Audio espacial 3 en 1.\n\n• Espacial original conserva el sonido anterior.\n• Audio 8D añade movimiento suave, velocidad, amplitud y reverberación.\n• Espacial avanzado usa un modelo binaural paramétrico con retardos y filtrado entre oídos.\n• Perfiles y preferencias independientes. Recomendado con audífonos; no separa instrumentos ni sigue la cabeza.</string>
+    <string name="space_whats_new_body">Nueva identidad de Total Music.\n\n• Google Expressive: nuevo tema seleccionable en Ajustes → Apariencia.\n• Total EQ: modo avanzado de 31 bandas y filtros paramétricos.\n• Preamplificación, graves, agudos, balance, amplitud estéreo, crossfeed y limitador.\n• Perfiles de sonido propios guardados.\n\nSe conservan el tema Original, los controles anteriores y los modos de audio espacial.</string>
 </resources>

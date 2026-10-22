@@ -3,5 +3,5 @@
     <string name="space_playlist_actions">Playlist options</string>
     <string name="space_song_actions">Song options</string>
     <string name="space_whats_new">What is new in Total Music %1$s</string>
-    <string name="space_whats_new_body">Three spatial modes.\n\n• Original preserves the previous spatial sound.\n• Audio 8D adds a smooth orbit with speed, width and room controls.\n• Advanced uses a parametric binaural model with interaural delays and head-shadow filtering.\n• Independent profiles and preferences. Best with headphones; no source separation or head tracking.</string>
+    <string name="space_whats_new_body">New Total Music identity.\n\n• Google Expressive: select the new theme in Settings → Appearance.\n• Total EQ: advanced 31-band mode and parametric filters.\n• Preamp, bass, treble, balance, stereo width, crossfeed and peak limiter.\n• Save your own sound profiles.\n\nOriginal appearance, legacy EQ controls and spatial audio modes remain available.</string>
 </resources>

@@ -457,6 +457,7 @@ internal fun TransportRow(
                 size = playSize,
                 touchSize = playTouch,
                 onClick = onPlayPause,
+                expressivePlay = com.music.bitchord.ui.theme.LocalGoogleExpressive.current,
                 haptic = if (isPlaying) Haptic.Pause else Haptic.Resume,
             )
         }
@@ -707,6 +708,7 @@ private fun TransportGlyph(
     haptic: Haptic = Haptic.Tap,
     /** Vertical squash of the glyph alone; its width and touch box are untouched. */
     heightScale: Float = 1f,
+    expressivePlay: Boolean = false,
 ) {
     val haptics = rememberHaptics()
     // Faded rather than hidden: the row keeps its shape at the ends of a queue.
@@ -717,6 +719,7 @@ private fun TransportGlyph(
     Box(
         modifier = Modifier
             .size(touchSize)
+            .then(if (expressivePlay) Modifier.clip(RoundedCornerShape(28.dp)).background(MaterialTheme.colorScheme.primaryContainer) else Modifier)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -730,9 +733,9 @@ private fun TransportGlyph(
         Icon(
             painter = painterResource(icon),
             contentDescription = contentDescription,
-            tint = Color.White.copy(alpha = alpha),
+            tint = (if (expressivePlay) MaterialTheme.colorScheme.onPrimaryContainer else Color.White).copy(alpha = alpha),
             modifier = Modifier
-                .size(size)
+                .size(if (expressivePlay) size * 0.65f else size)
                 .then(if (heightScale != 1f) Modifier.graphicsLayer { scaleY = heightScale } else Modifier),
         )
     }

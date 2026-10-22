@@ -60,6 +60,15 @@ class EqualizerProcessor : BaseAudioProcessor() {
     @Volatile
     private var target: Tuning = Tuning.OFF
 
+    private var totalScratch = FloatArray(0)
+    private var totalPcm = ByteBuffer.allocate(0).order(ByteOrder.nativeOrder())
+    private val totalEq = TotalEqEngine()
+    @Volatile private var totalEnabled = false
+    fun setTotalConfig(config: TotalEqConfig?) {
+        totalEnabled = config != null
+        totalEq.setConfig(config)
+    }
+
     private var channelCount = 0
     private var sampleRate = 0
 
@@ -99,12 +108,14 @@ class EqualizerProcessor : BaseAudioProcessor() {
     }
 
     val isEnabled: Boolean
-        get() = target !== Tuning.OFF
+        get() = totalEnabled || target !== Tuning.OFF
 
     /**
      * Configures the Float32 DSP engine for [sampleRate] and [channelCount].
      */
     fun configure(sampleRate: Int, channelCount: Int) {
+        totalEq.configure(sampleRate, channelCount)
+        com.music.bitchord.data.settings.TotalMusicSettings.sampleRate.value = sampleRate
         this.sampleRate = sampleRate
         this.channelCount = channelCount
         val requiredSize = channelCount * EqLayout.SLOTS * 2
@@ -123,6 +134,7 @@ class EqualizerProcessor : BaseAudioProcessor() {
      * Preserves dynamic headroom without clamping to [-1.0f, +1.0f].
      */
     fun process(block: AudioBlock) {
+        totalEq.process(block.samples, block.frameCount)
         val frameCount = block.frameCount
         if (frameCount == 0 || channelCount < 1 || sampleRate <= 0) return
 
@@ -173,6 +185,7 @@ class EqualizerProcessor : BaseAudioProcessor() {
     }
 
     override fun onFlush() {
+        totalEq.flush()
         state.fill(0f)
         running.fill(false)
         snapToTarget()
@@ -193,6 +206,25 @@ class EqualizerProcessor : BaseAudioProcessor() {
         if (frameCount == 0) return
         val outputBuffer = replaceOutputBuffer(frameCount * bytesPerFrame)
 
+        // The legacy Media3 PCM16 adapter uses the same advanced engine as the float sink.
+        inputBuffer.order(ByteOrder.nativeOrder())
+        outputBuffer.order(ByteOrder.nativeOrder())
+        val sampleCount = frameCount * channelCount
+        if (totalScratch.size < sampleCount) totalScratch = FloatArray(sampleCount)
+        for (i in 0 until sampleCount) totalScratch[i] = inputBuffer.short / 32768f
+        totalEq.process(totalScratch, frameCount)
+        // Feed processed samples into the legacy filters without a second allocation.
+        if (totalPcm.capacity() < sampleCount * 2) totalPcm = ByteBuffer.allocate(sampleCount * 2).order(ByteOrder.nativeOrder())
+        val advancedInput = totalPcm
+        advancedInput.clear()
+        advancedInput.limit(sampleCount * 2)
+        for (i in 0 until sampleCount) advancedInput.putShort(PcmBoundary.clamp16FromFloat(totalScratch[i]))
+        advancedInput.flip()
+        inputBuffer.position(inputBuffer.limit())
+        processLegacyInput(advancedInput, outputBuffer, frameCount)
+    }
+
+    private fun processLegacyInput(inputBuffer: ByteBuffer, outputBuffer: ByteBuffer, frameCount: Int) {
         val tuning = target
         if (isFlat(tuning) && isSettled(tuning)) {
             outputBuffer.put(inputBuffer)

@@ -363,7 +363,8 @@ class MainActivity : AppCompatActivity() {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
             }
-            BitChordTheme(darkTheme = darkTheme) {
+            val expressive by com.music.bitchord.data.settings.TotalMusicSettings.expressive.collectAsStateWithLifecycle()
+            BitChordTheme(darkTheme = darkTheme, expressive = expressive) {
                 // The glass surfaces sample this layer, and a layer records only
                 // what is drawn into it — which, for BitChord, is a page that
                 // paints no background of its own. Everywhere a page is not
@@ -3417,7 +3418,7 @@ private fun BitChordApp(
                         showAccountScrobbling -> stringResource(R.string.account_scrobbling)
                         showSources -> stringResource(R.string.sources)
                         showListenTogether -> stringResource(R.string.listen_together)
-                        showEqualizer -> stringResource(R.string.equalizer)
+                        showEqualizer -> stringResource(R.string.total_eq_name)
                         showSettings -> stringResource(R.string.settings)
                         showReplay -> stringResource(R.string.replay)
                         detail != null && detailActiveShelf != null -> detailActiveShelf?.title.orEmpty()

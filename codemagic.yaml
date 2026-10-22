@@ -3,6 +3,13 @@ workflows:
     name: Total Music - release for private signing
     instance_type: mac_mini_m2
     max_build_duration: 90
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: total-music-1.1.0-expressive-eq
+          include: true
+      cancel_previous_builds: true
     environment:
       java: 21
       vars:

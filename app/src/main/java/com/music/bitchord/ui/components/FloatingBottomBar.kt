@@ -151,10 +151,11 @@ fun FloatingBottomBar(
     hazeState: HazeState,
     modifier: Modifier = Modifier,
 ) {
-    val pillShape = RoundedCornerShape(percent = 50)
-    val container = MaterialTheme.colorScheme.surface
+    val expressive = com.music.bitchord.ui.theme.LocalGoogleExpressive.current
+    val pillShape = if (expressive) RoundedCornerShape(28.dp) else RoundedCornerShape(percent = 50)
+    val container = if (expressive) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface
     val reduceDynamicBlur by AppSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
-    val useGlass = LocalLiquidGlassEnabled.current && isGlassSupported()
+    val useGlass = !expressive && LocalLiquidGlassEnabled.current && isGlassSupported()
     val reduceAnimation by AppSettings.reduceAnimation.collectAsStateWithLifecycle()
     // The glass settle is exactly the motion "reduce animation" promises to
     // drop — snapping both the indicator's travel and the glyph's pop to
@@ -213,7 +214,7 @@ fun FloatingBottomBar(
             .fillMaxWidth()
             .clip(pillShape)
             .then(
-                if (reduceDynamicBlur) {
+                if (reduceDynamicBlur || expressive) {
                     Modifier.background(container)
                 } else if (useGlass) {
                     Modifier.liquidGlass(shape = pillShape)
