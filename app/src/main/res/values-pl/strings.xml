@@ -1359,4 +1359,5 @@
     <string name="space_open_source">Licencje i otwarty kod</string>
     <string name="space_open_source_notice">Total Music to zmodyfikowana wersja Star Music i BitChord na licencji GPL-3.0. Zmiany: nexlibre, październik 2026. Pierwotni autorzy zachowują prawa autorskie. Możesz kopiować, modyfikować i rozpowszechniać program zgodnie z licencją, bez gwarancji. Kod źródłowy i pierwotne informacje znajdują się w podanych repozytoriach. Licencja GPL jest dostępna offline.</string>
     <string name="total_eq_10_bands">10 niezależnych pasm</string>
+    <string name="total_accent">Kolor akcentu</string>
 </resources>
