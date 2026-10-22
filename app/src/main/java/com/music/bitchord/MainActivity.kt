@@ -364,7 +364,8 @@ class MainActivity : AppCompatActivity() {
                 ThemeMode.DARK -> true
             }
             val expressive by com.music.bitchord.data.settings.TotalMusicSettings.expressive.collectAsStateWithLifecycle()
-            BitChordTheme(darkTheme = darkTheme, expressive = expressive) {
+            val accent by com.music.bitchord.data.settings.TotalMusicSettings.accent.collectAsStateWithLifecycle()
+            BitChordTheme(darkTheme = darkTheme, expressive = expressive, accent = Color(accent)) {
                 // The glass surfaces sample this layer, and a layer records only
                 // what is drawn into it — which, for BitChord, is a page that
                 // paints no background of its own. Everywhere a page is not
