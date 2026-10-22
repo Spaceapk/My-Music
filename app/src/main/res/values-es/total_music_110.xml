@@ -1,4 +1,5 @@
-<resources>
+<!-- New controls fall back to English outside Spanish. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="total_eq_name">Total EQ</string>
     <string name="total_appearance_style">Estilo visual</string>
     <string name="total_original_theme">Original</string>
