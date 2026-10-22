@@ -1,0 +1,26 @@
+name: Total Music - preserve GitLab history
+on:
+  push:
+    branches: [migration/gitlab-history-20261022]
+    paths: ['.migration/gitlab-20261022/**', '.github/workflows/total-music-import-gitlab.yml']
+permissions:
+  contents: write
+concurrency:
+  group: total-music-import-gitlab-20261022
+  cancel-in-progress: false
+jobs:
+  preserve-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - name: Verify backup and create new refs atomically (no force push)
+        run: python3 .migration/gitlab-20261022/import.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: total-music-migration-verification
+          path: migration-result.json
+          if-no-files-found: error
+          retention-days: 30
