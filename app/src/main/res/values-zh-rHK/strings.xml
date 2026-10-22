@@ -1281,4 +1281,5 @@
     <string name="space_sort_manual">手動排序</string>
     <string name="space_sort_artist">歌手</string>
     <string name="space_sort_recent">最近加入此清單</string>
+    <string name="total_eq_10_bands">10 個獨立頻段</string>
 </resources>

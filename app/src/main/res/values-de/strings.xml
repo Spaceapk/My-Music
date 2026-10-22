@@ -1306,4 +1306,5 @@
     <string name="space_about_local">Lokaler Musikplayer · Gepflegt von nexlibre</string>
     <string name="space_open_source">Lizenzen und Open Source</string>
     <string name="space_open_source_notice">Total Music ist eine modifizierte Version von Star Music und BitChord unter GPL-3.0. Änderungen von nexlibre, Oktober 2026. Die ursprünglichen Autoren behalten ihre Urheberrechte. Die Lizenz erlaubt Kopieren, Ändern und Weitergeben; es besteht keine Gewährleistung. Quellcode und ursprüngliche Hinweise stehen in den verlinkten Repositories. Die GPL-Lizenz ist offline verfügbar.</string>
+    <string name="total_eq_10_bands">10 unabhängige Bänder</string>
 </resources>

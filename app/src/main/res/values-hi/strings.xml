@@ -1306,4 +1306,5 @@
     <string name="space_about_local">स्थानीय संगीत प्लेयर · रखरखाव: nexlibre</string>
     <string name="space_open_source">लाइसेंस और ओपन सोर्स</string>
     <string name="space_open_source_notice">Total Music, Star Music और BitChord का संशोधित संस्करण है और GPL-3.0 के अंतर्गत वितरित है। बदलाव: nexlibre, अक्टूबर 2026। मूल लेखकों के कॉपीराइट सुरक्षित हैं। आप लाइसेंस के अनुसार इस सॉफ़्टवेयर की प्रतिलिपि बना सकते हैं, बदल सकते हैं और पुनर्वितरित कर सकते हैं। कोई वारंटी नहीं है। स्रोत कोड और मूल सूचनाएँ दिए गए रिपॉज़िटरी में हैं। GPL लाइसेंस ऑफ़लाइन पढ़ने के लिए शामिल है।</string>
+    <string name="total_eq_10_bands">10 स्वतंत्र बैंड</string>
 </resources>
