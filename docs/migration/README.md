@@ -28,6 +28,11 @@ certificate is not the pinned permanent Total Music certificate.
   scrolling. Factory presets contain both ten- and 31-band curves.
 - The recovered adaptive/monochrome icon and opt-in expressive Material theme
   are retained along with the Original theme and existing playback/library.
+- Total Music is the default build on this integration; explicit `false` retains
+  the legacy Space Music variant. The update feed now points to Spaceapk/My-Music.
+- Version name stays 1.1.0 as requested, with versionCode 6, greater than both
+  recovered candidates (1.1.0/code 4 and 1.1.1/code 5). The permanent signer
+  still enforces a higher code than the actual previous signed APK.
 - GitHub Actions runs tests, lint and builds with `-PspaceSpatialEdition=true`.
   Artifacts record commit, package, version, checksums, test reports and whether
   signing/device testing actually occurred.

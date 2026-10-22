@@ -15,7 +15,7 @@ class AppUpdateCheckerTest {
         assertFalse(AppUpdateChecker.isNewer("2.1.0-beta", "2.1.0"))
     }
     @Test fun noticesOnlyQueryTotalMusic() {
-        assertEquals("https://api.github.com/repos/nexlibre/Total-Music-App/releases/latest", AppUpdateChecker.LATEST_RELEASE_URL)
+        assertEquals("https://api.github.com/repos/Spaceapk/My-Music/releases/latest", AppUpdateChecker.LATEST_RELEASE_URL)
     }
     @Test fun spatialChannelSelectsOnlyStableSpatialTags() {
         val releases = """[

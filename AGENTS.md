@@ -1,7 +1,8 @@
 # Total Music maintenance
 
-The maintained Total Music line is `total-music-stable` in
-`nexlibre-group/total-music`. Preserve the source history, including ancestor
+The maintained GitHub integration is `integration/total-music-1.1.0` in
+`Spaceapk/My-Music`. GitLab `nexlibre-group/total-music` remains a backup.
+Preserve the source history, including ancestor
 `369a1f68e80dae6780d317e82d226bff06d37b01`. Do not rebuild the app from scratch,
 force-push, or overwrite the Space Music branches.
 
@@ -10,7 +11,8 @@ Read `docs/TOTAL_MUSIC_RELEASES.md` before preparing an APK. Keep
 `total-music-release.properties` is the single release version source.
 Use `scripts/release/prepare_version.py` to increase both version fields.
 
-Run the Codemagic `total-music-release` workflow. CI produces an unsigned
+Run GitHub Actions `total-music-android.yml` for this integration. Codemagic
+remains available as a fallback. CI produces a clearly labeled debug test APK and an unsigned
 release ZIP; that ZIP is not a user-installable delivery. Sign locally in Work
 using `scripts/release/sign_apk.py` and verify the pinned certificate and hash.
 For all releases after 1.0.2, supply the previous permanent-key-signed APK.

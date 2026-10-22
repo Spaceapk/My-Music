@@ -69,8 +69,8 @@ val listenTogetherServer: String = (
  */
 val betaSuffix = ""
 
-// Parallel identity for the spatial edition; keeps the existing app untouched.
-val spaceSpatialEdition = providers.gradleProperty("spaceSpatialEdition").orNull == "true"
+// This integration maintains Total Music by default. Explicit false retains the legacy Space Music build.
+val spaceSpatialEdition = providers.gradleProperty("spaceSpatialEdition").getOrElse("true") == "true"
 
 val totalMusicRelease = Properties().apply {
     rootProject.file("total-music-release.properties").inputStream().use { load(it) }

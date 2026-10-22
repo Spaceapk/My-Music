@@ -6,9 +6,31 @@ Total Music conserva el reproductor local y las funciones existentes: biblioteca
 
 ## Compatibilidad de instalación
 
-Total Music mantiene el identificador Android `org.nexlibre.spacemusic.spatial`, el mismo certificado de firma que Space Music Spatial 1.0.0 y una versión superior (`versionCode 2`, `versionName 1.0.1`). La huella SHA-256 esperada del certificado es `dbb5b7c02b7c8d1e1c78202aefa7f34d6f989e1b3ea01934237f772fc39c8bd0`. El código está preparado para actualizar esa edición; la publicación requiere validar el APK firmado con esa misma huella. No actualiza ni reemplaza la aplicación original Space Music (`org.nexlibre.spacemusic`), que permanece separada.
+Esta integración continúa Total Music con `org.nexlibre.totalmusic`, versión
+`1.1.0` y `versionCode 6`. Conserva el certificado permanente de Total Music
+1.0.2, cuya huella SHA-256 es
+`9ae145a703a85902fe6d6ab3d886f6801873d717929deaa3e3d0b0a81de829fa`.
+No debe confundirse con la antigua edición `org.nexlibre.spacemusic.spatial`,
+que usa otro identificador y otro certificado. Las ramas antiguas se conservan.
 
-La publicación firmada requiere disponer del PKCS#12 original y su contraseña en los secretos de GitHub Actions `SPACE_SPATIAL_KEYSTORE_B64` y `SPACE_SPATIAL_KEYSTORE_PASSWORD`. Estos secretos no se transfieren al importar el repositorio. No se debe crear una clave sustituta: el flujo valida la huella SHA-256 del certificado existente antes de publicar.
+El código 6 supera los candidatos recuperados de GitLab (códigos 4 y 5).
+La actualización definitiva requiere recuperar la clave privada original y
+verificar el APK anterior con `scripts/release/sign_apk.py`. No crear otra clave.
+Los APK de pruebas usan firma debug y **no** pueden actualizar la instalación
+con firma permanente. No desinstalar la aplicación existente para probarlos.
+
+El repositorio de integración es [Spaceapk/My-Music](https://github.com/Spaceapk/My-Music).
+GitLab se mantiene como respaldo hasta verificar y aprobar la integración.
+Consulta [el registro de migración](docs/migration/README.md).
+
+## Interfaz y ecualizador
+
+Se conservan el tema Original y el tema opcional Google Expressive con colores
+dinámicos, modo oscuro e ícono adaptable/monocromático recuperados de GitLab.
+Total EQ ofrece diez bandas DSP independientes (31, 62, 125, 250, 500 Hz;
+1, 2, 4, 8 y 16 kHz), deslizadores verticales, preamplificador, presets y
+perfiles persistentes. El modo avanzado de 31 bandas y los filtros paramétricos
+siguen disponibles. Las preferencias anteriores no se eliminan.
 
 ## Audio espacial 3 en 1
 
@@ -20,7 +42,18 @@ El modo avanzado no usa HRTF medidas, seguimiento de cabeza, separación de inst
 
 ## Construcción y verificación
 
-El workflow de GitHub Actions ejecuta pruebas JVM, lint, compilación optimizada y pruebas en emuladores Android 12–16. Antes de publicar, también verifica en Android 13 la instalación, el arranque y la reproducción del APK firmado con el certificado persistente, además de comprobar paquete, versión, alineación y SHA-256. Las pruebas de emulador no sustituyen pruebas físicas, Bluetooth ni escucha perceptual.
+El workflow `total-music-android.yml` ejecuta pruebas compartidas/JVM, pruebas
+unitarias Android, lint y compilaciones debug/release optimizada. Los artefactos
+incluyen commit, identidad del APK, certificados de prueba, SHA-256 e informes.
+La release sale **sin firmar** y no es una entrega definitiva. No se publica
+ninguna GitHub Release automáticamente desde esta integración. El registro
+`build-verification.json` declara expresamente si se verificó firma permanente
+y si hubo pruebas de dispositivo; no se deben asumir pruebas en emulador ni
+pruebas físicas por la mera presencia de workflows heredados.
+
+```sh
+./gradlew :shared:jvmTest :app:testProdDebugUnitTest :app:lintProdDebug :app:assembleProdRelease -PspaceSpatialEdition=true
+```
 
 Consulta [la arquitectura y límites del DSP](docs/spatial/implementation.md), [la licencia GPL-3.0](LICENSE) y los avisos conservados en el código. Los créditos de Star Music, BitChord y los autores originales se mantienen.
 

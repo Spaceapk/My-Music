@@ -44,12 +44,12 @@ object AppUpdateChecker {
     private const val CACHE_SUBDIR = "updates"
 
     internal const val LATEST_RELEASE_URL =
-        "https://api.github.com/repos/nexlibre/Total-Music-App/releases/latest"
+        "https://api.github.com/repos/Spaceapk/My-Music/releases/latest"
 
     // Spatial releases share the repository but use a separate version channel;
     // the original app's /latest feed therefore remains untouched.
     internal const val SPATIAL_RELEASES_URL =
-        "https://api.github.com/repos/nexlibre/Total-Music-App/releases?per_page=100"
+        "https://api.github.com/repos/Spaceapk/My-Music/releases?per_page=100"
 
     // Music's shared client remains disabled. Only release metadata and APKs
     // use this isolated client, including each HTTPS redirect hop.
