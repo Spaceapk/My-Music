@@ -1285,4 +1285,5 @@
     <string name="space_open_source">ライセンスとオープンソース</string>
     <string name="space_open_source_notice">Total MusicはStar MusicとBitChordを基にした改変版で、GPL-3.0で配布されています。改変: nexlibre、2026年10月。原作者の著作権は保持されます。ライセンスに従って複製、改変、再配布できますが、保証はありません。ソースコードと元の告知はリンク先のリポジトリにあります。GPLライセンスはオフラインで閲覧できます。</string>
     <string name="total_eq_10_bands">10個の独立したバンド</string>
+    <string name="total_accent">アクセントカラー</string>
 </resources>
