@@ -28,4 +28,7 @@
     <string name="total_eq_high_shelf">Estante de agudos</string>
     <string name="total_eq_low_pass">Paso bajo</string>
     <string name="total_eq_high_pass">Paso alto</string>
+    <string name="total_eq_drag_bands">Sube una barra para aumentar y bájala para reducir. Desliza hacia los lados para ver más bandas.</string>
+    <string name="total_eq_show_advanced">Gráfico y efectos avanzados</string>
+    <string name="total_eq_hide_advanced">Ocultar controles avanzados</string>
 </resources>
