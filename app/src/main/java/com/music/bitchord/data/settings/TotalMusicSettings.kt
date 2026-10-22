@@ -11,6 +11,7 @@ import kotlin.math.ln
 object TotalMusicSettings {
     private lateinit var prefs: SharedPreferences
     val expressive = MutableStateFlow(false)
+    val accent = MutableStateFlow(0xFF0B57D0.toInt())
     val config = MutableStateFlow(TotalEqConfig())
     val profiles = MutableStateFlow<Map<String, TotalEqConfig>>(emptyMap())
     val sampleRate = MutableStateFlow(48000)
@@ -18,12 +19,17 @@ object TotalMusicSettings {
     fun init(preferences: SharedPreferences) {
         prefs = preferences
         expressive.value = prefs.getBoolean("google_expressive", false)
+        accent.value = prefs.getInt("google_accent", 0xFF0B57D0.toInt())
         config.value = if (!prefs.contains("total_eq")) TotalEqConfig(graphicMode = TotalGraphicMode.TEN)
             else runCatching { decode(JSONObject(prefs.getString("total_eq", "{}")!!)) }.getOrDefault(TotalEqConfig())
         profiles.value = runCatching {
             val json = JSONObject(prefs.getString("total_eq_profiles", "{}")!!)
             json.keys().asSequence().take(64).associateWith { decode(json.getJSONObject(it)) }
         }.getOrDefault(emptyMap())
+    }
+    fun setAccent(value: Int) {
+        accent.value = value or 0xFF000000.toInt()
+        prefs.edit().putInt("google_accent", accent.value).apply()
     }
     fun setExpressive(value: Boolean) {
         expressive.value = value
