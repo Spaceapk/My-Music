@@ -16,6 +16,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.compose.ui.text.TextStyle
@@ -103,25 +105,51 @@ private fun Typography.withFamily(family: FontFamily) = Typography(
     labelSmall = labelSmall.copy(fontFamily = family),
 )
 
+/** One palette owns pages, elevated containers, menus and dialogs. Dark is always OLED black. */
+internal fun expressiveColorScheme(dark: Boolean, accent: Color): androidx.compose.material3.ColorScheme {
+    val primary = if (dark) lerp(accent, Color.White, 0.45f) else accent
+    val onPrimary = if (primary.luminance() > 0.179f) Color.Black else Color.White
+    val container = lerp(accent, if (dark) Color.Black else Color.White, if (dark) 0.70f else 0.87f)
+    val onContainer = if (container.luminance() > 0.179f) Color.Black else Color.White
+    val base = if (dark) darkColorScheme() else lightColorScheme()
+    return base.copy(
+        primary = primary, onPrimary = onPrimary, primaryContainer = container, onPrimaryContainer = onContainer,
+        secondary = primary, onSecondary = onPrimary, secondaryContainer = container, onSecondaryContainer = onContainer,
+        tertiary = primary, onTertiary = onPrimary, tertiaryContainer = container, onTertiaryContainer = onContainer,
+        background = if (dark) Color.Black else Color(0xFFF8F9FC),
+        onBackground = if (dark) Color(0xFFF3F3F3) else Color(0xFF191C20),
+        surface = if (dark) Color(0xFF0A0A0A) else Color(0xFFF8F9FC),
+        onSurface = if (dark) Color(0xFFF3F3F3) else Color(0xFF191C20),
+        surfaceVariant = if (dark) Color(0xFF202020) else Color(0xFFE3E5EB),
+        onSurfaceVariant = if (dark) Color(0xFFC5C5C5) else Color(0xFF43474E),
+        surfaceTint = Color.Transparent,
+        surfaceContainerLowest = if (dark) Color.Black else Color.White,
+        surfaceContainerLow = if (dark) Color(0xFF080808) else Color(0xFFF3F5FA),
+        surfaceContainer = if (dark) Color(0xFF101010) else Color(0xFFEDF0F6),
+        surfaceContainerHigh = if (dark) Color(0xFF181818) else Color(0xFFE7EAF0),
+        surfaceContainerHighest = if (dark) Color(0xFF202020) else Color(0xFFE1E4EA),
+        surfaceBright = if (dark) Color(0xFF202020) else Color(0xFFF8F9FC),
+        surfaceDim = if (dark) Color.Black else Color(0xFFD9DCE2),
+        outline = if (dark) Color(0xFF707070) else Color(0xFF74777F),
+        outlineVariant = if (dark) Color(0xFF303030) else Color(0xFFC4C7CF),
+    )
+}
+
 @Composable
 fun BitChordTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     expressive: Boolean = false,
+    accent: Color = Color(0xFF0B57D0),
     content: @Composable () -> Unit,
 ) {
-    val context = LocalContext.current
-    val colors = if (!expressive) {
-        if (darkTheme) DarkColors else LightColors
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-    } else if (darkTheme) {
-        darkColorScheme(primary = Color(0xFFA8C7FA), onPrimary = Color(0xFF062E6F),
-            primaryContainer = Color(0xFF284777), onPrimaryContainer = Color(0xFFD3E3FD),
-            secondary = Color(0xFFB8C7DE), background = Color(0xFF101318), surface = Color(0xFF191C20))
-    } else {
-        lightColorScheme(primary = Color(0xFF0B57D0), onPrimary = Color.White,
-            primaryContainer = Color(0xFFD3E3FD), onPrimaryContainer = Color(0xFF062E6F),
-            secondary = Color(0xFF526078), background = Color(0xFFF8F9FF), surface = Color(0xFFF0F4F9))
+    val colors = if (expressive) expressiveColorScheme(darkTheme, accent) else {
+        (if (darkTheme) DarkColors else LightColors).let { scheme ->
+            if (darkTheme) scheme.copy(background = Color.Black, surfaceTint = Color.Transparent,
+                surfaceContainerLowest = Color.Black, surfaceContainerLow = Color(0xFF080808),
+                surfaceContainer = Color(0xFF101010), surfaceContainerHigh = Color(0xFF181818),
+                surfaceContainerHighest = Color(0xFF202020), surfaceBright = Color(0xFF202020), surfaceDim = Color.Black)
+            else scheme
+        }
     }
     MaterialTheme(
         colorScheme = colors,
