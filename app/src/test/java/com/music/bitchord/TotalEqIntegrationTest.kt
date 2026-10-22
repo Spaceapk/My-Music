@@ -3,6 +3,7 @@ package com.music.bitchord
 import androidx.media3.common.C
 import androidx.media3.common.audio.AudioProcessor
 import com.music.bitchord.playback.EqualizerProcessor
+import com.music.bitchord.playback.TotalGraphicMode
 import com.music.bitchord.playback.TotalEqConfig
 import com.music.bitchord.playback.TotalFilter
 import com.music.bitchord.playback.audio.AudioBlock
@@ -17,7 +18,7 @@ import org.junit.Test
 
 /** Verify the actual two player-facing adapters, rather than only the DSP model. */
 class TotalEqIntegrationTest {
-    private val boost = TotalEqConfig(filters = listOf(TotalFilter(gain = 6f)),
+    private val boost = TotalEqConfig(graphicMode = TotalGraphicMode.TEN, tenBands = List(10) { if (it == 5) 6f else 0f },
         autoHeadroom = false, limiter = false)
 
     @Test fun totalEqChangesTheFloatSinkSamples() {

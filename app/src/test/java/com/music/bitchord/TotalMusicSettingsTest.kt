@@ -60,6 +60,30 @@ class TotalMusicSettingsTest {
         assertEquals("1,2,3", data["equalizer_bands"])
     }
 
+    @Test fun newInstallUsesTenBandsButOldPreferencesKeep31Bands() {
+        TotalMusicSettings.init(preferences())
+        assertEquals(TotalGraphicMode.TEN, TotalMusicSettings.config.value.graphicMode)
+        val data = mutableMapOf<String, Any>("total_eq" to """{"bands":[5,4,3],"preamp":-2}""")
+        TotalMusicSettings.init(preferences(data))
+        assertEquals(TotalGraphicMode.THIRTY_ONE, TotalMusicSettings.config.value.graphicMode)
+        assertEquals(5f, TotalMusicSettings.config.value.bands[0], 0f)
+        assertEquals(-2f, TotalMusicSettings.config.value.preamp, 0f)
+    }
+
+    @Test fun bothGraphicBanksAndModeSurviveReloadAndNamedProfile() {
+        val prefs = preferences(); TotalMusicSettings.init(prefs)
+        val config = TotalEqConfig(graphicMode = TotalGraphicMode.TEN, tenBands = List(10) { it - 5f },
+            bands = List(31) { 3f }, preamp = -5f)
+        TotalMusicSettings.update(config); TotalMusicSettings.saveProfile("Ten bands")
+        TotalMusicSettings.init(prefs)
+        assertEquals(config, TotalMusicSettings.config.value)
+        assertEquals(config, TotalMusicSettings.profiles.value.getValue("Ten bands"))
+        TotalMusicSettings.factoryProfiles.values.forEach {
+            assertEquals(10, it.tenBands.size)
+            assertTrue(it.tenBands.all { gain -> gain.isFinite() && gain in -12f..12f })
+        }
+    }
+
     @Test fun factoryPresetsHave31FiniteBoundedBands() {
         assertEquals(11, TotalMusicSettings.factoryProfiles.size)
         TotalMusicSettings.factoryProfiles.values.forEach { c ->

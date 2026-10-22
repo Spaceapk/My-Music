@@ -2,6 +2,8 @@ package com.music.bitchord.playback
 
 import kotlin.math.*
 
+enum class TotalGraphicMode { TEN, THIRTY_ONE }
+
 enum class TotalFilterType { PEAK, LOW_SHELF, HIGH_SHELF, LOW_PASS, HIGH_PASS }
 
 data class TotalFilter(
@@ -23,8 +25,11 @@ data class TotalEqConfig(
     val crossfeed: Float = 0f,
     val autoHeadroom: Boolean = true,
     val limiter: Boolean = true,
+    val graphicMode: TotalGraphicMode = TotalGraphicMode.THIRTY_ONE,
+    val tenBands: List<Float> = List(10) { 0f },
 ) {
     fun sanitized() = copy(
+        tenBands = List(10) { tenBands.getOrElse(it) { 0f }.safe(-12f, 12f) },
         bands = List(31) { bands.getOrElse(it) { 0f }.safe(-12f, 12f) },
         filters = filters.take(8).map { it.copy(frequency = it.frequency.safe(20f, 20000f, 1000f),
             gain = it.gain.safe(-12f, 12f), q = it.q.safe(0.2f, 10f, 0.707f)) },
@@ -96,10 +101,17 @@ object TotalEqDesign {
     val frequencies = listOf(20f,25f,31.5f,40f,50f,63f,80f,100f,125f,160f,200f,250f,315f,400f,500f,630f,
         800f,1000f,1250f,1600f,2000f,2500f,3150f,4000f,5000f,6300f,8000f,10000f,12500f,16000f,20000f)
 
+    val tenFrequencies = listOf(31f, 62f, 125f, 250f, 500f, 1000f, 2000f, 4000f, 8000f, 16000f)
+
+    fun activeFrequencies(config: TotalEqConfig) = if (config.graphicMode == TotalGraphicMode.TEN) tenFrequencies else frequencies
+    fun activeGains(config: TotalEqConfig) = if (config.graphicMode == TotalGraphicMode.TEN) config.tenBands else config.bands
+
     fun coefficients(config: TotalEqConfig, sampleRate: Int): List<TotalCoefficients> = buildList {
-        config.bands.forEachIndexed { i, gain ->
-            if (abs(gain) > 0.001f && frequencies[i] < sampleRate * 0.45)
-                add(TotalCoefficients.of(TotalFilter(frequency = frequencies[i], gain = gain, q = 4.318f), sampleRate))
+        val hz = activeFrequencies(config)
+        val q = if (config.graphicMode == TotalGraphicMode.TEN) 1.414f else 4.318f
+        activeGains(config).take(hz.size).forEachIndexed { i, gain ->
+            if (abs(gain) > 0.001f && hz[i] < sampleRate * 0.45)
+                add(TotalCoefficients.of(TotalFilter(frequency = hz[i], gain = gain, q = q), sampleRate))
         }
         config.filters.filter { it.enabled }.forEach {
             if (it.type == TotalFilterType.LOW_PASS || it.type == TotalFilterType.HIGH_PASS || abs(it.gain) > 0.001f)

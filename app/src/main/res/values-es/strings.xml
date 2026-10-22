@@ -1278,4 +1278,5 @@
     <string name="space_about_local">Reproductor de música local · Mantenido por nexlibre</string>
     <string name="space_open_source">Licencias y código abierto</string>
     <string name="space_open_source_notice">Total Music es una versión modificada derivada de Star Music y BitChord, distribuida bajo GPL-3.0. Modificaciones de nexlibre, octubre de 2026. Los autores originales conservan sus derechos de autor. Puedes copiar, modificar y redistribuir este software según su licencia. Se ofrece sin garantía. El código fuente y los avisos originales están disponibles en los repositorios enlazados. La licencia GPL se incluye a continuación para consultarla sin conexión.</string>
+    <string name="total_eq_10_bands">10 bandas independientes</string>
 </resources>

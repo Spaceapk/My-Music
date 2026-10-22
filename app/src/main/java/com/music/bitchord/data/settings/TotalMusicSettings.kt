@@ -18,7 +18,8 @@ object TotalMusicSettings {
     fun init(preferences: SharedPreferences) {
         prefs = preferences
         expressive.value = prefs.getBoolean("google_expressive", false)
-        config.value = runCatching { decode(JSONObject(prefs.getString("total_eq", "{}")!!)) }.getOrDefault(TotalEqConfig())
+        config.value = if (!prefs.contains("total_eq")) TotalEqConfig(graphicMode = TotalGraphicMode.TEN)
+            else runCatching { decode(JSONObject(prefs.getString("total_eq", "{}")!!)) }.getOrDefault(TotalEqConfig())
         profiles.value = runCatching {
             val json = JSONObject(prefs.getString("total_eq_profiles", "{}")!!)
             json.keys().asSequence().take(64).associateWith { decode(json.getJSONObject(it)) }
@@ -48,6 +49,7 @@ object TotalMusicSettings {
         prefs.edit().putString("total_eq_profiles", json.toString()).apply()
     }
     private fun encode(c: TotalEqConfig): JSONObject = JSONObject().apply {
+        put("graphicMode", c.graphicMode.name); put("tenBands", JSONArray(c.tenBands))
         put("bands", JSONArray(c.bands)); put("preamp", c.preamp); put("bass", c.bass); put("treble", c.treble)
         put("balance", c.balance); put("width", c.width); put("crossfeed", c.crossfeed)
         put("autoHeadroom", c.autoHeadroom); put("limiter", c.limiter)
@@ -58,7 +60,10 @@ object TotalMusicSettings {
     private fun decode(j: JSONObject): TotalEqConfig {
         val bands = j.optJSONArray("bands")
         val filters = j.optJSONArray("filters")
+        val tenBands = j.optJSONArray("tenBands")
         return TotalEqConfig(
+            graphicMode = runCatching { TotalGraphicMode.valueOf(j.optString("graphicMode")) }.getOrDefault(TotalGraphicMode.THIRTY_ONE),
+            tenBands = List(10) { tenBands?.optDouble(it, 0.0)?.toFloat() ?: 0f },
             bands = List(31) { bands?.optDouble(it, 0.0)?.toFloat() ?: 0f },
             filters = List(minOf(filters?.length() ?: 0, 8)) { i ->
                 val f = filters!!.getJSONObject(i)
@@ -87,10 +92,11 @@ object TotalMusicSettings {
         "Hip-Hop" to listOf(7f,5f,1f,0f,2f,1f,2f),
     ).mapValues { (_, gains) ->
         val anchors = listOf(20f,80f,315f,1000f,3150f,8000f,20000f)
-        TotalEqConfig(bands = TotalEqDesign.frequencies.map { hz ->
+        fun gainsAt(frequencies: List<Float>) = frequencies.map { hz ->
             val i = (0..5).firstOrNull { hz <= anchors[it + 1] } ?: 5
             val t = (ln(hz / anchors[i]) / ln(anchors[i + 1] / anchors[i])).coerceIn(0f, 1f)
             gains[i] + (gains[i + 1] - gains[i]) * t
-        })
+        }
+        TotalEqConfig(bands = gainsAt(TotalEqDesign.frequencies), tenBands = gainsAt(TotalEqDesign.tenFrequencies))
     }
 }

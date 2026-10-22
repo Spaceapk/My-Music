@@ -33,6 +33,31 @@ class TotalEqEngineTest {
         }
     }
 
+    @Test fun tenIndependentBandsProcessAudioAtExactRequestedFrequencies() {
+        assertEquals(listOf(31f, 62f, 125f, 250f, 500f, 1000f, 2000f, 4000f, 8000f, 16000f), TotalEqDesign.tenFrequencies)
+        for (rate in listOf(32000, 44100, 48000, 96000)) {
+            TotalEqDesign.tenFrequencies.forEachIndexed { index, hz ->
+                if (hz >= rate * 0.45) return@forEachIndexed
+                for (gain in listOf(-6f, 6f)) {
+                    val config = TotalEqConfig(graphicMode = TotalGraphicMode.TEN,
+                        tenBands = List(10) { if (it == index) gain else 0f })
+                    assertEquals(1, TotalEqDesign.coefficients(config, rate).size)
+                    assertEquals("$rate Hz / $hz Hz", gain.toDouble(), measuredDb(config, hz.toDouble(), rate), 0.12)
+                }
+            }
+        }
+    }
+
+    @Test fun switchingGraphicModesKeepsIndependentBanksAndRespectsNyquist() {
+        val config = TotalEqConfig(bands = List(31) { 6f }, tenBands = List(10) { -6f }, graphicMode = TotalGraphicMode.TEN)
+        assertEquals(10, TotalEqDesign.coefficients(config, 48000).size)
+        assertEquals(9, TotalEqDesign.coefficients(config, 32000).size)
+        assertEquals(31, TotalEqDesign.coefficients(config.copy(graphicMode = TotalGraphicMode.THIRTY_ONE), 48000).size)
+        val safe = config.copy(tenBands = listOf(Float.NaN, 99f, -99f)).sanitized()
+        assertEquals(listOf(0f, 12f, -12f), safe.tenBands.take(3))
+        assertEquals(10, safe.tenBands.size)
+    }
+
     @Test fun parametricShapesProduceMeasuredFiltering() {
         fun curve(type: TotalFilterType, gain: Float = 6f) = TotalEqConfig(filters = listOf(TotalFilter(type, 1000f, gain)))
         assertEquals(6.0, measuredDb(curve(TotalFilterType.PEAK), 1000.0), 0.02)
