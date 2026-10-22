@@ -1,3 +1,10 @@
+# 1.1.1
+
+- Total EQ muestra 31 deslizadores verticales independientes con frecuencia y ganancia.
+- Barras al inicio; gráfico y controles avanzados plegados de forma predeterminada.
+- Ajuste en pasos de 0,5 dB, acceso mediante lector de pantalla y desplazamiento lateral.
+- Conserva perfiles, DSP, firma e identidad Android existentes.
+
 # Total Music 1.1.0 — candidata, pendiente de validación Android
 
 - Nueva identidad: nota musical y ondas; iconos adaptativo y monocromático.

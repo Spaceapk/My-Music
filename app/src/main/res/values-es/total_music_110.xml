@@ -7,7 +7,7 @@
     <string name="total_eq_save">Guardar</string>
     <string name="total_eq_delete_profile">Eliminar perfil guardado</string>
     <string name="total_eq_response">Respuesta combinada · %1$d Hz · ajuste automático %2$.1f dB. Toca el gráfico para elegir una banda. Las bandas sobre el 45%% de la frecuencia de muestreo están inactivas.</string>
-    <string name="total_eq_31_bands">31 bandas · elige una frecuencia</string>
+    <string name="total_eq_31_bands">Ecualizador de 31 bandas</string>
     <string name="total_eq_preamp">Preamplificación (dB)</string>
     <string name="total_eq_headroom">Margen automático de volumen</string>
     <string name="total_eq_limiter">Limitador de picos</string>
@@ -28,4 +28,7 @@
     <string name="total_eq_high_shelf">Estante de agudos</string>
     <string name="total_eq_low_pass">Paso bajo</string>
     <string name="total_eq_high_pass">Paso alto</string>
+    <string name="total_eq_drag_bands">Sube una barra para aumentar y bájala para reducir. Desliza hacia los lados para ver más bandas.</string>
+    <string name="total_eq_show_advanced">Gráfico y efectos avanzados</string>
+    <string name="total_eq_hide_advanced">Ocultar controles avanzados</string>
 </resources>

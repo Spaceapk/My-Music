@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
@@ -576,9 +577,11 @@ private fun BandSliders(
 }
 
 @Composable
-private fun BandFader(
+internal fun BandFader(
     value: Float,
     enabled: Boolean,
+    modifier: Modifier = Modifier,
+    allowHorizontalScroll: Boolean = false,
     onChange: (Float) -> Unit,
 ) {
     val haptics = rememberHaptics()
@@ -588,13 +591,28 @@ private fun BandFader(
     val range = EqLayout.MANUAL_RANGE_DB
     // See [TonePad]: the gesture block outlives the composition that made it.
     val latest by rememberUpdatedState(value)
+    val latestChange by rememberUpdatedState(onChange)
 
     Canvas(
-        modifier = Modifier
+        modifier = modifier
             .width(FADER_WIDTH)
             .height(FADER_HEIGHT)
-            .pointerInput(enabled) {
+            .pointerInput(enabled, allowHorizontalScroll) {
                 if (!enabled) return@pointerInput
+                if (allowHorizontalScroll) {
+                    // Let horizontal drags reach the band strip's scroll container.
+                    fun report(position: Offset) {
+                        val inset = KNOB_RADIUS.toPx()
+                        val usable = (size.height - inset * 2).coerceAtLeast(1f)
+                        val fraction = ((position.y - inset) / usable).coerceIn(0f, 1f)
+                        latestChange(snapGain((1f - fraction * 2) * range, range))
+                    }
+                    detectVerticalDragGestures(
+                        onDragStart = { report(it) },
+                        onVerticalDrag = { change, _ -> change.consume(); report(change.position) },
+                    )
+                    return@pointerInput
+                }
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     down.consume()
@@ -610,7 +628,7 @@ private fun BandFader(
                             // people are aiming for when they undo a band.
                             haptics.play(Haptic.Tick)
                             last = snapped
-                            onChange(snapped)
+                            latestChange(snapped)
                         }
                     }
                     report(down.position)
