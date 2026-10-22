@@ -1290,4 +1290,5 @@
     <string name="space_open_source">ใบอนุญาตและโอเพนซอร์ส</string>
     <string name="space_open_source_notice">Total Music เป็นเวอร์ชันดัดแปลงจาก Star Music และ BitChord ภายใต้ GPL-3.0 แก้ไขโดย nexlibre ตุลาคม 2026 ผู้เขียนเดิมยังคงมีลิขสิทธิ์ คุณสามารถคัดลอก แก้ไข และเผยแพร่ซอฟต์แวร์ตามใบอนุญาตได้ โดยไม่มีการรับประกัน ซอร์สโค้ดและประกาศเดิมอยู่ในคลังโค้ดที่เชื่อมโยงไว้ มีใบอนุญาต GPL แนบไว้ให้อ่านแบบออฟไลน์</string>
     <string name="total_eq_10_bands">10 ย่านความถี่อิสระ</string>
+    <string name="total_accent">สีเน้น</string>
 </resources>
