@@ -109,3 +109,29 @@ El panel de Codemagic mostró una página en blanco al abrir el proyecto y
 también su lista de aplicaciones, incluso tras recargar. No apareció un
 formulario de acceso ni un error que permita atribuirlo a las credenciales.
 No se ha declarado una compilación ni una firma 1.1.0 exitosa.
+
+### Estado de cierre de esta sesión
+
+El código quedó guardado en GitLab en el commit `06dd6cbc` y el MR en borrador
+https://gitlab.com/nexlibre-group/total-music/-/merge_requests/4.
+La última consulta a pipelines de esta rama devolvió cero resultados; tampoco
+había estados de compilación en el commit. El disparo por push no constituye
+evidencia de que Codemagic haya iniciado una compilación.
+
+Se pudo preparar Gradle 8.11.1, Java 21 y descargar componentes del SDK local.
+La comprobación Android completa se detuvo durante la configuración por la
+ausencia del NDK 27.0.12077973 y de licencias aceptadas. Una comprobación
+diagnóstica de Kotlin sin compilar bibliotecas nativas también se detuvo por
+los componentes/licencias SDK requeridos. No se aceptaron licencias ni se
+alteró el proyecto para eludir ese bloqueo. No se llegaron a compilar las
+pantallas Android ni a ejecutar lint o las regresiones heredadas.
+
+La integración de GitLab disponible permite guardar el código, pero no expone
+la administración de webhooks. Al abrir esa configuración en el navegador,
+GitLab solicitó iniciar sesión; el acceso seguro no se completó. La sesión
+conectada para el código y la del navegador son independientes. No atribuir
+el fallo de carga de Codemagic a credenciales incorrectas: no hay evidencia
+para ese diagnóstico.
+
+No hay APK 1.1.0 nuevo, informe de firma nuevo ni respaldo de esa versión en
+Drive. La clave permanente y sus respaldos anteriores no se modificaron.
